@@ -33,3 +33,7 @@ pg_data/
 # OS
 Thumbs.db
 .DS_Store
+._*
+.Spotlight-V100/
+.Trashes/
+.fseventsd/

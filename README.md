@@ -35,7 +35,7 @@ Install the following before running locally:
 
 - Node.js 18 or newer
 - npm
-- Docker Desktop (for PostgreSQL via compose)
+- Docker Desktop (optional, for containerized DB/app runs)
 - Java 17 and Android Studio (for mobile app)
 
 ## Quick Start (Web + API + Engine)
@@ -66,6 +66,15 @@ FRONTEND_URL=http://localhost:3000
 
 ### 2) Install dependencies
 
+Preferred (single command from dependency manager file):
+
+```bash
+cd adapt
+npm run install:all
+```
+
+Manual alternative:
+
 ```bash
 cd adapt/backend && npm install
 cd ../engine-service && npm install
@@ -74,9 +83,11 @@ cd ../frontend && npm install
 
 ### 3) Start PostgreSQL
 
+If you have local PostgreSQL installed, you can use that and skip Docker here.
+
 ```bash
 cd ..
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 4) Start services (separate terminals)
@@ -109,6 +120,38 @@ npm run dev
 - Frontend: http://localhost:3000
 - Backend health: http://localhost:3001/health
 - Engine health: http://localhost:4001/health
+
+## Single Docker Image Stack (Frontend + Backend + Engine in one image)
+
+From `adapt/`, run:
+
+```bash
+docker compose --profile single-image up -d --build
+```
+
+Verify:
+
+```bash
+docker compose --profile single-image ps
+```
+
+View logs:
+
+```bash
+docker compose --profile single-image logs -f adapt-app
+```
+
+Stop:
+
+```bash
+docker compose --profile single-image down
+```
+
+Notes:
+- This mode runs one app container (`adapt_app`) plus the existing PostgreSQL container.
+- `docker compose up -d` still starts only PostgreSQL (DB behavior unchanged).
+- This Docker setup is scoped to `adapt/` and does not touch `Adapt_mobile_app/` or Android Studio/Gradle workflows.
+- Docker is optional for development; it is not a mandatory core requirement if your team uses a local PostgreSQL setup.
 
 ## Useful Scripts
 

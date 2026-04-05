@@ -2,6 +2,10 @@
 # OS / Editor
 # -----------------------------
 .DS_Store
+._*
+.Spotlight-V100/
+.Trashes/
+.fseventsd/
 Thumbs.db
 *.swp
 *.swo

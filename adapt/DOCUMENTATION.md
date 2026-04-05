@@ -37,7 +37,7 @@ The repository contains three main apps:
 ## Prerequisites
 - Node.js 18+
 - npm
-- PostgreSQL (local install or Docker)
+- Docker Desktop (optional, for DB/app containers)
 
 ## Environment Setup
 
@@ -62,6 +62,14 @@ ENGINE_SERVICE_URL=http://localhost:4001
 
 ## Install Dependencies
 
+Preferred (from `adapt/package.json` helper scripts):
+
+```bash
+npm run install:all
+```
+
+Manual alternative:
+
 ```bash
 cd backend && npm install
 cd ../frontend && npm install
@@ -74,7 +82,7 @@ cd ../engine-service && npm install
 
 Terminal 1 (database):
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 Terminal 2 (engine):
@@ -100,6 +108,28 @@ npm run dev
 ### Option B: Helper scripts
 - Windows: `START_ALL.bat` or `START_ALL_NO_DOCKER.bat`
 - Linux/Mac: `start_all.sh`
+
+### Option C: Single app image (frontend + backend + engine)
+
+From `adapt/`:
+
+```bash
+docker compose --profile single-image up -d --build
+```
+
+Useful commands:
+
+```bash
+docker compose --profile single-image ps
+docker compose --profile single-image logs -f adapt-app
+docker compose --profile single-image down
+```
+
+Notes:
+- This runs a single app container (`adapt_app`) plus the existing PostgreSQL container.
+- `docker compose up -d` still starts only PostgreSQL, so DB-only workflows are unchanged.
+- This setup only uses files under `adapt/` and does not affect `Adapt_mobile_app/` or Android development.
+- Docker is optional for local development if your team already has a local PostgreSQL instance.
 
 ## Commands
 

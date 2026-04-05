@@ -1,0 +1,12 @@
+**/node_modules
+**/.next
+**/dist
+**/build
+**/coverage
+**/npm-debug.log*
+backend/.env
+backend/.env.*
+engine-service/.env
+engine-service/.env.*
+frontend/.env
+frontend/.env.*

@@ -8,13 +8,14 @@
  * - Admin dashboard (simulation/debug)
  */
 
-import express, { Express, Request, Response } from "express";
+import express from "express";
+import type { Express, Request, Response } from "express";
 import cors from "cors";
-import { AdaptRuleEngine } from "./engine";
-import { EngineInput, EngineEvaluationResult } from "./types";
+import { AdaptRuleEngine } from "./engine.js";
+import type { EngineInput, EngineEvaluationResult } from "./types.js";
 
 const app: Express = express();
-const port = process.env.PORT || 4001;
+const port = Number(process.env.ENGINE_PORT || process.env.PORT || 4001);
 const engine = new AdaptRuleEngine();
 
 // Middleware

@@ -1,6 +1,8 @@
 import { query } from './index.js';
 
 const schema = `
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
 -- Users Table
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

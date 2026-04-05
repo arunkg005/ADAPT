@@ -1,7 +1,13 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import type { Secret, SignOptions } from 'jsonwebtoken';
 import { query } from '../db/index.js';
 import { config } from '../config.js';
+
+const jwtSecret: Secret = config.jwt.secret;
+const jwtSignOptions: SignOptions = {
+  expiresIn: config.jwt.expiry as SignOptions['expiresIn'],
+};
 
 interface LoginPayload {
   email: string;
@@ -53,8 +59,8 @@ export const authService = {
         email: user.email,
         role: user.role,
       },
-      config.jwt.secret,
-      { expiresIn: config.jwt.expiry }
+      jwtSecret,
+      jwtSignOptions
     );
 
     return {
@@ -115,8 +121,8 @@ export const authService = {
         email: createdUser.email,
         role: createdUser.role,
       },
-      config.jwt.secret,
-      { expiresIn: config.jwt.expiry }
+      jwtSecret,
+      jwtSignOptions
     );
 
     return {

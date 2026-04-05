@@ -9,14 +9,15 @@
  * 5. Build output with rule trace
  */
 
-import {
+import type {
   EngineInput,
   EngineOutput,
   TaskState,
   CognitiveScores,
   AssistanceMode,
   Severity,
-} from "./types";
+  Confidence,
+} from "./types.js";
 
 export class AdaptRuleEngine {
   private trace: string[] = [];
@@ -68,8 +69,8 @@ export class AdaptRuleEngine {
       assistanceMode,
       adaptationActions,
       escalationRequired,
-      escalationReason,
       ruleTrace: this.trace,
+      ...(escalationReason ? { escalationReason } : {}),
     };
   }
 
@@ -235,7 +236,7 @@ export class AdaptRuleEngine {
   private identifyPrimaryIssues(
     scores: CognitiveScores
   ): { primaryIssue: keyof CognitiveScores | "NONE"; secondaryIssue: keyof CognitiveScores | "NONE" } {
-    const sorted = Object.entries(scores)
+    const sorted = (Object.entries(scores) as Array<[keyof CognitiveScores, number]>)
       .sort(([, a], [, b]) => b - a)
       .map(([key]) => key);
 
@@ -260,7 +261,7 @@ export class AdaptRuleEngine {
     let severity: Severity = "NONE";
     let confidence = 50; // default medium confidence
 
-    const maxScore = Math.max(...Object.values(scores));
+    const maxScore = Math.max(...(Object.values(scores) as number[]));
 
     // Severity rules
     if (taskState === "NOT_STARTED" || taskState === "ABANDONED") {
@@ -350,11 +351,19 @@ export class AdaptRuleEngine {
       adaptationActions = ["NOTIFY_CAREGIVER", "SCHEDULE_FOLLOWUP"];
     }
 
+    if (escalationReason) {
+      return {
+        assistanceMode,
+        adaptationActions,
+        escalationRequired,
+        escalationReason,
+      };
+    }
+
     return {
       assistanceMode,
       adaptationActions,
       escalationRequired,
-      escalationReason,
     };
   }
 }

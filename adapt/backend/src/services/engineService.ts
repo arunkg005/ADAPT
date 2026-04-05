@@ -24,6 +24,12 @@ interface EngineOutput {
   ruleTrace: string[];
 }
 
+interface EngineResponse {
+  success: boolean;
+  output?: EngineOutput;
+  error?: string;
+}
+
 export const engineService = {
   async evaluate(input: EngineInput): Promise<EngineOutput> {
     try {
@@ -39,10 +45,14 @@ export const engineService = {
         throw new Error(`Engine service returned ${response.status}`);
       }
 
-      const result = await response.json();
+      const result = (await response.json()) as EngineResponse;
 
       if (!result.success) {
         throw new Error(result.error || 'Engine evaluation failed');
+      }
+
+      if (!result.output) {
+        throw new Error('Engine evaluation failed');
       }
 
       return result.output;

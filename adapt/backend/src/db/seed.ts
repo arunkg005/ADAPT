@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { query } from './db/index.js';
+import { query } from './index.js';
 
 // Sample data for testing
 const sampleUsers = [
