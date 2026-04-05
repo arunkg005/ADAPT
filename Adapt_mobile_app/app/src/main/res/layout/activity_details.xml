@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:navigationIcon="@android:drawable/ic_menu_revert"
+        app:navigationIconTint="@color/primaryBlue"
+        app:title="Patient Analysis"
+        app:titleTextColor="@color/primaryBlue"
+        app:titleCentered="true" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Card for Independence Trend -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/lightBlue"
+                android:layout_marginBottom="24dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Independence Trend"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+
+                    <!-- Placeholder for Graph -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@color/lightBlue" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Progressing toward Level 4 (Semi-Independent)"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card for Cognitive Load -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/lightBlue"
+                android:layout_marginBottom="24dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cognitive Load (Weekly)"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+
+                    <!-- Placeholder for Graph -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@color/lightBlue" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Stable performance with low mental fatigue."
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Real-time Surveillance Logs"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvDetailedLogs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

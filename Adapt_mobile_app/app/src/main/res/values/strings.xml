@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">ADAPT</string>
+    <string name="routine_step">Step %1$d</string>
+    <string name="next_step">Next Step</string>
+    <string name="finish_routine">Finish Routine</string>
+    <string name="routine_completed">Routine Completed!</string>
+    <string name="start">Start</string>
+    <string name="todays_overview">Today\'s Overview</string>
+    <string name="progress">Progress</string>
+    <string name="your_routines">Your Routines</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="full_name">Full Name</string>
+    <string name="patient">Patient</string>
+    <string name="caregiver">Caregiver</string>
+    <string name="nav_status">Status</string>
+    <string name="nav_logs">Logs</string>
+    <string name="nav_tasks">Tasks</string>
+    <string name="nav_profile">Profile</string>
+</resources>

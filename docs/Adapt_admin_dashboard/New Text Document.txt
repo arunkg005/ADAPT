@@ -1,0 +1,86 @@
+┌─────────────────────────────────────────────┐
+│                Device Layer                 │
+│                                             │
+│  Mobile Devices                             │
+│  ├ Patient App                              │
+│  └ Caregiver App                            │
+│                                             │
+│  Wearable Devices                           │
+│  ├ Smartwatch                               │
+│  ├ Fitness Tracker                          │
+│  └ Health Monitoring Band                   │
+│                                             │
+│  IoT Sensors                                │
+│  ├ motion sensors                           │
+│  ├ bed occupancy sensors                    │
+│  ├ smart medication box                     │
+│  └ hydration monitor                        │
+└─────────────────────────────────────────────┘
+                    │
+                    │ Bluetooth / WiFi / Zigbee
+                    ▼
+┌─────────────────────────────────────────────┐
+│             IoT Gateway Layer               │
+│                                             │
+│ Device Manager                              │
+│ ├ device registration                       │
+│ ├ device authentication                     │
+│ └ firmware compatibility                    │
+│                                             │
+│ Sensor Data Aggregator                      │
+│ ├ collects device telemetry                 │
+│ ├ filters redundant data                    │
+│ └ compresses sensor streams                 │
+│                                             │
+│ Edge Event Processor                        │
+│ ├ fall detection                            │
+│ ├ abnormal heart rate detection             │
+│ └ emergency trigger events                  │
+└─────────────────────────────────────────────┘
+                    │
+                    │ MQTT / HTTP Streaming
+                    ▼
+┌─────────────────────────────────────────────┐
+│            Cloud Processing Layer           │
+│                                             │
+│ Data Ingestion Service                      │
+│ ├ sensor data stream handler                │
+│ ├ device telemetry parsing                  │
+│ └ message queue integration                 │
+│                                             │
+│ Real-Time Processing Engine                 │
+│ ├ patient condition monitoring              │
+│ ├ activity pattern detection                │
+│ └ health anomaly detection                  │
+│                                             │
+│ Device Coordination Service                 │
+│ ├ wearable integration                      │
+│ ├ IoT command dispatch                      │
+│ └ device configuration management           │
+└─────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────┐
+│           AI Behavioral Analysis Layer      │
+│                                             │
+│ Health Condition Prediction Model           │
+│                                             │
+│ Behavioral Trend Analysis                   │
+│                                             │
+│ Risk Detection Engine                       │
+│ ├ fall risk prediction                      │
+│ ├ inactivity risk                           │
+│ └ stress detection                          │
+│                                             │
+│ Alert Generation System                     │
+└─────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────┐
+│               Data Platform                 │
+│                                             │
+│ PostgreSQL (structured data)                │
+│ Time-Series DB (sensor telemetry)           │
+│ Object Storage (analytics datasets)         │
+└─────────────────────────────────────────────┘
+

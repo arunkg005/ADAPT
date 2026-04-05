@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <!-- Minimalist Header with Context -->
+    <LinearLayout
+        android:id="@+id/taskHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvRoutineTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Morning Routine"
+            android:textColor="@color/primaryBlue"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:letterSpacing="0.1"/>
+
+        <!-- Progress Indicator for Executive Functioning Support -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="12dp">
+
+            <ProgressBar
+                android:id="@+id/taskProgressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="8dp"
+                android:layout_weight="1"
+                android:progress="20"
+                android:progressDrawable="@drawable/custom_progress_bar"/>
+
+            <TextView
+                android:id="@+id/tvProgressText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 / 5"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:layout_marginStart="16dp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Micro-Task Content Area (Focused for Attention Control) -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="24dp"
+        app:cardCornerRadius="32dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/lightBlue"
+        app:layout_constraintTop_toBottomOf="@id/taskHeader"
+        app:layout_constraintBottom_toTopOf="@id/taskActions">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp">
+
+            <!-- Visual Support Placeholder -->
+            <ImageView
+                android:id="@+id/ivTaskVisual"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@android:drawable/ic_dialog_info"
+                app:tint="@color/primaryBlue"
+                android:layout_marginBottom="32dp"
+                android:alpha="0.8"/>
+
+            <TextView
+                android:id="@+id/tvTaskTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wake Up"
+                android:textColor="@color/text_primary"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:id="@+id/tvTaskDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sit up slowly and put your feet on the floor."
+                android:textColor="@color/text_secondary"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"/>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Large Action Area for Reduced Cognitive Load -->
+    <LinearLayout
+        android:id="@+id/taskActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/btnNextTask"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="I've Done This"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:cornerRadius="24dp"
+            android:backgroundTint="@color/primaryBlue"
+            android:textColor="@color/white"
+            android:textAllCaps="false"/>
+
+        <!-- Option to repeat for Processing Speed issues -->
+        <Button
+            android:id="@+id/btnRepeatTask"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="16dp"
+            android:text="Wait, tell me again"
+            android:textSize="16sp"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/primaryBlue"
+            android:textAllCaps="false"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

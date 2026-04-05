@@ -1,0 +1,78 @@
+# -----------------------------
+# OS / Editor
+# -----------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+.idea/
+*.iml
+.vscode/
+
+# -----------------------------
+# Logs
+# -----------------------------
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -----------------------------
+# Env / Local config
+# -----------------------------
+.env
+.env.*
+!.env.example
+!.env*.example
+local.properties
+
+# -----------------------------
+# Node / TypeScript / Next.js
+# -----------------------------
+**/node_modules/
+**/.next/
+**/out/
+**/dist/
+**/coverage/
+**/build/
+
+**/.pnp
+**/.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+*.tsbuildinfo
+next-env.d.ts
+.vercel/
+
+# -----------------------------
+# Database / runtime artifacts
+# -----------------------------
+*.db
+*.sqlite
+*.sqlite3
+pg_data/
+
+# -----------------------------
+# Android / Gradle generated
+# -----------------------------
+.gradle/
+**/.gradle/
+**/captures/
+**/.externalNativeBuild/
+**/.cxx/
+
+# -----------------------------
+# Secrets / certs
+# -----------------------------
+*.jks
+*.keystore
+*.pem
+docs/Project_ADAPT.rar

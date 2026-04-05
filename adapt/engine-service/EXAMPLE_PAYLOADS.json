@@ -1,0 +1,260 @@
+{
+  "description": "Example ADAPT Rule Engine Input Payloads",
+  "scenarios": [
+    {
+      "name": "Scenario 1: Normal Progress (PROGRESSING)",
+      "description": "Patient taking medication, progressing normally through steps",
+      "expectedOutput": {
+        "taskState": "PROGRESSING",
+        "assistanceMode": "NONE",
+        "severity": "NONE"
+      },
+      "payload": {
+        "patientId": "patient_001",
+        "taskContext": {
+          "taskId": "task_med_001",
+          "taskName": "Take Morning Medication",
+          "taskType": "MEDICATION",
+          "scheduledStartTime": 1700000000,
+          "expectedDurationMs": 300000,
+          "stepCount": 4,
+          "riskLevel": "MEDIUM",
+          "complexity": "LOW"
+        },
+        "passiveSignals": {
+          "reminderDelivered": true,
+          "voicePromptDelivered": true,
+          "voicePromptAcknowledged": true,
+          "devicePickedUp": true,
+          "motionDetectedAfterPrompt": true,
+          "noResponseDurationMs": 5000,
+          "taskWindowElapsedMs": 45000
+        },
+        "interactionSignals": {
+          "singleTapConfirm": true,
+          "voiceConfirmDone": false,
+          "voiceHelpRequest": false,
+          "instructionReplay": 0,
+          "promptDismissed": 0,
+          "wrongTapCount": 0,
+          "choiceSwitches": 0,
+          "helpRequests": 0
+        },
+        "progressSignals": {
+          "currentStepIndex": 2,
+          "stepCompleted": true,
+          "stepRevisits": 0,
+          "screenBacktracks": 0,
+          "taskCompleted": false,
+          "taskAbandoned": false,
+          "idleTimeMs": 3000,
+          "responseTimeMs": 8000
+        },
+        "historySignals": {
+          "recentFailureCount": 0,
+          "recentMissedTaskCount": 0,
+          "recentHelpFrequency": 0,
+          "baselineResponseTimeMs": 10000,
+          "commonDifficultyType": "NONE",
+          "lastAdaptationUsed": "NONE",
+          "lastAdaptationSuccess": true,
+          "consecutivePromptIgnorals": 0
+        }
+      }
+    },
+    {
+      "name": "Scenario 2: Task Not Started (ESCALATION NEEDED)",
+      "description": "Reminder delivered but patient hasn't responded or moved",
+      "expectedOutput": {
+        "taskState": "NOT_STARTED",
+        "assistanceMode": "ESCALATE_CARETAKER",
+        "severity": "CRITICAL",
+        "escalationRequired": true
+      },
+      "payload": {
+        "patientId": "patient_002",
+        "taskContext": {
+          "taskId": "task_med_002",
+          "taskName": "Insulin Injection",
+          "taskType": "MEDICATION",
+          "scheduledStartTime": 1700000000,
+          "expectedDurationMs": 600000,
+          "stepCount": 5,
+          "riskLevel": "HIGH",
+          "complexity": "HIGH"
+        },
+        "passiveSignals": {
+          "reminderDelivered": true,
+          "voicePromptDelivered": true,
+          "voicePromptAcknowledged": false,
+          "devicePickedUp": false,
+          "motionDetectedAfterPrompt": false,
+          "noResponseDurationMs": 180000,
+          "taskWindowElapsedMs": 200000
+        },
+        "interactionSignals": {
+          "singleTapConfirm": false,
+          "voiceConfirmDone": false,
+          "voiceHelpRequest": false,
+          "instructionReplay": 0,
+          "promptDismissed": 0,
+          "wrongTapCount": 0,
+          "choiceSwitches": 0,
+          "helpRequests": 0
+        },
+        "progressSignals": {
+          "currentStepIndex": 0,
+          "stepCompleted": false,
+          "stepRevisits": 0,
+          "screenBacktracks": 0,
+          "taskCompleted": false,
+          "taskAbandoned": false,
+          "idleTimeMs": 180000,
+          "responseTimeMs": 180000
+        },
+        "historySignals": {
+          "recentFailureCount": 3,
+          "recentMissedTaskCount": 2,
+          "recentHelpFrequency": 80,
+          "baselineResponseTimeMs": 30000,
+          "commonDifficultyType": "ATTENTION",
+          "lastAdaptationUsed": "VOICE_GUIDED",
+          "lastAdaptationSuccess": false,
+          "consecutivePromptIgnorals": 2
+        }
+      }
+    },
+    {
+      "name": "Scenario 3: Confused/Memory Issues (VOICE GUIDED SUPPORT)",
+      "description": "Patient replaying instructions repeatedly, revisiting same steps",
+      "expectedOutput": {
+        "taskState": "CONFUSED",
+        "primaryIssue": "workingMemory",
+        "assistanceMode": "GUIDED_STEP",
+        "severity": "MODERATE",
+        "adaptationActions": ["RESET_TO_LAST_GOOD_STEP", "SIMPLIFY_INSTRUCTIONS", "VOICE_ONLY"]
+      },
+      "payload": {
+        "patientId": "patient_003",
+        "taskContext": {
+          "taskId": "task_hygiene_001",
+          "taskName": "Morning Hygiene Routine",
+          "taskType": "HYGIENE",
+          "scheduledStartTime": 1700000000,
+          "expectedDurationMs": 1200000,
+          "stepCount": 6,
+          "riskLevel": "MEDIUM",
+          "complexity": "MEDIUM"
+        },
+        "passiveSignals": {
+          "reminderDelivered": true,
+          "voicePromptDelivered": true,
+          "voicePromptAcknowledged": true,
+          "devicePickedUp": true,
+          "motionDetectedAfterPrompt": true,
+          "noResponseDurationMs": 25000,
+          "taskWindowElapsedMs": 180000
+        },
+        "interactionSignals": {
+          "singleTapConfirm": true,
+          "voiceConfirmDone": false,
+          "voiceHelpRequest": true,
+          "instructionReplay": 4,
+          "promptDismissed": 1,
+          "wrongTapCount": 2,
+          "choiceSwitches": 2,
+          "helpRequests": 2
+        },
+        "progressSignals": {
+          "currentStepIndex": 2,
+          "stepCompleted": true,
+          "stepRevisits": 3,
+          "screenBacktracks": 2,
+          "taskCompleted": false,
+          "taskAbandoned": false,
+          "idleTimeMs": 45000,
+          "responseTimeMs": 35000
+        },
+        "historySignals": {
+          "recentFailureCount": 2,
+          "recentMissedTaskCount": 0,
+          "recentHelpFrequency": 60,
+          "baselineResponseTimeMs": 15000,
+          "commonDifficultyType": "MEMORY",
+          "lastAdaptationUsed": "SIMPLIFIED_STEPS",
+          "lastAdaptationSuccess": true,
+          "consecutivePromptIgnorals": 0
+        }
+      }
+    },
+    {
+      "name": "Scenario 4: Stalled/Slow Progress (SOFT REMINDER)",
+      "description": "Patient idle for extended period, not making progress",
+      "expectedOutput": {
+        "taskState": "STALLED",
+        "primaryIssue": "attention",
+        "assistanceMode": "VOICE_CUE",
+        "severity": "MILD"
+      },
+      "payload": {
+        "patientId": "patient_004",
+        "taskContext": {
+          "taskId": "task_meal_001",
+          "taskName": "Prepare Lunch",
+          "taskType": "MEAL",
+          "scheduledStartTime": 1700000000,
+          "expectedDurationMs": 1800000,
+          "stepCount": 5,
+          "riskLevel": "LOW",
+          "complexity": "MEDIUM"
+        },
+        "passiveSignals": {
+          "reminderDelivered": true,
+          "voicePromptDelivered": true,
+          "voicePromptAcknowledged": true,
+          "devicePickedUp": true,
+          "motionDetectedAfterPrompt": true,
+          "noResponseDurationMs": 60000,
+          "taskWindowElapsedMs": 120000
+        },
+        "interactionSignals": {
+          "singleTapConfirm": false,
+          "voiceConfirmDone": false,
+          "voiceHelpRequest": false,
+          "instructionReplay": 1,
+          "promptDismissed": 0,
+          "wrongTapCount": 0,
+          "choiceSwitches": 0,
+          "helpRequests": 0
+        },
+        "progressSignals": {
+          "currentStepIndex": 1,
+          "stepCompleted": true,
+          "stepRevisits": 1,
+          "screenBacktracks": 0,
+          "taskCompleted": false,
+          "taskAbandoned": false,
+          "idleTimeMs": 70000,
+          "responseTimeMs": 45000
+        },
+        "historySignals": {
+          "recentFailureCount": 1,
+          "recentMissedTaskCount": 0,
+          "recentHelpFrequency": 30,
+          "baselineResponseTimeMs": 20000,
+          "commonDifficultyType": "ATTENTION",
+          "lastAdaptationUsed": "NONE",
+          "lastAdaptationSuccess": true,
+          "consecutivePromptIgnorals": 0
+        }
+      }
+    }
+  ],
+  "howToTest": {
+    "step1": "Start the engine service: cd adapt/engine-service && npm run dev",
+    "step2": "In another terminal, run curl commands or Postman",
+    "step3": "Example curl command:",
+    "example": "curl -X POST http://localhost:4001/engine/evaluate -H 'Content-Type: application/json' -d @scenario1.json",
+    "note": "Save each payload as scenario1.json, scenario2.json, etc., then test"
+  }
+}

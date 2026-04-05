@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/lightBlue">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvRoutineTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Morning Routine"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"/>
+
+                <TextView
+                    android:id="@+id/tvRoutineTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="08:00 AM"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStartRoutine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/start"
+                android:backgroundTint="@color/primaryBlue"
+                android:textColor="@color/white"
+                app:cornerRadius="12dp"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
+        </LinearLayout>
+
+        <!-- Caretaker Tracking Info (Progress for Executive Function) -->
+        <LinearLayout
+            android:id="@+id/caretakerInfoLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"
+            android:visibility="visible">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/lightBlue"
+                android:layout_marginBottom="12dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvRoutineStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Status: 3/5 Steps Completed"
+                    android:textSize="13sp"
+                    android:textColor="@color/primaryBlue"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvLastActivity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Last: 5m ago"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary"/>
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/routineMiniProgress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_marginTop="8dp"
+                android:progress="60"
+                android:progressDrawable="@drawable/custom_progress_bar"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

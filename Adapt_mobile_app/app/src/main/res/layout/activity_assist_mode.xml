@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <!-- Focused UI for Patient -->
+    <LinearLayout
+        android:id="@+id/llFocusedContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ADAPT ASSIST"
+            android:textColor="@color/primaryBlue"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.2"
+            android:layout_marginBottom="48dp"/>
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@android:drawable/ic_lock_lock"
+            app:tint="@color/primaryBlue"
+            android:layout_marginBottom="32dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Focused Mode Active"
+            android:textColor="@color/text_primary"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Only your active routines will be shown here. Distractions are blocked."
+            android:textColor="@color/text_secondary"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginBottom="48dp"/>
+
+        <Button
+            android:id="@+id/btnViewActiveTask"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="Open Current Task"
+            android:backgroundTint="@color/primaryBlue"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:cornerRadius="24dp"/>
+
+    </LinearLayout>
+
+    <!-- Hidden Caretaker Unlock Button (Requires Long Press) -->
+    <Button
+        android:id="@+id/btnCaretakerUnlock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Caregiver: Hold to Unlock"
+        android:textSize="12sp"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp"
+        android:alpha="0.5"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

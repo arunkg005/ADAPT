@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 3-Pallet Rule: White (Base), Blue (Primary), Light Blue (Secondary) -->
+    <color name="white">#FFFFFF</color>
+    <color name="primaryBlue">#1976D2</color>
+    <color name="lightBlue">#E3F2FD</color>
+
+    <!-- Theme Aliases -->
+    <color name="colorPrimary">@color/primaryBlue</color>
+    <color name="colorPrimaryDark">#1565C0</color>
+    <color name="colorAccent">@color/lightBlue</color>
+
+    <!-- UI Backgrounds -->
+    <color name="windowBackground">#FFFFFF</color>
+    <color name="cardBackground">#F8F9FA</color>
+
+    <!-- Glassmorphism assets for White Theme -->
+    <color name="glass_white">#B3FFFFFF</color> <!-- 70% White -->
+    <color name="glass_stroke">#4D1976D2</color> <!-- 30% Blue stroke -->
+
+    <color name="black">#000000</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+
+    <!-- For Gradient backgrounds if needed -->
+    <color name="bg_gradient_start">#FFFFFF</color>
+    <color name="bg_gradient_end">#E3F2FD</color>
+</resources>

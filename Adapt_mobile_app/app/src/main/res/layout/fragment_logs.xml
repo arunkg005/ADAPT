@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Activity History"
+            android:textColor="@color/text_primary"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Surveillance logs from IoT and Mobile"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipAll"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All Logs"
+                    android:checked="true"
+                    app:chipBackgroundColor="@color/lightBlue" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipIot"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="IoT Sensors" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipMobile"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mobile Actions" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipAlerts"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Alerts" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvLogs"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp" />
+
+</LinearLayout>
