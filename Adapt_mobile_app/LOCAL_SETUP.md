@@ -35,6 +35,14 @@ This file is machine-specific and should not be edited for teammates unless need
 
 From repository root:
 
+Windows Command Prompt (cmd):
+
+```bat
+cd Adapt_mobile_app
+```
+
+macOS/Linux Terminal:
+
 ```bash
 cd Adapt_mobile_app
 ```

@@ -14,6 +14,14 @@ This guide helps a teammate run the web stack from a fresh clone.
 
 From the repository root:
 
+Windows Command Prompt (cmd):
+
+```bat
+cd adapt
+```
+
+macOS/Linux Terminal:
+
 ```bash
 cd adapt
 ```
@@ -21,6 +29,14 @@ cd adapt
 ## 3) Install Dependencies
 
 Preferred single command:
+
+Windows Command Prompt (cmd):
+
+```bat
+npm run install:all
+```
+
+macOS/Linux Terminal:
 
 ```bash
 npm run install:all
@@ -59,6 +75,14 @@ FRONTEND_URL=http://localhost:3000
 
 Option A (recommended for onboarding): Docker database
 
+Windows Command Prompt (cmd):
+
+```bat
+docker compose up -d
+```
+
+macOS/Linux Terminal:
+
 ```bash
 docker compose up -d
 ```
@@ -71,11 +95,29 @@ Option B: local PostgreSQL
 
 Terminal 1 (engine-service):
 
+Windows Command Prompt (cmd):
+
+```bat
+npm --prefix engine-service run dev
+```
+
+macOS/Linux Terminal:
+
 ```bash
 npm --prefix engine-service run dev
 ```
 
 Terminal 2 (backend):
+
+Windows Command Prompt (cmd):
+
+```bat
+npm --prefix backend run migrate
+npm --prefix backend run seed
+npm --prefix backend run dev
+```
+
+macOS/Linux Terminal:
 
 ```bash
 npm --prefix backend run migrate
@@ -84,6 +126,14 @@ npm --prefix backend run dev
 ```
 
 Terminal 3 (frontend):
+
+Windows Command Prompt (cmd):
+
+```bat
+npm --prefix frontend run dev
+```
+
+macOS/Linux Terminal:
 
 ```bash
 npm --prefix frontend run dev
@@ -99,11 +149,27 @@ npm --prefix frontend run dev
 
 If you want app services containerized:
 
+Windows Command Prompt (cmd):
+
+```bat
+npm run single-image:up
+```
+
+macOS/Linux Terminal:
+
 ```bash
 npm run single-image:up
 ```
 
 Stop it:
+
+Windows Command Prompt (cmd):
+
+```bat
+npm run single-image:down
+```
+
+macOS/Linux Terminal:
 
 ```bash
 npm run single-image:down
