@@ -26,15 +26,31 @@ import java.util.Locale;
 
 public class LogAdapter extends RecyclerView.Adapter<LogAdapter.LogViewHolder> {
 
-    private List<ActivityLog> allLogs;
-    private List<ActivityLog> filteredLogs;
+    private final List<ActivityLog> allLogs;
+    private final List<ActivityLog> filteredLogs;
+    private String activeCategory;
 
     public LogAdapter(List<ActivityLog> logs) {
-        this.allLogs = logs;
-        this.filteredLogs = new ArrayList<>(logs);
+        this.allLogs = new ArrayList<>();
+        this.filteredLogs = new ArrayList<>();
+        this.activeCategory = "All Logs";
+        setLogs(logs);
+    }
+
+    public void setLogs(List<ActivityLog> logs) {
+        allLogs.clear();
+        if (logs != null) {
+            allLogs.addAll(logs);
+        }
+        applyFilter(activeCategory);
     }
 
     public void filter(String category) {
+        activeCategory = category;
+        applyFilter(category);
+    }
+
+    private void applyFilter(String category) {
         filteredLogs.clear();
         if (category.equals("All Logs")) {
             filteredLogs.addAll(allLogs);
@@ -83,12 +99,18 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.LogViewHolder> {
             ivIcon = itemView.findViewById(R.id.ivLogIcon);
             vStatusIndicator = itemView.findViewById(R.id.vStatusIndicator);
 
-            itemView.setOnClickListener(v -> showDetailsDialog(filteredLogs.get(getAdapterPosition())));
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position == RecyclerView.NO_POSITION || position >= filteredLogs.size()) {
+                    return;
+                }
+                showDetailsDialog(filteredLogs.get(position));
+            });
         }
 
         void bind(ActivityLog log) {
             tvTitle.setText(log.getTitle());
-            tvDescription.setText(log.getSource() == ActivityLog.Source.IOT ? "IoT Surveillance" : "Mobile App Action");
+            tvDescription.setText(log.getDescription());
             
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
             tvTime.setText(sdf.format(new Date(log.getTimestamp())));

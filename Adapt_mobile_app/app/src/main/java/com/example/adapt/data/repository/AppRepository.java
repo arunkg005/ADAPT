@@ -14,13 +14,11 @@ import com.example.adapt.data.model.Routine;
 import com.example.adapt.data.model.Task;
 import com.example.adapt.data.model.TaskLog;
 import com.example.adapt.data.network.ApiService;
+import com.example.adapt.data.network.NetworkClient;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AppRepository {
     private final RoutineDao routineDao;
@@ -37,11 +35,7 @@ public class AppRepository {
         taskLogDao = db.taskLogDao();
         activityLogDao = db.activityLogDao();
         
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.example.com/") // Mock base URL
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        apiService = retrofit.create(ApiService.class);
+        apiService = NetworkClient.getRetrofit(application).create(ApiService.class);
         
         executorService = Executors.newFixedThreadPool(4);
     }
@@ -76,14 +70,20 @@ public class AppRepository {
         executorService.execute(() -> {
             Routine routine = routineDao.getRoutineByIdSync(routineId);
             if (routine != null) {
-                routine.setCompletedSteps(completedSteps);
+                int totalSteps = taskDao.countTasksForRoutine(routineId);
+                if (totalSteps > 0) {
+                    routine.setTotalSteps(totalSteps);
+                }
+
+                int safeCompletedSteps = Math.min(completedSteps, Math.max(1, routine.getTotalSteps()));
+                routine.setCompletedSteps(safeCompletedSteps);
                 routine.setLastActivityTimestamp(System.currentTimeMillis());
                 routineDao.update(routine);
                 
                 // Also create an ActivityLog for this progress
                 ActivityLog log = new ActivityLog(
                         "Progress Update: " + routine.getTitle(),
-                        "Completed " + completedSteps + " steps.",
+                        "Completed " + safeCompletedSteps + " steps.",
                         System.currentTimeMillis(),
                         ActivityLog.Source.MOBILE,
                         ActivityLog.Type.SUCCESS,

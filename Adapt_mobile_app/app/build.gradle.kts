@@ -6,12 +6,17 @@ android {
     namespace = "com.example.adapt"
     compileSdk = 34
 
+    val apiBaseUrl = (project.findProperty("ADAPT_API_BASE_URL") as String?)
+        ?: "http://10.0.2.2:3001/api/"
+
     defaultConfig {
         applicationId = "com.example.adapt"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -28,6 +33,10 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 

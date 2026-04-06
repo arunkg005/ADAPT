@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.example.adapt.data.model.ActivityLog;
 import com.example.adapt.data.model.Routine;
 import com.example.adapt.data.model.Task;
 import com.example.adapt.data.model.TaskLog;
@@ -45,5 +46,17 @@ public class RoutineViewModel extends AndroidViewModel {
 
     public void logTaskCompletion(TaskLog taskLog) {
         repository.logTaskCompletion(taskLog);
+    }
+
+    public void updateRoutineProgress(int routineId, int completedSteps) {
+        repository.updateRoutineProgress(routineId, completedSteps);
+    }
+
+    public LiveData<List<ActivityLog>> getAllLogs() {
+        return repository.getAllLogs();
+    }
+
+    public void insertActivityLog(ActivityLog log) {
+        repository.insertActivityLog(log);
     }
 }

@@ -10,6 +10,7 @@
   "scripts": {
     "install:all": "npm --prefix backend ci && npm --prefix engine-service ci && npm --prefix frontend ci",
     "build:all": "npm --prefix backend run build && npm --prefix engine-service run build && npm --prefix frontend run build",
+    "dev": "node scripts/dev-runner.mjs",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "single-image:up": "docker compose --profile single-image up -d --build",

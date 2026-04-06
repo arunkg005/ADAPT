@@ -37,7 +37,7 @@ public class RoutineFragment extends Fragment {
         rvRoutines.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         // Check if user is caretaker to enable modification features
-        boolean isCaretaker = prefManager.getRole().equals("caregiver");
+        boolean isCaretaker = "caregiver".equals(prefManager.getRole());
 
         adapter = new RoutineAdapter(new RoutineAdapter.OnRoutineClickListener() {
             @Override
@@ -48,6 +48,7 @@ public class RoutineFragment extends Fragment {
                 startActivity(intent);
             }
         });
+        adapter.setUserRole(prefManager.getRole());
 
         rvRoutines.setAdapter(adapter);
 
@@ -55,8 +56,11 @@ public class RoutineFragment extends Fragment {
         viewModel.getAllRoutines().observe(getViewLifecycleOwner(), routines -> {
             if (routines != null && !routines.isEmpty()) {
                 adapter.setRoutines(routines);
-            } else {
+            } else if (!prefManager.isRoutineSeeded()) {
                 addInitialData();
+                prefManager.setRoutineSeeded(true);
+            } else {
+                adapter.setRoutines(new java.util.ArrayList<>());
             }
         });
 

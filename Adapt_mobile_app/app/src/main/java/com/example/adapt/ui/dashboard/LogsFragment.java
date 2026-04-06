@@ -8,11 +8,14 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.adapt.R;
 import com.example.adapt.data.model.ActivityLog;
+import com.example.adapt.utils.PrefManager;
+import com.example.adapt.viewmodel.RoutineViewModel;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
@@ -22,6 +25,8 @@ import java.util.List;
 public class LogsFragment extends Fragment {
 
     private LogAdapter adapter;
+    private RoutineViewModel viewModel;
+    private PrefManager prefManager;
 
     @Nullable
     @Override
@@ -31,8 +36,24 @@ public class LogsFragment extends Fragment {
         RecyclerView rvLogs = view.findViewById(R.id.rvLogs);
         rvLogs.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        adapter = new LogAdapter(getMockLogs());
+        prefManager = new PrefManager(requireContext());
+        adapter = new LogAdapter(new ArrayList<>());
         rvLogs.setAdapter(adapter);
+
+        viewModel = new ViewModelProvider(this).get(RoutineViewModel.class);
+        viewModel.getAllLogs().observe(getViewLifecycleOwner(), logs -> {
+            if (logs != null && !logs.isEmpty()) {
+                adapter.setLogs(logs);
+                return;
+            }
+
+            if (!prefManager.isActivityLogSeeded()) {
+                prefManager.setActivityLogSeeded(true);
+                seedInitialLogs();
+            } else {
+                adapter.setLogs(new ArrayList<>());
+            }
+        });
 
         ChipGroup chipGroup = view.findViewById(R.id.chipGroup);
         if (chipGroup != null) {
@@ -49,7 +70,13 @@ public class LogsFragment extends Fragment {
         return view;
     }
 
-    private List<ActivityLog> getMockLogs() {
+    private void seedInitialLogs() {
+        for (ActivityLog log : buildInitialLogs()) {
+            viewModel.insertActivityLog(log);
+        }
+    }
+
+    private List<ActivityLog> buildInitialLogs() {
         List<ActivityLog> logs = new ArrayList<>();
         long now = System.currentTimeMillis();
 

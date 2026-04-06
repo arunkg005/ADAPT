@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.adapt.R;
 import com.example.adapt.data.model.Task;
 import com.example.adapt.data.model.TaskLog;
+import com.example.adapt.utils.PrefManager;
 import com.example.adapt.viewmodel.RoutineViewModel;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class TaskActivity extends AppCompatActivity {
     private List<Task> taskList = new ArrayList<>();
     private int currentTaskIndex = 0;
     private int routineId;
+    private PrefManager prefManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,25 +46,46 @@ public class TaskActivity extends AppCompatActivity {
         btnRepeatTask = findViewById(R.id.btnRepeatTask);
         taskProgressBar = findViewById(R.id.taskProgressBar);
         ivTaskVisual = findViewById(R.id.ivTaskVisual);
+        prefManager = new PrefManager(this);
 
         routineId = getIntent().getIntExtra("ROUTINE_ID", -1);
+        if (routineId <= 0) {
+            Toast.makeText(this, "Invalid routine", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         String routineTitle = getIntent().getStringExtra("ROUTINE_TITLE");
-        tvRoutineTitle.setText(routineTitle);
+        tvRoutineTitle.setText(routineTitle != null ? routineTitle : "Routine");
 
         viewModel = new ViewModelProvider(this).get(RoutineViewModel.class);
         
         viewModel.getTasksForRoutine(routineId).observe(this, tasks -> {
             if (tasks != null && !tasks.isEmpty()) {
                 taskList = tasks;
+                if (currentTaskIndex >= taskList.size()) {
+                    currentTaskIndex = taskList.size() - 1;
+                }
                 displayTask(currentTaskIndex);
-            } else {
+            } else if (!prefManager.isTaskSeeded(routineId)) {
                 addDummyTasks();
+                prefManager.setTaskSeeded(routineId, true);
+            } else {
+                btnNextTask.setEnabled(false);
+                btnRepeatTask.setEnabled(false);
+                Toast.makeText(this, "No tasks available for this routine", Toast.LENGTH_SHORT).show();
             }
         });
 
         // "Done" Button - Supporting Executive Function & Memory
         btnNextTask.setOnClickListener(v -> {
+            if (taskList.isEmpty()) {
+                return;
+            }
+
             logTaskCompletion();
+            viewModel.updateRoutineProgress(routineId, currentTaskIndex + 1);
+
             currentTaskIndex++;
             if (currentTaskIndex < taskList.size()) {
                 displayTask(currentTaskIndex);
@@ -74,6 +97,9 @@ public class TaskActivity extends AppCompatActivity {
 
         // "Repeat" Button - Supporting Processing Speed Limitations
         btnRepeatTask.setOnClickListener(v -> {
+            if (taskList.isEmpty()) {
+                return;
+            }
             displayTask(currentTaskIndex); // Re-triggering display/animation
             Toast.makeText(this, "Focus on this step.", Toast.LENGTH_SHORT).show();
         });
@@ -120,7 +146,11 @@ public class TaskActivity extends AppCompatActivity {
     private void logTaskCompletion() {
         if (currentTaskIndex < taskList.size()) {
             Task task = taskList.get(currentTaskIndex);
-            TaskLog log = new TaskLog(task.getId(), "user_123", true, System.currentTimeMillis());
+            String userId = prefManager.getUserEmail();
+            if (userId == null || userId.trim().isEmpty()) {
+                userId = "local_user";
+            }
+            TaskLog log = new TaskLog(task.getId(), userId, true, System.currentTimeMillis());
             viewModel.logTaskCompletion(log);
         }
     }

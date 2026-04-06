@@ -17,4 +17,7 @@ public interface TaskDao {
 
     @Query("SELECT * FROM tasks WHERE routineId = :routineId ORDER BY `order` ASC")
     LiveData<List<Task>> getTasksForRoutine(int routineId);
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE routineId = :routineId")
+    int countTasksForRoutine(int routineId);
 }
