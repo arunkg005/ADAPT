@@ -52,6 +52,15 @@ const Home = () => {
     localStorage.removeItem(USER_KEY);
   };
 
+  const goToSignIn = () => {
+    setToken(null);
+    setUser(null);
+    setAuthError("");
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    setEntryView("auth");
+  };
+
   useEffect(() => {
     const savedToken = localStorage.getItem(TOKEN_KEY);
     const savedUser = localStorage.getItem(USER_KEY);
@@ -157,7 +166,7 @@ const Home = () => {
         onGetStarted={() =>
           isLoggedIn ? setEntryView("dashboard") : setEntryView("auth")
         }
-        onSignIn={() => setEntryView("auth")}
+        onSignIn={goToSignIn}
         isLoggedIn={isLoggedIn}
       />
       <FeaturesSection />

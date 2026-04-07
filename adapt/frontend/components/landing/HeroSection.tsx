@@ -43,11 +43,9 @@ const HeroSection = ({ onGetStarted, onSignIn, isLoggedIn }: HeroSectionProps) =
                 {isLoggedIn ? "Continue to Dashboard" : "Get Started"}
                 <ArrowRight className="ml-1 h-5 w-5" />
               </Button>
-              {!isLoggedIn && (
-                <Button variant="hero-outline" size="xl" onClick={onSignIn}>
-                  Sign In
-                </Button>
-              )}
+              <Button variant="hero-outline" size="xl" onClick={onSignIn}>
+                {isLoggedIn ? "Sign In with Another Account" : "Sign In"}
+              </Button>
             </div>
 
             <div className="flex flex-wrap gap-3 pt-2">
