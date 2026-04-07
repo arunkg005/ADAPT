@@ -1,10 +1,41 @@
 # ADAPT Project
 
-ADAPT is a multi-component platform for cognitive assistance and caregiver support. This repository includes:
+ADAPT is a cross-platform cognitive assistance platform with shared backend services for caregiver workflows, telemetry analysis, and assist-mode recommendations.
 
-- Web dashboard and API stack under adapt/
-- Android mobile application under Adapt_mobile_app/
-- Project documentation under docs/
+This README is the current delivery snapshot and runbook.
+
+## Current Work Done
+
+Core functionality completed in this repository:
+
+- Shared backend modules delivered and integrated:
+	- AI endpoints
+	- Analysis endpoints
+	- Task Lab endpoints
+	- Cognitive endpoints
+- Backend hardening added:
+	- Helmet security headers
+	- Global and auth-specific rate limiting
+	- Configurable request body limits
+	- Role-based route guards
+- Database migration expanded for compatibility and new features:
+	- Backward-compatible telemetry columns and backfill
+	- Task Lab tables (`task_plans`, `task_plan_steps`)
+- Web caregiver console delivered (Next.js):
+	- Caregiver/admin auth flow
+	- Task Lab template and AI draft workflows
+	- Analysis overview and patient summary views
+	- AI assistant chat panel
+- Mobile application convergence delivered:
+	- Updated caregiver-facing flows
+	- Monitoring and reminder/escalation support
+	- Assist mode enhancements
+	- Task Lab and AI assistant wiring
+- CI release hardening workflow added:
+	- Workspace final gate
+	- Backend security audit
+	- Mobile artifact generation
+	- Signed readiness job (when secrets are present)
 
 ## Repository Structure
 
@@ -12,217 +43,121 @@ ADAPT is a multi-component platform for cognitive assistance and caregiver suppo
 Project_ADAPT/
 |- adapt/
 |  |- backend/         # Express + TypeScript API
-|  |- engine-service/  # Rule engine service
-|  |- frontend/        # Next.js application
-|  |- docker-compose.yml
-|  |- setup_database.sql
-|  \- start_all.sh
+|  |- engine-service/  # Cognitive engine service
+|  |- frontend/        # Next.js caregiver web app
+|  |- scripts/         # Smart validation tooling
+|  \- docker-compose.yml
 |- Adapt_mobile_app/   # Native Android app (Gradle)
-|- docs/               # Supporting docs and summaries
-\- .gitignore
+\- .github/workflows/  # CI pipelines
 ```
 
 ## Tech Stack
 
 - Frontend: Next.js, React, TypeScript
 - Backend: Node.js, Express, TypeScript, PostgreSQL
-- Engine: Node.js, Express, TypeScript
-- Mobile: Android (Java/Kotlin + Gradle)
+- Engine: Node.js, TypeScript
+- Mobile: Android (Gradle)
 
 ## Prerequisites
 
-Install the following before running locally:
-
-- Node.js 18 or newer
+- Node.js 18+
 - npm
-- Docker Desktop (optional, for containerized DB/app runs)
-- Java 17 and Android Studio (for mobile app)
+- Docker Desktop (optional but recommended for local PostgreSQL)
+- Java 17 + Android Studio (for mobile)
 
 ## Quick Start (Web + API + Engine)
 
-### 1) Configure backend environment
-
-From adapt/backend, create .env from .env.example and adjust values if needed.
-
-Example values:
-
-```env
-NODE_ENV=development
-PORT=3001
-API_BASE_URL=http://localhost:3001
-
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=adapt_db
-DB_USER=adapt_user
-DB_PASSWORD=adapt_password
-
-JWT_SECRET=change-this-secret
-JWT_EXPIRY=7d
-
-ENGINE_SERVICE_URL=http://localhost:4001
-FRONTEND_URL=http://localhost:3000
-```
-
-### 2) Install dependencies
-
-Preferred (single command from dependency manager file):
+### 1) Install dependencies
 
 ```bash
 cd adapt
 npm run install:all
 ```
 
-Manual alternative:
+### 2) Configure backend environment
 
-```bash
-cd adapt/backend && npm install
-cd ../engine-service && npm install
-cd ../frontend && npm install
-```
+Create `adapt/backend/.env` from `adapt/backend/.env.example`.
 
 ### 3) Start PostgreSQL
 
-If you have local PostgreSQL installed, you can use that and skip Docker here.
-
 ```bash
-cd ..
-docker compose up -d
+cd adapt
+npm run db:up
 ```
 
-### 4) Start services (separate terminals)
-
-Terminal A (engine):
+### 4) Start all services
 
 ```bash
-cd adapt/engine-service
+cd adapt
 npm run dev
 ```
 
-Terminal B (backend):
+Default local endpoints:
 
-```bash
-cd adapt/backend
-npm run migrate
-npm run seed
-npm run dev
-```
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:3001`
+- Backend health: `http://localhost:3001/health`
+- Engine health: `http://localhost:4001/health`
 
-Terminal C (frontend):
+## Validation Commands
 
-```bash
-cd adapt/frontend
-npm run dev
-```
+From `adapt/`:
 
-### 5) Verify local endpoints
+- Fast targeted check:
+	- `npm run check:smart`
+- Fast check with DB-aware migration step:
+	- `npm run check:smart:db`
+- Final release gate:
+	- `npm run check:final`
 
-- Frontend: http://localhost:3000
-- Backend health: http://localhost:3001/health
-- Engine health: http://localhost:4001/health
+`check:final` runs:
 
-## Single Docker Image Stack (Frontend + Backend + Engine in one image)
+1. Full workspace build (backend + engine + frontend)
+2. Backend migration
+3. Backend seed
 
-From `adapt/`, run:
+## Mobile Build Commands
 
-```bash
-docker compose --profile single-image up -d --build
-```
+From `Adapt_mobile_app/`:
 
-Verify:
-
-```bash
-docker compose --profile single-image ps
-```
-
-View logs:
-
-```bash
-docker compose --profile single-image logs -f adapt-app
-```
-
-Stop:
-
-```bash
-docker compose --profile single-image down
-```
-
-Notes:
-- This mode runs one app container (`adapt_app`) plus the existing PostgreSQL container.
-- `docker compose up -d` still starts only PostgreSQL (DB behavior unchanged).
-- This Docker setup is scoped to `adapt/` and does not touch `Adapt_mobile_app/` or Android Studio/Gradle workflows.
-- Docker is optional for development; it is not a mandatory core requirement if your team uses a local PostgreSQL setup.
-
-## Useful Scripts
-
-### adapt/backend
-
-- npm run dev
-- npm run build
-- npm run start
-- npm run typecheck
-- npm run migrate
-- npm run seed
-
-### adapt/engine-service
-
-- npm run dev
-- npm run build
-- npm run start
-
-### adapt/frontend
-
-- npm run dev
-- npm run build
-- npm run start
-- npm run lint
-
-## Android App (Adapt_mobile_app)
-
-1. Open Adapt_mobile_app/ in Android Studio.
-2. Let Gradle sync complete.
-3. Select an emulator or connected device.
-4. Run the app module.
-
-CLI build option:
-
-```bash
-cd Adapt_mobile_app
-./gradlew assembleDebug
-```
-
-On Windows cmd:
-
-```bat
-cd Adapt_mobile_app
-gradlew.bat assembleDebug
-```
-
-## Documentation
-
-- Main web stack notes: adapt/DOCUMENTATION.md
-- Admin dashboard notes: docs/Adapt_admin_dashboard/GET_STARTED.md
-- Mobile deployment notes: Adapt_mobile_app/DEPLOYMENT.md
+- Debug build:
+	- Windows: `gradlew.bat assembleDebug`
+	- macOS/Linux: `./gradlew assembleDebug`
+- Release readiness (after signing config):
+	- Windows: `gradlew.bat checkReleaseReadiness`
+	- macOS/Linux: `./gradlew checkReleaseReadiness`
 
 ## CI Release Hardening
 
-The repository includes a GitHub Actions pipeline for release hardening checks:
+Workflow: `.github/workflows/release-hardening.yml`
 
-- Workflow: .github/workflows/release-hardening.yml
-- Jobs:
-	- Workspace final gate (build all + DB migrate/seed)
-	- Backend production dependency audit
-	- Mobile unsigned release artifact generation
-	- Mobile signed release readiness (runs only when signing secrets are available)
+Jobs:
 
-Signed release readiness requires repository secrets:
+- Workspace final check
+- Backend production dependency audit
+- Mobile unsigned artifact generation
+- Mobile signed readiness (conditional)
 
-- ADAPT_RELEASE_STORE_FILE_BASE64
-- ADAPT_RELEASE_STORE_PASSWORD
-- ADAPT_RELEASE_KEY_ALIAS
-- ADAPT_RELEASE_KEY_PASSWORD
+Required GitHub secrets for signed mobile readiness:
+
+- `ADAPT_RELEASE_STORE_FILE_BASE64`
+- `ADAPT_RELEASE_STORE_PASSWORD`
+- `ADAPT_RELEASE_KEY_ALIAS`
+- `ADAPT_RELEASE_KEY_PASSWORD`
+
+## Current Pending Before Full Production Sign-off
+
+- Configure signing secrets and pass signed mobile readiness job.
+- Complete provider token verification hardening for social login flow.
+
+## Seed Credentials (Local Development)
+
+After running `npm run check:final` or `npm run db:prepare`, sample credentials are:
+
+- `admin@adapt.local` / `password123`
+- `caregiver1@adapt.local` / `password123`
 
 ## Notes
 
-- Do not commit large binary archives (GitHub blocks files larger than 100 MB).
-- Keep secrets out of git; use local .env files for credentials.
+- Keep secrets in local env/CI secret stores only.
+- Do not commit large binary files.
