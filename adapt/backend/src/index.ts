@@ -44,9 +44,28 @@ const allowedOrigins = [
   ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map((item) => item.trim()) : []),
 ].filter(Boolean);
 
+const allowVercelPreviewOrigins = process.env.ALLOW_VERCEL_PREVIEWS === 'true';
+const vercelFrontendPattern = /^https:\/\/frontend-[a-z0-9-]+\.vercel\.app$/i;
+
+const isOriginAllowed = (origin?: string): boolean => {
+  if (!origin) {
+    return true;
+  }
+
+  if (allowedOrigins.includes(origin)) {
+    return true;
+  }
+
+  if (allowVercelPreviewOrigins && vercelFrontendPattern.test(origin)) {
+    return true;
+  }
+
+  return false;
+};
+
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (isOriginAllowed(origin)) {
       callback(null, true);
       return;
     }
