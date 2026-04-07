@@ -120,7 +120,11 @@ app.listen(PORT, () => {
 ║  Health:   http://localhost:${PORT}/health                
 ║                                                            ║
 ║  Environment: ${config.env}
-║  Database: ${config.db.host}:${config.db.port}/${config.db.database}
+║  Database: ${
+    config.db.url
+      ? 'DATABASE_URL'
+      : `${config.db.host}:${config.db.port}/${config.db.database}`
+  }
 ║  Engine:   ${config.engineService.url}
 ║                                                            ║
 ╚════════════════════════════════════════════════════════════╝
