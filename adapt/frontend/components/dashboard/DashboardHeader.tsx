@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 interface DashboardHeaderProps {
   caregiverName: string;
   onLogout: () => void;
+  onOpenSettings: () => void;
 }
 
-const DashboardHeader = ({ caregiverName, onLogout }: DashboardHeaderProps) => {
+const DashboardHeader = ({ caregiverName, onLogout, onOpenSettings }: DashboardHeaderProps) => {
   return (
     <header className="glass-panel px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-4">
@@ -19,7 +20,7 @@ const DashboardHeader = ({ caregiverName, onLogout }: DashboardHeaderProps) => {
         </div>
       </div>
       <div className="flex gap-2">
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" onClick={onOpenSettings}>
           <Settings className="h-5 w-5" />
         </Button>
         <Button variant="ghost" size="sm" onClick={onLogout} className="text-destructive hover:text-destructive">

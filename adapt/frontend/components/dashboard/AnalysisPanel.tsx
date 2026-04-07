@@ -23,20 +23,39 @@ interface AnalysisPanelProps {
   overview: OverviewData | null;
   summary: PatientSummary | null;
   onLoadSummary: () => void;
+  onRefreshBoard: () => void;
+  analysisRefreshing: boolean;
   analysisBusy: boolean;
   analysisStatus: string;
   hasPatientId: boolean;
 }
 
-const AnalysisPanel = ({ overview, summary, onLoadSummary, analysisBusy, analysisStatus, hasPatientId }: AnalysisPanelProps) => {
+const AnalysisPanel = ({
+  overview,
+  summary,
+  onLoadSummary,
+  onRefreshBoard,
+  analysisRefreshing,
+  analysisBusy,
+  analysisStatus,
+  hasPatientId,
+}: AnalysisPanelProps) => {
+  const signalMax =
+    summary?.telemetry?.byType?.reduce((max, signal) => Math.max(max, signal.count), 1) || 1;
+
   return (
     <div className="space-y-6">
       {/* Overview */}
       {overview && (
         <div className="glass-panel p-6 space-y-4">
-          <div className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-accent" />
-            <h3 className="text-base font-heading font-bold text-foreground">Platform Overview</h3>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-accent" />
+              <h3 className="text-base font-heading font-bold text-foreground">Analysis Board</h3>
+            </div>
+            <Button size="sm" variant="outline" onClick={onRefreshBoard} disabled={analysisRefreshing}>
+              {analysisRefreshing ? "Refreshing..." : "Refresh Board"}
+            </Button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
@@ -106,6 +125,41 @@ const AnalysisPanel = ({ overview, summary, onLoadSummary, analysisBusy, analysi
                 <p className="text-xs text-muted-foreground">{summary.alerts.unacknowledged} unacknowledged</p>
               </div>
             </div>
+
+            {summary.telemetry.byType.length > 0 && (
+              <div className="rounded-xl border border-border bg-background p-4 space-y-3">
+                <p className="text-xs text-muted-foreground">Telemetry by Signal Type</p>
+                <div className="space-y-2">
+                  {summary.telemetry.byType.map((signal) => (
+                    <div key={signal.signalType} className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-foreground">{signal.signalType}</span>
+                        <span className="text-muted-foreground">{signal.count}</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                        <div
+                          className="h-full gradient-primary-bg"
+                          style={{ width: `${Math.max(8, Math.round((signal.count / signalMax) * 100))}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {summary.alerts.bySeverity && Object.keys(summary.alerts.bySeverity).length > 0 && (
+              <div className="rounded-xl border border-border bg-background p-4 space-y-3">
+                <p className="text-xs text-muted-foreground">Alert Severity Distribution</p>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(summary.alerts.bySeverity).map(([severity, count]) => (
+                    <span key={severity} className="px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs font-medium">
+                      {severity}: {String(count)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {summary.insight && (
               <div className="rounded-xl border border-accent/20 bg-accent/5 p-4 space-y-2">

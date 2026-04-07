@@ -7,6 +7,8 @@ import KpiRow from "./KpiRow";
 import TaskLabPanel from "./TaskLabPanel";
 import AnalysisPanel from "./AnalysisPanel";
 import ChatPanel from "./ChatPanel";
+import PatientsPanel from "./PatientsPanel";
+import SettingsPanel from "./SettingsPanel";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -25,6 +27,33 @@ interface DashboardViewProps {
   onLogout: () => void;
 }
 
+interface Patient {
+  id: string;
+  first_name: string;
+  last_name: string;
+  date_of_birth?: string;
+  cognitive_condition?: string;
+  risk_level?: string;
+}
+
+interface PatientFormState {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  cognitiveCondition: string;
+  riskLevel: string;
+  baselineResponseTimeMs: string;
+}
+
+interface DashboardSettings {
+  defaultPatientId: string;
+  analysisWindowHours: string;
+  autoRefreshOverview: boolean;
+  refreshIntervalMinutes: string;
+}
+
+type DashboardTab = "patients" | "tasklab" | "analysis" | "chat" | "settings";
+
 async function apiRequest<T>(apiBase: string, path: string, token: string, options?: { method?: string; body?: unknown }): Promise<T> {
   const res = await fetch(`${apiBase}${path}`, {
     method: options?.method || "GET",
@@ -38,10 +67,34 @@ async function apiRequest<T>(apiBase: string, path: string, token: string, optio
   return res.json();
 }
 
+const DASHBOARD_SETTINGS_KEY = "adapt_dashboard_settings";
+
 const DashboardView = ({ token, user, apiBase, onLogout }: DashboardViewProps) => {
-  const [activeTab, setActiveTab] = useState<"tasklab" | "analysis" | "chat">("tasklab");
+  const [activeTab, setActiveTab] = useState<DashboardTab>("patients");
   const [activePatientId, setActivePatientId] = useState("");
   const [analysisWindowHours, setAnalysisWindowHours] = useState("24");
+
+  // Patients state
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [patientBusy, setPatientBusy] = useState(false);
+  const [patientStatus, setPatientStatus] = useState("");
+  const [patientForm, setPatientForm] = useState<PatientFormState>({
+    firstName: "",
+    lastName: "",
+    dateOfBirth: "",
+    cognitiveCondition: "",
+    riskLevel: "MEDIUM",
+    baselineResponseTimeMs: "3000",
+  });
+
+  // Settings state
+  const [settingsForm, setSettingsForm] = useState<DashboardSettings>({
+    defaultPatientId: "",
+    analysisWindowHours: "24",
+    autoRefreshOverview: false,
+    refreshIntervalMinutes: "5",
+  });
+  const [settingsStatus, setSettingsStatus] = useState("");
 
   // Task Lab state
   const [taskPrompt, setTaskPrompt] = useState("");
@@ -57,6 +110,7 @@ const DashboardView = ({ token, user, apiBase, onLogout }: DashboardViewProps) =
   const [summary, setSummary] = useState<any>(null);
   const [analysisStatus, setAnalysisStatus] = useState("");
   const [analysisBusy, setAnalysisBusy] = useState(false);
+  const [analysisRefreshing, setAnalysisRefreshing] = useState(false);
 
   // Chat state
   const [chatPrompt, setChatPrompt] = useState("");
@@ -68,65 +122,294 @@ const DashboardView = ({ token, user, apiBase, onLogout }: DashboardViewProps) =
     return joined || user.email.split("@")[0] || "Caregiver";
   }, [user]);
 
-  const publishedPlanCount = useMemo(() => taskPlans.filter((p: any) => String(p.status || "").toUpperCase() === "PUBLISHED").length, [taskPlans]);
-  const draftPlanCount = useMemo(() => taskPlans.filter((p: any) => String(p.status || "").toUpperCase() === "DRAFT").length, [taskPlans]);
+  const publishedPlanCount = useMemo(
+    () => taskPlans.filter((p: any) => String(p.status || "").toUpperCase() === "PUBLISHED").length,
+    [taskPlans],
+  );
+  const draftPlanCount = useMemo(
+    () => taskPlans.filter((p: any) => String(p.status || "").toUpperCase() === "DRAFT").length,
+    [taskPlans],
+  );
+
+  const updatePatientForm = (field: keyof PatientFormState, value: string) => {
+    setPatientForm((current) => ({ ...current, [field]: value }));
+    if (patientStatus) {
+      setPatientStatus("");
+    }
+  };
+
+  const updateSettings = (patch: Partial<DashboardSettings>) => {
+    setSettingsForm((current) => ({ ...current, ...patch }));
+    if (settingsStatus) {
+      setSettingsStatus("");
+    }
+  };
 
   const loadTemplates = useCallback(async () => {
     try {
       const res = await apiRequest<{ data: any[] }>(apiBase, "/task-lab/templates", token);
       setTemplates(res.data || []);
-      if (res.data.length > 0) setSelectedTemplate((c) => c || res.data[0].key);
-    } catch (e) { setTaskStatus(e instanceof Error ? e.message : "Failed to load templates."); }
+      if (res.data.length > 0) {
+        setSelectedTemplate((current) => current || res.data[0].key);
+      }
+    } catch (e) {
+      setTaskStatus(e instanceof Error ? e.message : "Failed to load templates.");
+    }
   }, [token, apiBase]);
 
-  const loadTaskPlans = useCallback(async (patientId: string) => {
+  const loadPatients = useCallback(async () => {
     try {
-      const res = await apiRequest<{ data: any[] }>(apiBase, `/task-lab/plans?patientId=${encodeURIComponent(patientId)}&limit=50&offset=0`, token);
-      setTaskPlans(res.data || []);
-    } catch (e) { setTaskStatus(e instanceof Error ? e.message : "Failed to load plans."); }
+      const res = await apiRequest<{ data: Patient[] }>(apiBase, "/patients?limit=100&offset=0", token);
+      setPatients(res.data || []);
+    } catch (e) {
+      setPatientStatus(e instanceof Error ? e.message : "Failed to load patients.");
+    }
   }, [token, apiBase]);
+
+  const loadTaskPlans = useCallback(
+    async (patientId: string) => {
+      try {
+        const res = await apiRequest<{ data: any[] }>(
+          apiBase,
+          `/task-lab/plans?patientId=${encodeURIComponent(patientId)}&limit=50&offset=0`,
+          token,
+        );
+        setTaskPlans(res.data || []);
+      } catch (e) {
+        setTaskStatus(e instanceof Error ? e.message : "Failed to load plans.");
+      }
+    },
+    [token, apiBase],
+  );
 
   const loadOverview = useCallback(async () => {
     try {
       const windowMs = Math.max(1, parseInt(analysisWindowHours, 10) || 24) * 3_600_000;
       const res = await apiRequest<any>(apiBase, `/analysis/overview?windowMs=${windowMs}`, token);
       setOverview(res);
-    } catch (e) { setAnalysisStatus(e instanceof Error ? e.message : "Unable to load overview."); }
+    } catch (e) {
+      setAnalysisStatus(e instanceof Error ? e.message : "Unable to load overview.");
+    }
   }, [token, apiBase, analysisWindowHours]);
 
-  useEffect(() => { void loadTemplates(); }, [loadTemplates]);
-  useEffect(() => { void loadOverview(); }, [loadOverview]);
+  const loadPatientSummary = useCallback(async () => {
+    if (!activePatientId.trim()) {
+      setAnalysisStatus("Set patient ID first.");
+      return;
+    }
+    setAnalysisBusy(true);
+    setAnalysisStatus("");
+    try {
+      const windowMs = Math.max(1, parseInt(analysisWindowHours, 10) || 24) * 3_600_000;
+      const res = await apiRequest<any>(
+        apiBase,
+        `/analysis/patient/${encodeURIComponent(activePatientId.trim())}/summary?windowMs=${windowMs}`,
+        token,
+      );
+      setSummary(res);
+    } catch (e) {
+      setAnalysisStatus(e instanceof Error ? e.message : "Unable to load patient summary.");
+    } finally {
+      setAnalysisBusy(false);
+    }
+  }, [activePatientId, analysisWindowHours, token, apiBase]);
+
+  const refreshAnalysisBoard = useCallback(async () => {
+    setAnalysisRefreshing(true);
+    setAnalysisStatus("");
+    try {
+      await loadOverview();
+      if (activePatientId.trim()) {
+        await loadPatientSummary();
+      }
+      setAnalysisStatus("Analysis board refreshed.");
+    } catch {
+      setAnalysisStatus("Unable to refresh analysis board.");
+    } finally {
+      setAnalysisRefreshing(false);
+    }
+  }, [loadOverview, loadPatientSummary, activePatientId]);
+
   useEffect(() => {
-    if (activePatientId.trim()) void loadTaskPlans(activePatientId.trim());
-    else setTaskPlans([]);
+    void loadTemplates();
+  }, [loadTemplates]);
+
+  useEffect(() => {
+    void loadOverview();
+  }, [loadOverview]);
+
+  useEffect(() => {
+    void loadPatients();
+  }, [loadPatients]);
+
+  useEffect(() => {
+    if (activePatientId.trim()) {
+      void loadTaskPlans(activePatientId.trim());
+    } else {
+      setTaskPlans([]);
+    }
   }, [activePatientId, loadTaskPlans]);
 
-  const generateTaskDraft = async () => {
-    if (!taskPrompt.trim()) { setTaskStatus("Enter a prompt first."); return; }
-    setTaskBusy(true); setTaskStatus("");
+  useEffect(() => {
+    const raw = localStorage.getItem(DASHBOARD_SETTINGS_KEY);
+    if (!raw) {
+      return;
+    }
     try {
-      const res = await apiRequest<any>(apiBase, "/ai/task-lab/generate", token, { method: "POST", body: { prompt: taskPrompt } });
+      const parsed = JSON.parse(raw) as Partial<DashboardSettings>;
+      const loaded: DashboardSettings = {
+        defaultPatientId:
+          typeof parsed.defaultPatientId === "string" ? parsed.defaultPatientId : "",
+        analysisWindowHours:
+          typeof parsed.analysisWindowHours === "string"
+            ? parsed.analysisWindowHours
+            : "24",
+        autoRefreshOverview: Boolean(parsed.autoRefreshOverview),
+        refreshIntervalMinutes:
+          typeof parsed.refreshIntervalMinutes === "string"
+            ? parsed.refreshIntervalMinutes
+            : "5",
+      };
+      setSettingsForm(loaded);
+      setAnalysisWindowHours(loaded.analysisWindowHours);
+      if (loaded.defaultPatientId.trim()) {
+        setActivePatientId(loaded.defaultPatientId.trim());
+      }
+    } catch {
+      setSettingsStatus("Saved settings were invalid and were ignored.");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!settingsForm.autoRefreshOverview) {
+      return;
+    }
+    const minutes = Math.max(
+      1,
+      parseInt(settingsForm.refreshIntervalMinutes, 10) || 5,
+    );
+    const timerId = window.setInterval(() => {
+      void loadOverview();
+    }, minutes * 60_000);
+    return () => window.clearInterval(timerId);
+  }, [settingsForm.autoRefreshOverview, settingsForm.refreshIntervalMinutes, loadOverview]);
+
+  const createPatient = async () => {
+    if (!patientForm.firstName.trim() || !patientForm.lastName.trim()) {
+      setPatientStatus("First name and last name are required.");
+      return;
+    }
+    setPatientBusy(true);
+    setPatientStatus("");
+    try {
+      const baselineMs = parseInt(patientForm.baselineResponseTimeMs, 10);
+      const created = await apiRequest<Patient>(apiBase, "/patients", token, {
+        method: "POST",
+        body: {
+          first_name: patientForm.firstName.trim(),
+          last_name: patientForm.lastName.trim(),
+          date_of_birth: patientForm.dateOfBirth || undefined,
+          cognitive_condition: patientForm.cognitiveCondition || undefined,
+          risk_level: patientForm.riskLevel || "MEDIUM",
+          baseline_response_time_ms: Number.isFinite(baselineMs) ? baselineMs : undefined,
+        },
+      });
+      setPatientStatus("Patient added successfully.");
+      setActivePatientId(created.id);
+      setPatientForm({
+        firstName: "",
+        lastName: "",
+        dateOfBirth: "",
+        cognitiveCondition: "",
+        riskLevel: "MEDIUM",
+        baselineResponseTimeMs: "3000",
+      });
+      await Promise.all([loadPatients(), loadOverview()]);
+    } catch (e) {
+      setPatientStatus(e instanceof Error ? e.message : "Failed to add patient.");
+    } finally {
+      setPatientBusy(false);
+    }
+  };
+
+  const saveSettings = async () => {
+    const normalized: DashboardSettings = {
+      defaultPatientId: settingsForm.defaultPatientId.trim(),
+      analysisWindowHours: String(
+        Math.max(1, parseInt(settingsForm.analysisWindowHours, 10) || 24),
+      ),
+      autoRefreshOverview: settingsForm.autoRefreshOverview,
+      refreshIntervalMinutes: String(
+        Math.max(1, parseInt(settingsForm.refreshIntervalMinutes, 10) || 5),
+      ),
+    };
+
+    localStorage.setItem(DASHBOARD_SETTINGS_KEY, JSON.stringify(normalized));
+    setSettingsForm(normalized);
+    setAnalysisWindowHours(normalized.analysisWindowHours);
+    if (normalized.defaultPatientId) {
+      setActivePatientId(normalized.defaultPatientId);
+    }
+    setSettingsStatus("Settings saved.");
+    await loadOverview();
+  };
+
+  const generateTaskDraft = async () => {
+    if (!taskPrompt.trim()) {
+      setTaskStatus("Enter a prompt first.");
+      return;
+    }
+    setTaskBusy(true);
+    setTaskStatus("");
+    try {
+      const res = await apiRequest<any>(apiBase, "/ai/task-lab/generate", token, {
+        method: "POST",
+        body: { prompt: taskPrompt },
+      });
       setGeneratedDraft(res);
       setTaskStatus("AI draft generated. Review and publish to Task Lab.");
-    } catch (e) { setTaskStatus(e instanceof Error ? e.message : "Draft generation failed."); }
-    finally { setTaskBusy(false); }
+    } catch (e) {
+      setTaskStatus(e instanceof Error ? e.message : "Draft generation failed.");
+    } finally {
+      setTaskBusy(false);
+    }
   };
 
   const createTemplatePlan = async () => {
-    if (!activePatientId.trim()) { setTaskStatus("Set patient ID first."); return; }
-    if (!selectedTemplate) { setTaskStatus("Select a template first."); return; }
-    setTaskBusy(true); setTaskStatus("");
+    if (!activePatientId.trim()) {
+      setTaskStatus("Set patient ID first.");
+      return;
+    }
+    if (!selectedTemplate) {
+      setTaskStatus("Select a template first.");
+      return;
+    }
+    setTaskBusy(true);
+    setTaskStatus("");
     try {
-      await apiRequest(apiBase, "/task-lab/plans/from-template", token, { method: "POST", body: { patient_id: activePatientId.trim(), template_key: selectedTemplate } });
+      await apiRequest(apiBase, "/task-lab/plans/from-template", token, {
+        method: "POST",
+        body: {
+          patient_id: activePatientId.trim(),
+          template_key: selectedTemplate,
+        },
+      });
       setTaskStatus("Template plan created.");
       await loadTaskPlans(activePatientId.trim());
-    } catch (e) { setTaskStatus(e instanceof Error ? e.message : "Template creation failed."); }
-    finally { setTaskBusy(false); }
+    } catch (e) {
+      setTaskStatus(e instanceof Error ? e.message : "Template creation failed.");
+    } finally {
+      setTaskBusy(false);
+    }
   };
 
   const publishGeneratedDraft = async () => {
-    if (!generatedDraft || !activePatientId.trim()) { setTaskStatus("Set patient ID before publishing."); return; }
-    setTaskBusy(true); setTaskStatus("");
+    if (!generatedDraft || !activePatientId.trim()) {
+      setTaskStatus("Set patient ID before publishing.");
+      return;
+    }
+    setTaskBusy(true);
+    setTaskStatus("");
     try {
       await apiRequest(apiBase, "/task-lab/plans", token, {
         method: "POST",
@@ -142,47 +425,66 @@ const DashboardView = ({ token, user, apiBase, onLogout }: DashboardViewProps) =
           source: generatedDraft.draft.source || "AI",
           template_key: generatedDraft.draft.template_key,
           steps: (generatedDraft.draft.steps || []).map((s: any, i: number) => ({
-            step_order: s.step_order || i + 1, title: s.title, details: s.details, is_required: s.is_required !== false,
+            step_order: s.step_order || i + 1,
+            title: s.title,
+            details: s.details,
+            is_required: s.is_required !== false,
           })),
         },
       });
       setTaskStatus("Draft saved to Task Lab.");
       await loadTaskPlans(activePatientId.trim());
-    } catch (e) { setTaskStatus(e instanceof Error ? e.message : "Unable to publish draft."); }
-    finally { setTaskBusy(false); }
+    } catch (e) {
+      setTaskStatus(e instanceof Error ? e.message : "Unable to publish draft.");
+    } finally {
+      setTaskBusy(false);
+    }
   };
 
   const publishPlan = async (planId: string) => {
-    setTaskBusy(true); setTaskStatus("");
+    setTaskBusy(true);
+    setTaskStatus("");
     try {
-      await apiRequest(apiBase, `/task-lab/plans/${planId}/status`, token, { method: "PUT", body: { status: "PUBLISHED" } });
+      await apiRequest(apiBase, `/task-lab/plans/${planId}/status`, token, {
+        method: "PUT",
+        body: { status: "PUBLISHED" },
+      });
       setTaskStatus("Plan published.");
-      if (activePatientId.trim()) await loadTaskPlans(activePatientId.trim());
-    } catch (e) { setTaskStatus(e instanceof Error ? e.message : "Failed to update plan status."); }
-    finally { setTaskBusy(false); }
-  };
-
-  const loadPatientSummary = async () => {
-    if (!activePatientId.trim()) { setAnalysisStatus("Set patient ID first."); return; }
-    setAnalysisBusy(true); setAnalysisStatus("");
-    try {
-      const windowMs = Math.max(1, parseInt(analysisWindowHours, 10) || 24) * 3_600_000;
-      const res = await apiRequest<any>(apiBase, `/analysis/patient/${encodeURIComponent(activePatientId.trim())}/summary?windowMs=${windowMs}`, token);
-      setSummary(res);
-    } catch (e) { setAnalysisStatus(e instanceof Error ? e.message : "Unable to load patient summary."); }
-    finally { setAnalysisBusy(false); }
+      if (activePatientId.trim()) {
+        await loadTaskPlans(activePatientId.trim());
+      }
+    } catch (e) {
+      setTaskStatus(
+        e instanceof Error ? e.message : "Failed to update plan status.",
+      );
+    } finally {
+      setTaskBusy(false);
+    }
   };
 
   const sendChat = async () => {
-    if (!chatPrompt.trim()) return;
+    if (!chatPrompt.trim()) {
+      return;
+    }
     setChatBusy(true);
     try {
       const payload = await apiRequest<any>(apiBase, "/ai/chat", token, {
         method: "POST",
-        body: { prompt: chatPrompt, patientId: activePatientId.trim() || undefined },
+        body: {
+          prompt: chatPrompt,
+          patientId: activePatientId.trim() || undefined,
+        },
       });
-      const actionLines = payload.actionItems.map((item: string) => `- ${item}`).join("\n");
-      const flags = payload.safetyFlags.length > 0 ? payload.safetyFlags.join(", ") : "None";
+
+      const actionItems = Array.isArray(payload.actionItems)
+        ? payload.actionItems
+        : [];
+      const safetyFlags = Array.isArray(payload.safetyFlags)
+        ? payload.safetyFlags
+        : [];
+      const actionLines = actionItems.map((item: string) => `- ${item}`).join("\n");
+      const flags = safetyFlags.length > 0 ? safetyFlags.join(", ") : "None";
+
       setChatMessages((prev) => [
         ...prev,
         `You: ${chatPrompt}`,
@@ -190,46 +492,77 @@ const DashboardView = ({ token, user, apiBase, onLogout }: DashboardViewProps) =
       ]);
       setChatPrompt("");
     } catch (e) {
-      setChatMessages((prev) => [...prev, `System: ${e instanceof Error ? e.message : "Unable to contact AI endpoint."}`]);
-    } finally { setChatBusy(false); }
+      setChatMessages((prev) => [
+        ...prev,
+        `System: ${e instanceof Error ? e.message : "Unable to contact AI endpoint."}`,
+      ]);
+    } finally {
+      setChatBusy(false);
+    }
   };
 
   const tabs = [
+    { key: "patients" as const, label: "Patients" },
     { key: "tasklab" as const, label: "Task Lab" },
-    { key: "analysis" as const, label: "Analysis" },
+    { key: "analysis" as const, label: "Analysis Board" },
     { key: "chat" as const, label: "AI Chat" },
+    { key: "settings" as const, label: "Settings" },
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-          <DashboardHeader caregiverName={caregiverName} onLogout={onLogout} />
+          <DashboardHeader
+            caregiverName={caregiverName}
+            onLogout={onLogout}
+            onOpenSettings={() => setActiveTab("settings")}
+          />
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
           <KpiRow
-            patients={overview?.totals?.patients ?? null}
+            patients={overview?.totals?.patients ?? patients.length}
             unacknowledgedAlerts={overview?.totals?.unacknowledgedAlerts ?? null}
             publishedPlans={publishedPlanCount}
             draftPlans={draftPlanCount}
           />
         </motion.div>
 
-        {/* Filters */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="grid sm:grid-cols-2 gap-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="grid sm:grid-cols-2 gap-4"
+        >
           <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Active Patient ID</Label>
-            <Input value={activePatientId} onChange={(e) => setActivePatientId(e.target.value)} placeholder="Paste patient UUID" />
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Active Patient ID
+            </Label>
+            <Input
+              value={activePatientId}
+              onChange={(e) => setActivePatientId(e.target.value)}
+              placeholder="Paste patient UUID"
+            />
           </div>
           <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Analysis Window (hours)</Label>
-            <Input type="number" value={analysisWindowHours} onChange={(e) => setAnalysisWindowHours(e.target.value)} placeholder="24" />
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Analysis Window (hours)
+            </Label>
+            <Input
+              type="number"
+              value={analysisWindowHours}
+              onChange={(e) => setAnalysisWindowHours(e.target.value)}
+              placeholder="24"
+            />
           </div>
         </motion.div>
 
-        {/* Tabs */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {tabs.map((tab) => (
             <button
               key={tab.key}
@@ -245,8 +578,26 @@ const DashboardView = ({ token, user, apiBase, onLogout }: DashboardViewProps) =
           ))}
         </div>
 
-        {/* Tab content */}
-        <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {activeTab === "patients" && (
+            <PatientsPanel
+              patients={patients}
+              activePatientId={activePatientId}
+              patientForm={patientForm}
+              patientBusy={patientBusy}
+              patientStatus={patientStatus}
+              onSelectPatient={setActivePatientId}
+              onChangeForm={updatePatientForm}
+              onCreatePatient={createPatient}
+              onRefreshPatients={() => void loadPatients()}
+            />
+          )}
+
           {activeTab === "tasklab" && (
             <TaskLabPanel
               templates={templates}
@@ -264,16 +615,20 @@ const DashboardView = ({ token, user, apiBase, onLogout }: DashboardViewProps) =
               taskStatus={taskStatus}
             />
           )}
+
           {activeTab === "analysis" && (
             <AnalysisPanel
               overview={overview}
               summary={summary}
               onLoadSummary={loadPatientSummary}
+              onRefreshBoard={() => void refreshAnalysisBoard()}
+              analysisRefreshing={analysisRefreshing}
               analysisBusy={analysisBusy}
               analysisStatus={analysisStatus}
               hasPatientId={!!activePatientId.trim()}
             />
           )}
+
           {activeTab === "chat" && (
             <ChatPanel
               messages={chatMessages}
@@ -281,6 +636,16 @@ const DashboardView = ({ token, user, apiBase, onLogout }: DashboardViewProps) =
               onSetPrompt={setChatPrompt}
               onSend={sendChat}
               busy={chatBusy}
+            />
+          )}
+
+          {activeTab === "settings" && (
+            <SettingsPanel
+              userEmail={user.email}
+              settings={settingsForm}
+              settingsStatus={settingsStatus}
+              onSettingsChange={updateSettings}
+              onSaveSettings={() => void saveSettings()}
             />
           )}
         </motion.div>
