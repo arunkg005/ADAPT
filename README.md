@@ -157,6 +157,21 @@ After running `npm run check:final` or `npm run db:prepare`, sample credentials 
 - `admin@adapt.local` / `password123`
 - `caregiver1@adapt.local` / `password123`
 
+## Live Login Reliability Note
+
+The current web production setup uses a deployed frontend with a backend that is exposed through a temporary tunnel URL.
+
+If the tunnel expires, the UI can still load but login calls fail (commonly with `Failed to fetch` or HTTP 503 on backend tunnel endpoints).
+
+### Recovery Steps (when live login stops)
+
+1. Ensure backend is running locally on port 3001.
+2. Start a fresh public tunnel to `localhost:3001`.
+3. Update Vercel production env var `NEXT_PUBLIC_API_BASE` to the new `<tunnel-url>/api`.
+4. Redeploy frontend production.
+
+For permanent 24/7 reliability, deploy backend to a stable hosted service (instead of a temporary tunnel) and point `NEXT_PUBLIC_API_BASE` to that stable backend URL.
+
 ## Notes
 
 - Keep secrets in local env/CI secret stores only.
