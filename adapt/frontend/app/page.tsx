@@ -52,7 +52,7 @@ const Home = () => {
     localStorage.removeItem(USER_KEY);
   };
 
-  const goToSignIn = () => {
+  const openLoginPage = () => {
     setToken(null);
     setUser(null);
     setAuthError("");
@@ -163,10 +163,8 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       <HeroSection
-        onGetStarted={() =>
-          isLoggedIn ? setEntryView("dashboard") : setEntryView("auth")
-        }
-        onSignIn={goToSignIn}
+        onLogin={openLoginPage}
+        onOpenDashboard={() => setEntryView("dashboard")}
         isLoggedIn={isLoggedIn}
       />
       <FeaturesSection />

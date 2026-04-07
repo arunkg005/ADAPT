@@ -3,12 +3,12 @@ import { ArrowRight, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HeroSectionProps {
-  onGetStarted: () => void;
-  onSignIn: () => void;
+  onLogin: () => void;
+  onOpenDashboard: () => void;
   isLoggedIn: boolean;
 }
 
-const HeroSection = ({ onGetStarted, onSignIn, isLoggedIn }: HeroSectionProps) => {
+const HeroSection = ({ onLogin, onOpenDashboard, isLoggedIn }: HeroSectionProps) => {
   return (
     <section className="relative min-h-[85vh] flex items-center gradient-hero-bg overflow-hidden">
       {/* Decorative circles */}
@@ -39,13 +39,15 @@ const HeroSection = ({ onGetStarted, onSignIn, isLoggedIn }: HeroSectionProps) =
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Button variant="hero" size="xl" onClick={onGetStarted}>
-                {isLoggedIn ? "Continue to Dashboard" : "Get Started"}
+              <Button variant="hero" size="xl" onClick={onLogin}>
+                Login
                 <ArrowRight className="ml-1 h-5 w-5" />
               </Button>
-              <Button variant="hero-outline" size="xl" onClick={onSignIn}>
-                {isLoggedIn ? "Sign In with Another Account" : "Sign In"}
-              </Button>
+              {isLoggedIn && (
+                <Button variant="hero-outline" size="xl" onClick={onOpenDashboard}>
+                  Open Dashboard
+                </Button>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-3 pt-2">
