@@ -4,6 +4,11 @@ ADAPT is a cross-platform cognitive assistance platform with shared backend serv
 
 This README is the current delivery snapshot and runbook.
 
+## About
+
+- Live Web App: https://frontend-wine-five-32.vercel.app
+- Purpose: Caregiver-first platform for patient planning, assist workflows, analysis, and AI support.
+
 ## Current Work Done
 
 Core functionality completed in this repository:
