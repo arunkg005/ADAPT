@@ -4,7 +4,7 @@
 ADAPT is a cognitive assistance platform designed to support elderly and cognitively vulnerable users through guided routines, telemetry analysis, and caregiver-facing monitoring.
 
 The repository contains three main apps:
-- `frontend` (Next.js app for landing page, login, and dashboard)
+- `frontend` (Next.js app for web landing experience)
 - `backend` (Express + TypeScript API with PostgreSQL)
 - `engine-service` (independent cognitive evaluation service)
 
@@ -27,8 +27,8 @@ The repository contains three main apps:
 - App Router entry points live in `frontend/app`.
 - Active main routes are:
   - `frontend/app/page.tsx`
-  - `frontend/app/login/page.tsx`
-  - `frontend/app/dashboard/page.tsx`
+  - `frontend/app/layout.tsx`
+  - `frontend/app/globals.css`
 
 ### Engine Service
 - Main runtime files are in `engine-service/src`.
@@ -106,8 +106,8 @@ npm run dev
 ```
 
 ### Option B: Helper scripts
-- Windows: `START_ALL.bat` or `START_ALL_NO_DOCKER.bat`
-- Linux/Mac: `start_all.sh`
+- Cross-platform: from `adapt/`, run `npm run dev`
+- Linux/Mac legacy helper: `start_all.sh`
 
 ### Option C: Single app image (frontend + backend + engine)
 
@@ -132,6 +132,16 @@ Notes:
 - Docker is optional for local development if your team already has a local PostgreSQL instance.
 
 ## Commands
+
+### Workspace (`adapt/package.json`)
+- `npm run install:all` - install all service dependencies
+- `npm run build:all` - build backend, engine, and frontend
+- `npm run dev` - start all three services together
+- `npm run db:up` - start PostgreSQL via Docker
+- `npm run db:prepare` - run backend migration then seed
+- `npm run check:smart` - run diff-aware targeted checks
+- `npm run check:smart:db` - targeted checks + DB migration when relevant
+- `npm run check:final` - full build + DB prepare
 
 ### Backend (`backend/package.json`)
 - `npm run dev` - start backend in development mode
@@ -179,6 +189,10 @@ Run order for a fresh setup:
 - Backend uses JWT-based authentication.
 - Passwords are hashed with bcrypt.
 - Role model includes ADMIN, CAREGIVER, and PATIENT.
+- Role guards are enforced at route level via middleware.
+- `/api/docs` includes a `roles` list per endpoint for permission visibility.
+- Backend applies rate limiting globally and stricter limits for auth endpoints.
+- Backend response hardening uses security headers via Helmet.
 
 ## API Areas
 Main backend API groups:
@@ -207,4 +221,4 @@ Health endpoint:
 
 ## Notes
 - Repository includes several historical UI variant files (`*-new.tsx`, `*-old.tsx`, `*-redesigned.tsx`).
-- Treat `frontend/app/page.tsx`, `frontend/app/login/page.tsx`, and `frontend/app/dashboard/page.tsx` as primary routes unless intentionally switching variants.
+- Treat `frontend/app/page.tsx` as the current primary frontend route unless intentionally adding new routes.

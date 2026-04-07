@@ -202,6 +202,25 @@ gradlew.bat assembleDebug
 
 - Main web stack notes: adapt/DOCUMENTATION.md
 - Admin dashboard notes: docs/Adapt_admin_dashboard/GET_STARTED.md
+- Mobile deployment notes: Adapt_mobile_app/DEPLOYMENT.md
+
+## CI Release Hardening
+
+The repository includes a GitHub Actions pipeline for release hardening checks:
+
+- Workflow: .github/workflows/release-hardening.yml
+- Jobs:
+	- Workspace final gate (build all + DB migrate/seed)
+	- Backend production dependency audit
+	- Mobile unsigned release artifact generation
+	- Mobile signed release readiness (runs only when signing secrets are available)
+
+Signed release readiness requires repository secrets:
+
+- ADAPT_RELEASE_STORE_FILE_BASE64
+- ADAPT_RELEASE_STORE_PASSWORD
+- ADAPT_RELEASE_KEY_ALIAS
+- ADAPT_RELEASE_KEY_PASSWORD
 
 ## Notes
 

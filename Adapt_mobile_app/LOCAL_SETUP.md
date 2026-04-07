@@ -59,6 +59,40 @@ macOS/Linux:
 ./gradlew assembleDebug
 ```
 
+### Build with a custom backend URL
+
+Windows:
+
+```bat
+gradlew.bat assembleDebug -PADAPT_API_BASE_URL=http://10.0.2.2:3001/api/
+```
+
+macOS/Linux:
+
+```bash
+./gradlew assembleDebug -PADAPT_API_BASE_URL=http://10.0.2.2:3001/api/
+```
+
+### Generate release artifacts
+
+Windows:
+
+```bat
+gradlew.bat assembleRelease
+gradlew.bat bundleRelease
+```
+
+macOS/Linux:
+
+```bash
+./gradlew assembleRelease
+./gradlew bundleRelease
+```
+
+Output paths:
+- `app/build/outputs/apk/release/app-release-unsigned.apk`
+- `app/build/outputs/bundle/release/app-release.aab`
+
 ## 6) Tests (Optional)
 
 Windows:
@@ -84,3 +118,4 @@ macOS/Linux:
 
 - Do not commit local machine paths or credentials.
 - Keep local.properties as local-only configuration.
+- Configure signing only via Gradle properties/environment, never in source control.
