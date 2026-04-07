@@ -1,12 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import HeroSection from "@/components/landing/HeroSection";
-import FeaturesSection from "@/components/landing/FeaturesSection";
-import MobileFlowSection from "@/components/landing/MobileFlowSection";
-import ProblemSolutionSection from "@/components/landing/ProblemSolutionSection";
+import { useRouter } from "next/navigation";
 import AuthPage from "@/components/auth/AuthPage";
-import DashboardView from "@/components/dashboard/DashboardView";
 
 interface AuthUser {
   id: string;
@@ -21,16 +17,14 @@ interface AuthResponse {
   user: AuthUser;
 }
 
-type EntryView = "landing" | "auth" | "dashboard";
-
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:3001/api";
 const TOKEN_KEY = "adapt_web_token";
 const USER_KEY = "adapt_web_user";
 
-const Home = () => {
+const LoginPage = () => {
+  const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [entryView, setEntryView] = useState<EntryView>("landing");
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
 
@@ -39,26 +33,9 @@ const Home = () => {
   const persistSession = (payload: AuthResponse) => {
     setToken(payload.token);
     setUser(payload.user);
-    setEntryView("dashboard");
     localStorage.setItem(TOKEN_KEY, payload.token);
     localStorage.setItem(USER_KEY, JSON.stringify(payload.user));
-  };
-
-  const clearSession = () => {
-    setToken(null);
-    setUser(null);
-    setEntryView("landing");
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-  };
-
-  const openLoginPage = () => {
-    setToken(null);
-    setUser(null);
-    setAuthError("");
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-    setEntryView("auth");
+    router.replace("/");
   };
 
   useEffect(() => {
@@ -72,9 +49,9 @@ const Home = () => {
     try {
       setToken(savedToken);
       setUser(JSON.parse(savedUser));
-      setEntryView("dashboard");
     } catch {
-      clearSession();
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
     }
   }, []);
 
@@ -135,52 +112,18 @@ const Home = () => {
     }
   };
 
-  if (entryView === "auth") {
-    return (
-      <AuthPage
-        onBack={() => setEntryView("landing")}
-        onLogin={handleLogin}
-        onRegister={handleRegister}
-        onDashboard={() => setEntryView("dashboard")}
-        isLoggedIn={isLoggedIn}
-        userEmail={user?.email}
-        authLoading={authLoading}
-        authError={authError}
-      />
-    );
-  }
-
-  if (entryView === "dashboard" && isLoggedIn) {
-    return (
-      <DashboardView
-        token={token!}
-        user={user!}
-        apiBase={API_BASE}
-        onLogout={clearSession}
-      />
-    );
-  }
-
   return (
-    <div className="min-h-screen">
-      <HeroSection
-        onLogin={openLoginPage}
-        onOpenDashboard={() => setEntryView("dashboard")}
-        isLoggedIn={isLoggedIn}
-      />
-      <FeaturesSection />
-      <ProblemSolutionSection />
-      <MobileFlowSection />
-      <footer className="py-12 bg-primary text-primary-foreground">
-        <div className="container max-w-7xl mx-auto px-6 text-center space-y-2">
-          <p className="font-heading font-bold text-lg">ADAPT Care Platform</p>
-          <p className="text-sm text-primary-foreground/70">
-            Cognitive assistance for caregiver workflows
-          </p>
-        </div>
-      </footer>
-    </div>
+    <AuthPage
+      onBack={() => router.push("/")}
+      onLogin={handleLogin}
+      onRegister={handleRegister}
+      onDashboard={() => router.push("/")}
+      isLoggedIn={isLoggedIn}
+      userEmail={user?.email}
+      authLoading={authLoading}
+      authError={authError}
+    />
   );
 };
 
-export default Home;
+export default LoginPage;

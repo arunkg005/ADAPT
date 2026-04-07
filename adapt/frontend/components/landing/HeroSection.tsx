@@ -1,3 +1,4 @@
+import { MouseEvent } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,11 @@ interface HeroSectionProps {
 }
 
 const HeroSection = ({ onLogin, onOpenDashboard, isLoggedIn }: HeroSectionProps) => {
+  const handleLoginClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    onLogin();
+  };
+
   return (
     <section className="relative min-h-[85vh] flex items-center gradient-hero-bg overflow-hidden">
       {/* Decorative circles */}
@@ -39,9 +45,11 @@ const HeroSection = ({ onLogin, onOpenDashboard, isLoggedIn }: HeroSectionProps)
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Button variant="hero" size="xl" onClick={onLogin}>
-                Login
-                <ArrowRight className="ml-1 h-5 w-5" />
+              <Button variant="hero" size="xl" asChild>
+                <a href="/login" onClick={handleLoginClick}>
+                  Login
+                  <ArrowRight className="ml-1 h-5 w-5" />
+                </a>
               </Button>
               {isLoggedIn && (
                 <Button variant="hero-outline" size="xl" onClick={onOpenDashboard}>
