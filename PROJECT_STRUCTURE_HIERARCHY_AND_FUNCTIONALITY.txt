@@ -1,0 +1,483 @@
+ADAPT Project Structure and Functionality Map
+Generated on: 2026-04-07
+
+Important note
+- This map covers the complete maintained project hierarchy and functionality.
+- Generated/runtime folders are listed separately to keep this readable.
+
+============================================================
+1) Top-level hierarchy
+============================================================
+Project_ADAPT/
+|- .github/
+|  |- workflows/
+|  |  |- release-hardening.yml
+|  |     Purpose: CI release hardening pipeline (workspace final gate, backend audit, mobile artifacts, signed readiness when secrets exist)
+|
+|- .git/
+|  Purpose: Git repository metadata
+|
+|- .vscode/
+|  Purpose: Editor workspace settings and local developer tooling
+|
+|- adapt/
+|  Purpose: Web/API/engine workspace
+|
+|- Adapt_mobile_app/
+|  Purpose: Native Android mobile application
+|
+|- README.md
+|  Purpose: Primary entry documentation and runbook
+|
+|- PROJECT_COMPLETE_DOCUMENTATION.md
+|  Purpose: Consolidated project documentation snapshot
+|
+|- PROJECT_STRUCTURE_HIERARCHY_AND_FUNCTIONALITY.txt
+|  Purpose: This file (full hierarchy + functionality map)
+
+============================================================
+2) Web/API/Engine workspace (adapt)
+============================================================
+adapt/
+|- ARCHITECTURE_REFERENCE.md
+|  Purpose: Quick architecture and file ownership index
+|
+|- DOCUMENTATION.md
+|  Purpose: Technical platform documentation
+|
+|- FAST_WORKFLOW.md
+|  Purpose: Fast validation/check workflow guidance
+|
+|- LOCAL_SETUP.md
+|  Purpose: Local setup instructions for web stack
+|
+|- docker-compose.yml
+|  Purpose: Local PostgreSQL and profile-based container orchestration
+|
+|- Dockerfile.single
+|  Purpose: Single image build for app services
+|
+|- package.json
+|  Purpose: Workspace scripts (install/build/dev/check)
+|
+|- setup_database.sql
+|  Purpose: Base PostgreSQL DB/user setup script
+|
+|- start_all.sh
+|  Purpose: Legacy Linux/Mac startup helper
+|
+|- docker/
+|  |- run-single.sh
+|     Purpose: Helper for single-image container run path
+|
+|- scripts/
+|  |- dev-runner.mjs
+|  |  Purpose: Start engine, backend, and frontend together
+|  |
+|  |- smart-check.mjs
+|     Purpose: Diff-aware targeted checks and optional DB migration check
+|
+|- backend/
+|  Purpose: Express + TypeScript API service
+|
+|- engine-service/
+|  Purpose: Cognitive/rule engine service
+|
+|- frontend/
+   Purpose: Next.js caregiver web application
+
+------------------------------------------------------------
+2.1) Backend structure and functionality (adapt/backend)
+------------------------------------------------------------
+adapt/backend/
+|- .env.example
+|  Purpose: Environment variable template
+|
+|- package.json
+|  Purpose: Backend scripts (dev/build/start/typecheck/migrate/seed)
+|
+|- package-lock.json
+|  Purpose: Backend dependency lock file
+|
+|- tsconfig.json
+|  Purpose: TypeScript compiler settings
+|
+|- src/
+   |- config.ts
+   |  Purpose: Centralized env config and security/rate-limit settings
+   |
+   |- index.ts
+   |  Purpose: App bootstrap, middleware setup, route mount, health endpoint
+   |
+   |- db/
+   |  |- index.ts
+   |  |  Purpose: PostgreSQL connection/pool utilities
+   |  |
+   |  |- migrate.ts
+   |  |  Purpose: Schema creation/migration (core tables, telemetry compatibility, Task Lab tables)
+   |  |
+   |  |- seed.ts
+   |     Purpose: Seed sample users/patients/caregivers/devices data
+   |
+   |- middleware/
+   |  |- auth.ts
+   |  |  Purpose: JWT auth middleware and role guard helpers
+   |  |
+   |  |- errorHandler.ts
+   |     Purpose: Central error handling and not-found handling
+   |
+   |- routes/
+   |  |- index.ts
+   |  |  Purpose: Route aggregation and API docs endpoint
+   |  |
+   |  |- auth.ts
+   |  |  Purpose: Login/register/verify/logout/social-login and admin registration endpoints
+   |  |
+   |  |- patients.ts
+   |  |  Purpose: Patient CRUD and caregiver assignment APIs
+   |  |
+   |  |- caregivers.ts
+   |  |  Purpose: Caregiver CRUD APIs
+   |  |
+   |  |- devices.ts
+   |  |  Purpose: Device registration/status/update APIs
+   |  |
+   |  |- alerts.ts
+   |  |  Purpose: Alert CRUD + acknowledge workflows
+   |  |
+   |  |- telemetry.ts
+   |  |  Purpose: Telemetry ingest/query and manual evaluation trigger
+   |  |
+   |  |- ai.ts
+   |  |  Purpose: Caregiver AI chat and Task Lab draft generation APIs
+   |  |
+   |  |- analysis.ts
+   |  |  Purpose: Overview and patient summary analytics APIs
+   |  |
+   |  |- taskLab.ts
+   |  |  Purpose: Task Lab templates/plans/status/step completion APIs
+   |  |
+   |  |- cognitive.ts
+   |     Purpose: Cognitive evaluation and assist-mode next action APIs
+   |
+   |- services/
+      |- authService.ts
+      |  Purpose: Auth business logic, token creation, role/platform checks
+      |
+      |- patientService.ts
+      |  Purpose: Patient data operations
+      |
+      |- caregiverService.ts
+      |  Purpose: Caregiver data operations and user-link provisioning
+      |
+      |- deviceService.ts
+      |  Purpose: Device data operations
+      |
+      |- alertService.ts
+      |  Purpose: Alert persistence and acknowledgement logic
+      |
+      |- telemetryService.ts
+      |  Purpose: Telemetry persistence/query and cleanup routines
+      |
+      |- engineService.ts
+      |  Purpose: Backend client for engine-service evaluate/health APIs
+      |
+      |- aiService.ts
+      |  Purpose: Deterministic AI helper responses and Task Lab draft generation logic
+      |
+      |- analysisService.ts
+      |  Purpose: Analytics aggregation for overview and patient summaries
+      |
+      |- cognitiveService.ts
+      |  Purpose: Assist-mode/cognitive decision shaping on top of engine output
+      |
+      |- taskLabService.ts
+         Purpose: Task Lab templates, plan creation, status, and step operations
+
+------------------------------------------------------------
+2.2) Engine service structure and functionality (adapt/engine-service)
+------------------------------------------------------------
+adapt/engine-service/
+|- EXAMPLE_PAYLOADS.json
+|  Purpose: Sample request payloads for testing engine behavior
+|
+|- package.json
+|  Purpose: Engine scripts and dependencies
+|
+|- tsconfig.json
+|  Purpose: TypeScript settings for engine service
+|
+|- src/
+   |- index.ts
+   |  Purpose: Engine HTTP server entrypoint
+   |
+   |- engine.ts
+   |  Purpose: Core rule/evaluation logic
+   |
+   |- types.ts
+      Purpose: Input/output type contracts for engine evaluation
+
+------------------------------------------------------------
+2.3) Frontend structure and functionality (adapt/frontend)
+------------------------------------------------------------
+adapt/frontend/
+|- package.json
+|  Purpose: Next.js scripts (dev/build/start/lint)
+|
+|- package-lock.json
+|  Purpose: Frontend dependency lock file
+|
+|- tsconfig.json
+|  Purpose: TypeScript settings
+|
+|- next.config.ts
+|  Purpose: Next.js config
+|
+|- eslint.config.mjs
+|  Purpose: Lint rules and checks
+|
+|- postcss.config.mjs
+|  Purpose: PostCSS configuration
+|
+|- next-env.d.ts
+|  Purpose: Next.js TypeScript env typing
+|
+|- README.md
+|  Purpose: Default frontend boilerplate note
+|
+|- public/
+|  |- file.svg
+|  |- globe.svg
+|  |- next.svg
+|  |- vercel.svg
+|  |- window.svg
+|     Purpose: Static frontend assets/icons
+|
+|- app/
+   |- favicon.ico
+   |  Purpose: Browser tab icon
+   |
+   |- globals.css
+   |  Purpose: Global UI theme/styling definitions
+   |
+   |- layout.tsx
+   |  Purpose: Root app layout and font/metadata setup
+   |
+   |- page.tsx
+      Purpose: Main caregiver console page (auth, task lab, analysis, chat)
+
+============================================================
+3) Mobile app hierarchy and functionality (Adapt_mobile_app)
+============================================================
+Adapt_mobile_app/
+|- build.gradle.kts
+|  Purpose: Project-level Gradle config
+|
+|- settings.gradle.kts
+|  Purpose: Gradle module settings
+|
+|- gradle.properties
+|  Purpose: Gradle properties
+|
+|- gradlew / gradlew.bat
+|  Purpose: Gradle wrappers for Unix/Windows
+|
+|- LOCAL_SETUP.md
+|  Purpose: Mobile local setup notes
+|
+|- DEPLOYMENT.md
+|  Purpose: Mobile release/deployment runbook
+|
+|- FINAL_VERSION_MODULE_PLAN.md
+|  Purpose: Module-wise delivery roadmap and status tracking
+|
+|- app/
+   |- build.gradle.kts
+   |  Purpose: App module build config (SDK, dependencies, build logic)
+   |
+   |- proguard-rules.pro
+   |  Purpose: Shrinker/obfuscation rules
+   |
+   |- src/
+      |- main/
+      |  |- AndroidManifest.xml
+      |  |  Purpose: App components/permissions/service declarations
+      |  |
+      |  |- java/com/example/adapt/
+      |  |  |- AdaptApplication.java
+      |  |  |  Purpose: Application bootstrap (global init/crash handling)
+      |  |  |
+      |  |  |- MainActivity.java
+      |  |  |  Purpose: Main shell activity and navigation container
+      |  |  |
+      |  |  |- data/
+      |  |  |  |- local/
+      |  |  |  |  |- AppDatabase.java
+      |  |  |  |  |  Purpose: Room database root
+      |  |  |  |  |
+      |  |  |  |  |- Converters.java
+      |  |  |  |  |  Purpose: Room type converters
+      |  |  |  |  |
+      |  |  |  |  |- ActivityLogDao.java
+      |  |  |  |  |- RoutineDao.java
+      |  |  |  |  |- TaskDao.java
+      |  |  |  |  |- TaskLogDao.java
+      |  |  |  |     Purpose: Local persistence DAO interfaces
+      |  |  |  |
+      |  |  |  |- model/
+      |  |  |  |  |- User.java
+      |  |  |  |  |- Routine.java
+      |  |  |  |  |- Task.java
+      |  |  |  |  |- TaskLog.java
+      |  |  |  |  |- ActivityLog.java
+      |  |  |  |  |- CaregiverLink.java
+      |  |  |  |     Purpose: Local/domain data models
+      |  |  |  |
+      |  |  |  |- network/
+      |  |  |  |  |- NetworkClient.java
+      |  |  |  |  |  Purpose: Retrofit/HTTP client setup
+      |  |  |  |  |
+      |  |  |  |  |- ApiService.java
+      |  |  |  |  |  Purpose: Shared backend endpoint interface
+      |  |  |  |  |
+      |  |  |  |  |- auth/
+      |  |  |  |  |  |- AuthApiService.java
+      |  |  |  |  |  |- LoginRequest.java
+      |  |  |  |  |  |- RegisterRequest.java
+      |  |  |  |  |  |- SocialLoginRequest.java
+      |  |  |  |  |  |- AuthResponse.java
+      |  |  |  |  |  |- AuthUser.java
+      |  |  |  |  |     Purpose: Auth API contracts
+      |  |  |  |  |
+      |  |  |  |  |- dto/
+      |  |  |  |     |- ApiListResponse.java
+      |  |  |  |     |- BackendPatient.java
+      |  |  |  |     |- BackendDevice.java
+      |  |  |  |     |- BackendAlert.java
+      |  |  |  |     |- BackendTelemetry.java
+      |  |  |  |     |- PatientCreateRequest.java
+      |  |  |  |     |- DeviceCreateRequest.java
+      |  |  |  |     |- TelemetryIngestRequest.java
+      |  |  |  |     |- TelemetryIngestResponse.java
+      |  |  |  |     |- EvaluateTelemetryRequest.java
+      |  |  |  |     |- EvaluateTelemetryResponse.java
+      |  |  |  |     |- AssistNextActionRequest.java
+      |  |  |  |     |- AssistNextActionResponse.java
+      |  |  |  |     |- AlertCreateRequest.java
+      |  |  |  |     |- TaskLabGenerateRequest.java
+      |  |  |  |     |- TaskLabGenerateResponse.java
+      |  |  |  |     |- TaskPlanCreateRequest.java
+      |  |  |  |     |- TaskPlanResponse.java
+      |  |  |  |     |- TaskPlanStepPayload.java
+      |  |  |  |        Purpose: Backend integration payload contracts
+      |  |  |  |
+      |  |  |  |- repository/
+      |  |  |     |- AppRepository.java
+      |  |  |        Purpose: Unified data access layer (local + network)
+      |  |  |
+      |  |  |- ui/
+      |  |  |  |- assistant/
+      |  |  |  |  |- AiAssistantActivity.java
+      |  |  |  |     Purpose: AI assistant experience and task draft workflows
+      |  |  |  |
+      |  |  |  |- dashboard/
+      |  |  |  |  |- DashboardActivity.java
+      |  |  |  |  |- StatusFragment.java
+      |  |  |  |  |- LogsFragment.java
+      |  |  |  |  |- ProfileFragment.java
+      |  |  |  |  |- RoutineFragment.java
+      |  |  |  |  |- RoutineAdapter.java
+      |  |  |  |  |- LogAdapter.java
+      |  |  |  |  |- DetailsActivity.java
+      |  |  |  |  |- AssistModeActivity.java
+      |  |  |  |  |- TaskLabFragment.java
+      |  |  |  |  |- PatientWorkspaceAdapter.java
+      |  |  |  |     Purpose: Dashboard UI and caregiver workflows
+      |  |  |  |
+      |  |  |  |- login/
+      |  |  |  |  |- LoginActivity.java
+      |  |  |  |  |- RegisterActivity.java
+      |  |  |  |     Purpose: Authentication screens and role onboarding
+      |  |  |  |
+      |  |  |  |- task/
+      |  |  |     |- TaskActivity.java
+      |  |  |        Purpose: Task execution flow for routines
+      |  |  |
+      |  |  |- utils/
+      |  |     |- PrefManager.java
+      |  |     |  Purpose: Shared preferences/state persistence
+      |  |     |
+      |  |     |- MonitoringService.java
+      |  |     |  Purpose: Background monitoring + telemetry cycles
+      |  |     |
+      |  |     |- ReminderWorker.java
+      |  |     |  Purpose: Scheduled reminders/escalation checks
+      |  |     |
+      |  |     |- TaskGuardianScheduler.java
+      |  |     |  Purpose: WorkManager scheduling helper
+      |  |     |
+      |  |     |- CrashRecoveryManager.java
+      |  |        Purpose: Crash capture/recovery utilities
+      |  |
+      |  |- viewmodel/
+      |     |- RoutineViewModel.java
+      |        Purpose: UI-facing state + repository orchestration
+      |
+      |  |- res/
+      |     |- layout/
+      |     |  Purpose: Screen and component XML layouts
+      |     |  Key screens:
+      |     |  - activity_main.xml (app shell)
+      |     |  - activity_login.xml / activity_register.xml (auth)
+      |     |  - activity_assist_mode.xml (assist mode)
+      |     |  - activity_ai_assistant.xml (AI assistant)
+      |     |  - activity_task.xml (task execution)
+      |     |  - fragment_status.xml / fragment_logs.xml / fragment_routine_list.xml / fragment_task_lab.xml
+      |     |
+      |     |- menu/
+      |     |  - bottom_nav_menu.xml
+      |     |  - drawer_menu.xml
+      |     |  Purpose: Navigation menus
+      |     |
+      |     |- values/
+      |     |  - strings.xml
+      |     |  - colors.xml
+      |     |  - themes.xml
+      |     |  Purpose: App constants, theme, and styling values
+      |     |
+      |     |- drawable/, mipmap-*/, values-night/, xml/
+      |        Purpose: Icons, graphics, and UI support resources
+      |
+      |- test/
+      |  Purpose: Unit test source set
+      |
+      |- androidTest/
+         Purpose: Instrumentation test source set
+
+============================================================
+4) Generated/runtime folders (not primary source ownership)
+============================================================
+These exist in the repository tree but are generated or environment-specific:
+
+- adapt/backend/node_modules/
+- adapt/backend/dist/
+- adapt/engine-service/node_modules/
+- adapt/engine-service/dist/
+- adapt/frontend/node_modules/
+- adapt/frontend/.next/
+- Adapt_mobile_app/.gradle/
+- Adapt_mobile_app/build/
+- Adapt_mobile_app/app/build/
+- IDE/local files such as local.properties
+
+============================================================
+5) Functional ownership summary
+============================================================
+- API platform and business logic: adapt/backend
+- Cognitive evaluation engine: adapt/engine-service
+- Caregiver web console: adapt/frontend
+- Mobile caregiver + assist mode app: Adapt_mobile_app
+- CI/CD release gating: .github/workflows/release-hardening.yml
+- Shared developer runbooks and architecture references: README.md and adapt/*.md docs
+
+End of file.
