@@ -70,26 +70,6 @@ Project_ADAPT/
 - Docker Desktop (optional but recommended for local PostgreSQL)
 - Java 17 + Android Studio (for mobile)
 
-## Deploy Backend on Render (Stable Production)
-
-This repository now includes a Render Blueprint file at `render.yaml` that provisions:
-
-- Render Postgres database
-- Engine service (`adapt/engine-service`)
-- Backend API (`adapt/backend`)
-
-Use the one-click Blueprint flow:
-
-- https://render.com/deploy?repo=https://github.com/arunkg005/ADAPT
-
-After Render deploys successfully:
-
-1. Copy your backend service public URL (for example: `https://adapt-backend-api.onrender.com`).
-2. Update Vercel production env `NEXT_PUBLIC_API_BASE` to `<backend-url>/api`.
-3. Redeploy frontend on Vercel.
-
-This removes tunnel-expiry failures and gives a stable live login path.
-
 ## Quick Start (Web + API + Engine)
 
 ### 1) Install dependencies
