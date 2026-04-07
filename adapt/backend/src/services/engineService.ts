@@ -18,9 +18,13 @@ interface EngineOutput {
   taskState: string;
   cognitiveScores: any;
   primaryIssue: string;
+  secondaryIssue?: string;
   severity: string;
+  confidence?: number;
   assistanceMode: string;
   adaptationActions: any[];
+  escalationRequired?: boolean;
+  escalationReason?: string;
   ruleTrace: string[];
 }
 
@@ -65,7 +69,23 @@ export const engineService = {
   async health(): Promise<any> {
     try {
       const response = await fetch(`${config.engineService.url}/health`);
-      return await response.json();
+
+      if (!response.ok) {
+        return {
+          status: 'UNAVAILABLE',
+          error: `HTTP_${response.status}`,
+        };
+      }
+
+      const payload = await response.json();
+      if (!payload || typeof payload !== 'object') {
+        return {
+          status: 'UNAVAILABLE',
+          error: 'INVALID_HEALTH_PAYLOAD',
+        };
+      }
+
+      return payload;
     } catch (error) {
       console.error('Engine service health check failed:', error);
       return { status: 'UNAVAILABLE' };

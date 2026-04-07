@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,12 +17,12 @@ import com.example.adapt.data.network.auth.AuthApiService;
 import com.example.adapt.data.network.auth.AuthResponse;
 import com.example.adapt.data.network.auth.AuthUser;
 import com.example.adapt.data.network.auth.RegisterRequest;
+import com.example.adapt.data.network.auth.SocialLoginRequest;
 import com.example.adapt.utils.PrefManager;
 
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,9 +30,8 @@ import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText etName, etEmail, etPassword;
-    private RadioGroup rgRole;
-    private Button btnRegister;
+    private EditText etFirstName, etLastName, etEmail, etPassword;
+    private Button btnRegister, btnGoogleSignUp, btnFacebookSignUp;
     private TextView tvLogin;
     private PrefManager prefManager;
     private AuthApiService authApiService;
@@ -46,34 +44,28 @@ public class RegisterActivity extends AppCompatActivity {
         prefManager = new PrefManager(this);
         authApiService = NetworkClient.getRetrofit(this).create(AuthApiService.class);
 
-        etName = findViewById(R.id.etName);
+        etFirstName = findViewById(R.id.etFirstName);
+        etLastName = findViewById(R.id.etLastName);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
-        rgRole = findViewById(R.id.rgRole);
         btnRegister = findViewById(R.id.btnRegister);
+        btnGoogleSignUp = findViewById(R.id.btnGoogleSignUp);
+        btnFacebookSignUp = findViewById(R.id.btnFacebookSignUp);
         tvLogin = findViewById(R.id.tvLogin);
 
         btnRegister.setOnClickListener(v -> {
-            String name = etName.getText().toString().trim();
+            String firstName = etFirstName.getText().toString().trim();
+            String lastName = etLastName.getText().toString().trim();
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString();
-            int selectedRoleId = rgRole.getCheckedRadioButtonId();
 
-            if (name.isEmpty()) {
-                etName.setError("Name is required");
-                etName.requestFocus();
+            if (firstName.isEmpty()) {
+                etFirstName.setError("First name is required");
+                etFirstName.requestFocus();
                 return;
             }
 
-            if (email.isEmpty()) {
-                etEmail.setError("Email is required");
-                etEmail.requestFocus();
-                return;
-            }
-
-            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                etEmail.setError("Enter a valid email address");
-                etEmail.requestFocus();
+            if (!isValidEmail(email)) {
                 return;
             }
 
@@ -83,8 +75,29 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            String selectedRole = selectedRoleId == R.id.rbCaregiver ? "caregiver" : "patient";
-            registerWithBackend(name, email, password, selectedRole);
+            registerWithBackend(firstName, lastName, email, password);
+        });
+
+        btnGoogleSignUp.setOnClickListener(v -> {
+            String email = etEmail.getText().toString().trim();
+            if (!isValidEmail(email)) {
+                return;
+            }
+
+            String firstName = etFirstName.getText().toString().trim();
+            String lastName = etLastName.getText().toString().trim();
+            socialSignupWithBackend("google", firstName, lastName, email, btnGoogleSignUp);
+        });
+
+        btnFacebookSignUp.setOnClickListener(v -> {
+            String email = etEmail.getText().toString().trim();
+            if (!isValidEmail(email)) {
+                return;
+            }
+
+            String firstName = etFirstName.getText().toString().trim();
+            String lastName = etLastName.getText().toString().trim();
+            socialSignupWithBackend("facebook", firstName, lastName, email, btnFacebookSignUp);
         });
 
         tvLogin.setOnClickListener(v -> {
@@ -92,23 +105,22 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    private void registerWithBackend(String fullName, String email, String password, String selectedRole) {
-        setLoading(true);
+    private void registerWithBackend(String firstName, String lastName, String email, String password) {
+        setCredentialLoading(true);
 
-        String[] nameParts = splitName(fullName);
         RegisterRequest request = new RegisterRequest(
                 email,
                 password,
-                nameParts[0],
-                nameParts[1],
+                firstName,
+                lastName,
                 null,
-                selectedRole.toUpperCase(Locale.US)
+                "CAREGIVER"
         );
 
         authApiService.register(request).enqueue(new Callback<AuthResponse>() {
             @Override
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                setLoading(false);
+                setCredentialLoading(false);
 
                 if (!response.isSuccessful()) {
                     Toast.makeText(RegisterActivity.this, parseApiError(response, "Registration failed"), Toast.LENGTH_LONG).show();
@@ -116,53 +128,90 @@ public class RegisterActivity extends AppCompatActivity {
                 }
 
                 AuthResponse authResponse = response.body();
-                if (authResponse == null || authResponse.getToken() == null || authResponse.getToken().trim().isEmpty()) {
+                if (!isValidAuthResponse(authResponse)) {
                     Toast.makeText(RegisterActivity.this, "Invalid server response", Toast.LENGTH_LONG).show();
                     return;
                 }
 
-                AuthUser authUser = authResponse.getUser();
-                String role = normalizeRole(authUser != null ? authUser.getRole() : selectedRole);
-                String userEmail = authUser != null && authUser.getEmail() != null ? authUser.getEmail() : email;
-                String displayName = authUser != null ? authUser.getDisplayName() : fullName;
-
-                prefManager.saveSession(authResponse.getToken(), role, displayName, userEmail);
-
-                Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
+                String fallbackName = (firstName + " " + lastName).trim();
+                completeAuth(authResponse, email, fallbackName, "Registration successful");
             }
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
-                setLoading(false);
+                setCredentialLoading(false);
                 Toast.makeText(RegisterActivity.this, "Unable to reach server. Check backend connection.", Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    private String[] splitName(String fullName) {
-        String safeName = fullName == null ? "" : fullName.trim();
-        if (safeName.isEmpty()) {
-            return new String[]{"ADAPT", "User"};
-        }
+    private void socialSignupWithBackend(String provider, String firstName, String lastName, String email, Button providerButton) {
+        setSocialLoading(true, providerButton);
 
-        String[] parts = safeName.split("\\s+");
-        if (parts.length == 1) {
-            return new String[]{parts[0], "User"};
-        }
+        String safeFirstName = firstName.isEmpty() ? capitalize(provider) : firstName;
+        String safeLastName = lastName.isEmpty() ? "User" : lastName;
+        SocialLoginRequest request = new SocialLoginRequest(provider, email, safeFirstName, safeLastName);
 
-        String firstName = parts[0];
-        StringBuilder lastNameBuilder = new StringBuilder();
-        for (int i = 1; i < parts.length; i++) {
-            if (i > 1) {
-                lastNameBuilder.append(' ');
+        authApiService.socialLogin(request).enqueue(new Callback<AuthResponse>() {
+            @Override
+            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                setSocialLoading(false, providerButton);
+
+                if (!response.isSuccessful()) {
+                    Toast.makeText(RegisterActivity.this, parseApiError(response, "Social signup failed"), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                AuthResponse authResponse = response.body();
+                if (!isValidAuthResponse(authResponse)) {
+                    Toast.makeText(RegisterActivity.this, "Invalid server response", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                completeAuth(authResponse, email, (safeFirstName + " " + safeLastName).trim(), "Signed up with " + capitalize(provider));
             }
-            lastNameBuilder.append(parts[i]);
+
+            @Override
+            public void onFailure(Call<AuthResponse> call, Throwable t) {
+                setSocialLoading(false, providerButton);
+                Toast.makeText(RegisterActivity.this, "Unable to reach server. Check backend connection.", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private boolean isValidEmail(String email) {
+        if (email.isEmpty()) {
+            etEmail.setError("Email is required");
+            etEmail.requestFocus();
+            return false;
         }
-        return new String[]{firstName, lastNameBuilder.toString()};
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            etEmail.setError("Enter a valid email address");
+            etEmail.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isValidAuthResponse(AuthResponse authResponse) {
+        return authResponse != null && authResponse.getToken() != null && !authResponse.getToken().trim().isEmpty();
+    }
+
+    private void completeAuth(AuthResponse authResponse, String fallbackEmail, String fallbackDisplayName, String message) {
+        AuthUser authUser = authResponse.getUser();
+        String role = normalizeRole(authUser != null ? authUser.getRole() : "caregiver");
+        String userEmail = authUser != null && authUser.getEmail() != null ? authUser.getEmail() : fallbackEmail;
+        String displayName = authUser != null ? authUser.getDisplayName() : fallbackDisplayName;
+
+        prefManager.saveSession(authResponse.getToken(), role, displayName, userEmail);
+
+        Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private String normalizeRole(String apiRole) {
@@ -171,7 +220,11 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         String normalized = apiRole.trim().toLowerCase();
-        if (normalized.contains("caregiver") || normalized.contains("admin")) {
+        if (normalized.contains("admin")) {
+            return "admin";
+        }
+
+        if (normalized.contains("caregiver")) {
             return "caregiver";
         }
 
@@ -182,9 +235,44 @@ public class RegisterActivity extends AppCompatActivity {
         return "patient";
     }
 
-    private void setLoading(boolean loading) {
+    private void setCredentialLoading(boolean loading) {
+        setBaseLoadingState(loading);
+        btnRegister.setText(loading ? "Creating Account..." : "Create Account");
+        if (!loading) {
+            btnGoogleSignUp.setText("Google");
+            btnFacebookSignUp.setText("Facebook");
+        }
+    }
+
+    private void setSocialLoading(boolean loading, Button providerButton) {
+        setBaseLoadingState(loading);
+        btnRegister.setText("Create Account");
+
+        if (loading) {
+            providerButton.setText("Connecting...");
+        } else {
+            btnGoogleSignUp.setText("Google");
+            btnFacebookSignUp.setText("Facebook");
+        }
+    }
+
+    private void setBaseLoadingState(boolean loading) {
         btnRegister.setEnabled(!loading);
-        btnRegister.setText(loading ? "Creating Account..." : "Register");
+        btnGoogleSignUp.setEnabled(!loading);
+        btnFacebookSignUp.setEnabled(!loading);
+    }
+
+    private String capitalize(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        String normalized = value.trim();
+        if (normalized.isEmpty()) {
+            return "";
+        }
+
+        return Character.toUpperCase(normalized.charAt(0)) + normalized.substring(1).toLowerCase();
     }
 
     private String parseApiError(Response<?> response, String fallback) {

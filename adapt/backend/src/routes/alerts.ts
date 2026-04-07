@@ -1,11 +1,13 @@
 import { Router, Response } from 'express';
 import { alertService } from '../services/alertService.js';
-import { authMiddleware, AuthRequest } from '../middleware/auth.js';
+import { caregiverService } from '../services/caregiverService.js';
+import { authService } from '../services/authService.js';
+import { authMiddleware, AuthRequest, requireRoles } from '../middleware/auth.js';
 
 const router = Router();
 
 // GET /api/alerts
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: AuthRequest, res: Response) => {
   try {
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
     const offset = parseInt(req.query.offset as string) || 0;
@@ -20,7 +22,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/alerts/:id
-router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/:id', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: AuthRequest, res: Response) => {
   try {
     const alert = await alertService.getById(req.params.id);
     res.json(alert);
@@ -30,7 +32,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/alerts
-router.post('/', authMiddleware, async (req: any, res: Response) => {
+router.post('/', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: any, res: Response) => {
   try {
     const {
       patient_id,
@@ -63,13 +65,32 @@ router.post('/', authMiddleware, async (req: any, res: Response) => {
 });
 
 // PUT /api/alerts/:id/acknowledge
-router.put('/:id/acknowledge', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.put(
+  '/:id/acknowledge',
+  authMiddleware,
+  requireRoles('CAREGIVER'),
+  async (req: AuthRequest, res: Response) => {
   try {
     if (!req.userId) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
 
-    const alert = await alertService.acknowledge(req.params.id, req.userId);
+    const user = await authService.getUserById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    let caregiver = await caregiverService.getByUserId(user.id);
+
+    if (!caregiver) {
+      if (user.role !== 'CAREGIVER') {
+        return res.status(403).json({ error: 'Only caregivers can acknowledge alerts' });
+      }
+
+      caregiver = await caregiverService.ensureForUser(user);
+    }
+
+    const alert = await alertService.acknowledge(req.params.id, caregiver.id);
     res.json(alert);
   } catch (error: any) {
     res.status(error.status || 500).json({ error: error.message });
@@ -77,7 +98,7 @@ router.put('/:id/acknowledge', authMiddleware, async (req: AuthRequest, res: Res
 });
 
 // DELETE /api/alerts/:id
-router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.delete('/:id', authMiddleware, requireRoles('ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
     await alertService.delete(req.params.id);
     res.json({ message: 'Alert deleted successfully' });

@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.example.adapt.R;
 import com.example.adapt.ui.login.LoginActivity;
 import com.example.adapt.utils.PrefManager;
+import com.example.adapt.utils.TaskGuardianScheduler;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class ProfileFragment extends Fragment {
@@ -44,15 +45,27 @@ public class ProfileFragment extends Fragment {
         String name = prefManager.getUserName();
         String email = prefManager.getUserEmail();
         String role = prefManager.getRole();
+        String roleLabel = "Patient";
+
+        if ("caregiver".equals(role)) {
+            roleLabel = "Caregiver";
+        } else if ("admin".equals(role)) {
+            roleLabel = "Admin";
+        }
 
         tvUserName.setText(name);
         tvUserEmail.setText(email);
-        tvUserRole.setText("Role: " + (role.equals("caregiver") ? "Caregiver" : "Patient"));
+        tvUserRole.setText("Role: " + roleLabel);
 
         if (switchNotifications != null) {
             switchNotifications.setChecked(prefManager.isReminderEnabled());
             switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 prefManager.setReminderEnabled(isChecked);
+                if (isChecked) {
+                    TaskGuardianScheduler.ensureScheduled(requireContext());
+                } else {
+                    TaskGuardianScheduler.cancelScheduled(requireContext());
+                }
                 String message = isChecked ? "Routine reminders enabled" : "Routine reminders disabled";
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
             });
@@ -82,6 +95,7 @@ public class ProfileFragment extends Fragment {
         // Logout
         Button btnLogout = view.findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(v -> {
+            TaskGuardianScheduler.cancelScheduled(requireContext());
             prefManager.clear();
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -2,6 +2,17 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config.js';
 
+export type UserRole = 'ADMIN' | 'CAREGIVER' | 'PATIENT';
+
+const normalizeRole = (role?: string): UserRole | null => {
+  const normalized = String(role || '').trim().toUpperCase();
+  if (normalized === 'ADMIN' || normalized === 'CAREGIVER' || normalized === 'PATIENT') {
+    return normalized;
+  }
+
+  return null;
+};
+
 export interface AuthRequest extends Request {
   userId?: string;
   userRole?: string;
@@ -35,8 +46,28 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
 };
 
 export const adminOnly = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (req.userRole !== 'ADMIN') {
+  if (normalizeRole(req.userRole) !== 'ADMIN') {
     return res.status(403).json({ error: 'Admin access required' });
   }
   next();
+};
+
+export const requireRoles = (...allowedRoles: UserRole[]) => {
+  const allowed = new Set<UserRole>(allowedRoles);
+
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    const role = normalizeRole(req.userRole);
+    if (!role) {
+      return res.status(403).json({ error: 'Role is missing or invalid for this action' });
+    }
+
+    if (!allowed.has(role)) {
+      return res.status(403).json({
+        error: 'Insufficient role for this action',
+        allowedRoles,
+      });
+    }
+
+    next();
+  };
 };

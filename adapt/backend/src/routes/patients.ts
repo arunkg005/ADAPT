@@ -1,12 +1,12 @@
 import { Router, Response } from 'express';
 import { patientService } from '../services/patientService.js';
 import { caregiverService } from '../services/caregiverService.js';
-import { authMiddleware, AuthRequest } from '../middleware/auth.js';
+import { authMiddleware, AuthRequest, requireRoles } from '../middleware/auth.js';
 
 const router = Router();
 
 // GET /api/patients
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: AuthRequest, res: Response) => {
   try {
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
     const offset = parseInt(req.query.offset as string) || 0;
@@ -21,7 +21,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/patients/:id
-router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/:id', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: AuthRequest, res: Response) => {
   try {
     const patient = await patientService.getById(req.params.id);
     res.json(patient);
@@ -31,7 +31,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/patients
-router.post('/', authMiddleware, async (req: any, res: Response) => {
+router.post('/', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: any, res: Response) => {
   try {
     const { first_name, last_name, date_of_birth, cognitive_condition, risk_level, baseline_response_time_ms } =
       req.body;
@@ -56,7 +56,7 @@ router.post('/', authMiddleware, async (req: any, res: Response) => {
 });
 
 // PUT /api/patients/:id
-router.put('/:id', authMiddleware, async (req: any, res: Response) => {
+router.put('/:id', authMiddleware, requireRoles('ADMIN'), async (req: any, res: Response) => {
   try {
     const patient = await patientService.update(req.params.id, req.body);
     res.json(patient);
@@ -66,7 +66,7 @@ router.put('/:id', authMiddleware, async (req: any, res: Response) => {
 });
 
 // DELETE /api/patients/:id
-router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.delete('/:id', authMiddleware, requireRoles('ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
     await patientService.delete(req.params.id);
     res.json({ message: 'Patient deleted successfully' });
@@ -76,7 +76,7 @@ router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) =>
 });
 
 // GET /api/patients/:id/caregivers
-router.get('/:id/caregivers', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/:id/caregivers', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: AuthRequest, res: Response) => {
   try {
     const caregivers = await caregiverService.getByPatientId(req.params.id);
     res.json(caregivers);
@@ -86,7 +86,7 @@ router.get('/:id/caregivers', authMiddleware, async (req: AuthRequest, res: Resp
 });
 
 // POST /api/patients/:patientId/caregivers/:caregiverId
-router.post('/:patientId/caregivers/:caregiverId', authMiddleware, async (req: any, res: Response) => {
+router.post('/:patientId/caregivers/:caregiverId', authMiddleware, requireRoles('ADMIN'), async (req: any, res: Response) => {
   try {
     const { relationship } = req.body;
     await caregiverService.assignToPatient(req.params.patientId, req.params.caregiverId, relationship);
@@ -97,7 +97,7 @@ router.post('/:patientId/caregivers/:caregiverId', authMiddleware, async (req: a
 });
 
 // DELETE /api/patients/:patientId/caregivers/:caregiverId
-router.delete('/:patientId/caregivers/:caregiverId', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.delete('/:patientId/caregivers/:caregiverId', authMiddleware, requireRoles('ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
     await caregiverService.removeFromPatient(req.params.patientId, req.params.caregiverId);
     res.json({ message: 'Caregiver removed from patient' });

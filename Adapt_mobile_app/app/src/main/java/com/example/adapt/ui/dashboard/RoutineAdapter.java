@@ -88,8 +88,8 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineV
             btnStart.setOnClickListener(v -> listener.onStartClick(routine));
 
             // Support for Executive Function & Generalization (Visual Progress)
-            // Show caretaker tracking info only if user is a caregiver
-            if ("caregiver".equals(role)) {
+            // Show caretaker tracking info for caregiver/admin users.
+            if ("caregiver".equals(role) || "admin".equals(role)) {
                 caretakerLayout.setVisibility(View.VISIBLE);
                 String statusText = "Status: " + routine.getCompletedSteps() + "/" + routine.getTotalSteps() + " Steps";
                 tvStatus.setText(statusText);

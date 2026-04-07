@@ -14,13 +14,16 @@ import java.util.List;
 @Dao
 public interface RoutineDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Routine routine);
+    long insert(Routine routine);
 
     @Update
     void update(Routine routine);
 
     @Query("SELECT * FROM routines")
     LiveData<List<Routine>> getAllRoutines();
+
+    @Query("SELECT * FROM routines")
+    List<Routine> getAllRoutinesSync();
 
     @Query("SELECT * FROM routines WHERE id = :routineId")
     LiveData<Routine> getRoutineById(int routineId);

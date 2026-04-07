@@ -140,6 +140,16 @@
             android:textColor="@color/primaryBlue"
             android:textAllCaps="false"/>
 
+        <Button
+            android:id="@+id/btnNeedHelp"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:text="I Need Help"
+            android:textAllCaps="false"
+            android:textColor="@android:color/holo_orange_dark"
+            style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

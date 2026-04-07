@@ -9,6 +9,9 @@ public interface AuthApiService {
     @POST("auth/login")
     Call<AuthResponse> login(@Body LoginRequest request);
 
+    @POST("auth/social-login")
+    Call<AuthResponse> socialLogin(@Body SocialLoginRequest request);
+
     @POST("auth/register")
     Call<AuthResponse> register(@Body RegisterRequest request);
 }

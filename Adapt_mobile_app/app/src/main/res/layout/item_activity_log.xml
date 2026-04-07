@@ -68,6 +68,16 @@
                     android:text="IoT Surveillance"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"/>
+
+                <TextView
+                    android:id="@+id/tvLogPatient"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Patient: General"
+                    android:textColor="@color/primaryBlue"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <TextView

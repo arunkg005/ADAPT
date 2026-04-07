@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application
+        android:name=".AdaptApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -19,7 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Adapt"
-        android:usesCleartextTraffic="true"
+        android:usesCleartextTraffic="${usesCleartextTraffic}"
         tools:targetApi="31">
 
         <activity
@@ -37,6 +38,7 @@
         <activity android:name=".ui.task.TaskActivity" />
         <activity android:name=".ui.dashboard.DetailsActivity" />
         <activity android:name=".ui.dashboard.AssistModeActivity" />
+        <activity android:name=".ui.assistant.AiAssistantActivity" />
 
         <service
             android:name=".utils.MonitoringService"

@@ -19,4 +19,9 @@
     <string name="nav_logs">Logs</string>
     <string name="nav_tasks">Tasks</string>
     <string name="nav_profile">Profile</string>
+    <string name="nav_task_lab">Task Lab</string>
+    <string name="nav_ai_assistant">AI Assistant</string>
+    <string name="nav_assist_mode">Assist Mode</string>
+    <string name="nav_dark_mode">Dark Mode</string>
+    <string name="nav_about">About ADAPT</string>
 </resources>

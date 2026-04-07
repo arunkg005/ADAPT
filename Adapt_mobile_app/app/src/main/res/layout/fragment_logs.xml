@@ -27,6 +27,36 @@
             android:textColor="@color/text_secondary"
             android:textSize="14sp" />
 
+        <EditText
+            android:id="@+id/etLogSearch"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/glass_card_bg"
+            android:hint="Search logs by task, patient, or issue"
+            android:padding="12dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary" />
+
+        <Button
+            android:id="@+id/btnAcknowledgeAlert"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="@color/primaryBlue"
+            android:text="Acknowledge Next Backend Alert"
+            android:textAllCaps="false"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/tvAlertStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Checking backend alerts..."
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,14 +84,14 @@
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="IoT Sensors" />
+                    android:text="IoT/Sensor" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipMobile"
+                    android:id="@+id/chipTaskRoutine"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mobile Actions" />
+                    android:text="Task/Routine" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipAlerts"

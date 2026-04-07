@@ -1,11 +1,11 @@
 import { Router, Response } from 'express';
 import { deviceService } from '../services/deviceService.js';
-import { authMiddleware, AuthRequest } from '../middleware/auth.js';
+import { authMiddleware, AuthRequest, requireRoles } from '../middleware/auth.js';
 
 const router = Router();
 
 // GET /api/devices
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: AuthRequest, res: Response) => {
   try {
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
     const offset = parseInt(req.query.offset as string) || 0;
@@ -20,7 +20,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/devices/:id
-router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/:id', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: AuthRequest, res: Response) => {
   try {
     const device = await deviceService.getById(req.params.id);
     res.json(device);
@@ -30,7 +30,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/devices
-router.post('/', authMiddleware, async (req: any, res: Response) => {
+router.post('/', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: any, res: Response) => {
   try {
     const { patient_id, device_name, device_type, os, capabilities } = req.body;
 
@@ -55,7 +55,7 @@ router.post('/', authMiddleware, async (req: any, res: Response) => {
 });
 
 // PUT /api/devices/:id
-router.put('/:id', authMiddleware, async (req: any, res: Response) => {
+router.put('/:id', authMiddleware, requireRoles('ADMIN'), async (req: any, res: Response) => {
   try {
     const device = await deviceService.update(req.params.id, req.body);
     res.json(device);
@@ -65,7 +65,7 @@ router.put('/:id', authMiddleware, async (req: any, res: Response) => {
 });
 
 // PATCH /api/devices/:id/status
-router.patch('/:id/status', authMiddleware, async (req: any, res: Response) => {
+router.patch('/:id/status', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: any, res: Response) => {
   try {
     const { is_online } = req.body;
 
@@ -81,7 +81,7 @@ router.patch('/:id/status', authMiddleware, async (req: any, res: Response) => {
 });
 
 // DELETE /api/devices/:id
-router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.delete('/:id', authMiddleware, requireRoles('ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
     await deviceService.delete(req.params.id);
     res.json({ message: 'Device deleted successfully' });

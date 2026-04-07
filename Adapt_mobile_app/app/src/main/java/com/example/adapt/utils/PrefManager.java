@@ -13,6 +13,28 @@ public class PrefManager {
     private static final String KEY_ROUTINE_SEEDED = "routine_seeded";
     private static final String KEY_ACTIVITY_LOG_SEEDED = "activity_log_seeded";
     private static final String KEY_TASK_SEEDED_PREFIX = "task_seeded_";
+    private static final String KEY_DARK_MODE_ENABLED = "dark_mode_enabled";
+    private static final String KEY_AI_ASSISTANT_ENABLED = "ai_assistant_enabled";
+    private static final String KEY_ACTIVE_PATIENT_ID = "active_patient_id";
+    private static final String KEY_ACTIVE_PATIENT_NAME = "active_patient_name";
+    private static final String KEY_ACTIVE_PATIENT_RISK = "active_patient_risk";
+    private static final String KEY_CONNECTED_DEVICES_COUNT = "connected_devices_count";
+    private static final String KEY_LATEST_DIAGNOSTIC_SUMMARY = "latest_diagnostic_summary";
+    private static final String KEY_LATEST_DIAGNOSTIC_SEVERITY = "latest_diagnostic_severity";
+    private static final String KEY_LATEST_DIAGNOSTIC_TIMESTAMP = "latest_diagnostic_timestamp";
+    private static final String KEY_ROUTINE_LAST_REMINDER_PREFIX = "routine_last_reminder_";
+    private static final String KEY_ROUTINE_LAST_ESCALATION_PREFIX = "routine_last_escalation_";
+    private static final String KEY_TASK_LAB_DRAFT_TITLE = "task_lab_draft_title";
+    private static final String KEY_TASK_LAB_DRAFT_DESCRIPTION = "task_lab_draft_description";
+    private static final String KEY_TASK_LAB_DRAFT_TIME = "task_lab_draft_time";
+    private static final String KEY_ASSIST_VOICE_GUIDANCE_ENABLED = "assist_voice_guidance_enabled";
+    private static final String KEY_ASSIST_LARGE_TEXT_ENABLED = "assist_large_text_enabled";
+    private static final String KEY_ASSIST_DOUBLE_CONFIRM_ENABLED = "assist_double_confirm_enabled";
+    private static final String KEY_ASSIST_ADAPTIVE_PROMPTS_ENABLED = "assist_adaptive_prompts_enabled";
+    private static final String KEY_ROUTINE_RESTRICTIONS_ENABLED_PREFIX = "assist_routine_restrictions_enabled_";
+    private static final String KEY_ROUTINE_DOUBLE_CONFIRM_PREFIX = "assist_routine_double_confirm_";
+    private static final String KEY_ROUTINE_ALLOW_REPEAT_PREFIX = "assist_routine_allow_repeat_";
+    private static final String KEY_ROUTINE_ALLOW_HELP_PREFIX = "assist_routine_allow_help_";
 
     private final SharedPreferences pref;
 
@@ -99,6 +121,197 @@ public class PrefManager {
 
     private String getTaskSeededKey(int routineId) {
         return KEY_TASK_SEEDED_PREFIX + routineId;
+    }
+
+    public void setDarkModeEnabled(boolean enabled) {
+        pref.edit().putBoolean(KEY_DARK_MODE_ENABLED, enabled).apply();
+    }
+
+    public boolean isDarkModeEnabled() {
+        return pref.getBoolean(KEY_DARK_MODE_ENABLED, false);
+    }
+
+    public void setAiAssistantEnabled(boolean enabled) {
+        pref.edit().putBoolean(KEY_AI_ASSISTANT_ENABLED, enabled).apply();
+    }
+
+    public boolean isAiAssistantEnabled() {
+        return pref.getBoolean(KEY_AI_ASSISTANT_ENABLED, true);
+    }
+
+    public void setActivePatient(String patientId, String patientName, String patientRisk) {
+        pref.edit()
+                .putString(KEY_ACTIVE_PATIENT_ID, patientId)
+                .putString(KEY_ACTIVE_PATIENT_NAME, patientName)
+                .putString(KEY_ACTIVE_PATIENT_RISK, patientRisk)
+                .apply();
+    }
+
+    public String getActivePatientId() {
+        return pref.getString(KEY_ACTIVE_PATIENT_ID, "");
+    }
+
+    public String getActivePatientName() {
+        return pref.getString(KEY_ACTIVE_PATIENT_NAME, "Patient");
+    }
+
+    public String getActivePatientRisk() {
+        return pref.getString(KEY_ACTIVE_PATIENT_RISK, "MEDIUM");
+    }
+
+    public void setConnectedDevicesCount(int count) {
+        pref.edit().putInt(KEY_CONNECTED_DEVICES_COUNT, Math.max(0, count)).apply();
+    }
+
+    public int getConnectedDevicesCount() {
+        return pref.getInt(KEY_CONNECTED_DEVICES_COUNT, 0);
+    }
+
+    public void setLatestDiagnostic(String summary, String severity, long timestampMs) {
+        pref.edit()
+                .putString(KEY_LATEST_DIAGNOSTIC_SUMMARY, summary)
+                .putString(KEY_LATEST_DIAGNOSTIC_SEVERITY, severity)
+                .putLong(KEY_LATEST_DIAGNOSTIC_TIMESTAMP, timestampMs)
+                .apply();
+    }
+
+    public String getLatestDiagnosticSummary() {
+        return pref.getString(KEY_LATEST_DIAGNOSTIC_SUMMARY, "No diagnostic data yet.");
+    }
+
+    public String getLatestDiagnosticSeverity() {
+        return pref.getString(KEY_LATEST_DIAGNOSTIC_SEVERITY, "NONE");
+    }
+
+    public long getLatestDiagnosticTimestamp() {
+        return pref.getLong(KEY_LATEST_DIAGNOSTIC_TIMESTAMP, 0L);
+    }
+
+    public void setLastRoutineReminderTimestamp(int routineId, long timestampMs) {
+        pref.edit().putLong(KEY_ROUTINE_LAST_REMINDER_PREFIX + routineId, timestampMs).apply();
+    }
+
+    public long getLastRoutineReminderTimestamp(int routineId) {
+        return pref.getLong(KEY_ROUTINE_LAST_REMINDER_PREFIX + routineId, 0L);
+    }
+
+    public void setLastRoutineEscalationTimestamp(int routineId, long timestampMs) {
+        pref.edit().putLong(KEY_ROUTINE_LAST_ESCALATION_PREFIX + routineId, timestampMs).apply();
+    }
+
+    public long getLastRoutineEscalationTimestamp(int routineId) {
+        return pref.getLong(KEY_ROUTINE_LAST_ESCALATION_PREFIX + routineId, 0L);
+    }
+
+    public void saveTaskLabDraft(String title, String description, String scheduledTime) {
+        pref.edit()
+                .putString(KEY_TASK_LAB_DRAFT_TITLE, title)
+                .putString(KEY_TASK_LAB_DRAFT_DESCRIPTION, description)
+                .putString(KEY_TASK_LAB_DRAFT_TIME, scheduledTime)
+                .apply();
+    }
+
+    public boolean hasTaskLabDraft() {
+        String title = getTaskLabDraftTitle();
+        return title != null && !title.trim().isEmpty();
+    }
+
+    public String getTaskLabDraftTitle() {
+        return pref.getString(KEY_TASK_LAB_DRAFT_TITLE, "");
+    }
+
+    public String getTaskLabDraftDescription() {
+        return pref.getString(KEY_TASK_LAB_DRAFT_DESCRIPTION, "");
+    }
+
+    public String getTaskLabDraftTime() {
+        return pref.getString(KEY_TASK_LAB_DRAFT_TIME, "09:00 AM");
+    }
+
+    public void clearTaskLabDraft() {
+        pref.edit()
+                .remove(KEY_TASK_LAB_DRAFT_TITLE)
+                .remove(KEY_TASK_LAB_DRAFT_DESCRIPTION)
+                .remove(KEY_TASK_LAB_DRAFT_TIME)
+                .apply();
+    }
+
+    public void setAssistVoiceGuidanceEnabled(boolean enabled) {
+        pref.edit().putBoolean(KEY_ASSIST_VOICE_GUIDANCE_ENABLED, enabled).apply();
+    }
+
+    public boolean isAssistVoiceGuidanceEnabled() {
+        return pref.getBoolean(KEY_ASSIST_VOICE_GUIDANCE_ENABLED, true);
+    }
+
+    public void setAssistLargeTextEnabled(boolean enabled) {
+        pref.edit().putBoolean(KEY_ASSIST_LARGE_TEXT_ENABLED, enabled).apply();
+    }
+
+    public boolean isAssistLargeTextEnabled() {
+        return pref.getBoolean(KEY_ASSIST_LARGE_TEXT_ENABLED, true);
+    }
+
+    public void setAssistDoubleConfirmEnabled(boolean enabled) {
+        pref.edit().putBoolean(KEY_ASSIST_DOUBLE_CONFIRM_ENABLED, enabled).apply();
+    }
+
+    public boolean isAssistDoubleConfirmEnabled() {
+        return pref.getBoolean(KEY_ASSIST_DOUBLE_CONFIRM_ENABLED, true);
+    }
+
+    public void setAssistAdaptivePromptsEnabled(boolean enabled) {
+        pref.edit().putBoolean(KEY_ASSIST_ADAPTIVE_PROMPTS_ENABLED, enabled).apply();
+    }
+
+    public boolean isAssistAdaptivePromptsEnabled() {
+        return pref.getBoolean(KEY_ASSIST_ADAPTIVE_PROMPTS_ENABLED, true);
+    }
+
+    public void setRoutineRestrictions(int routineId, boolean requireDoubleConfirm, boolean allowRepeat, boolean allowHelp) {
+        pref.edit()
+                .putBoolean(KEY_ROUTINE_RESTRICTIONS_ENABLED_PREFIX + routineId, true)
+                .putBoolean(KEY_ROUTINE_DOUBLE_CONFIRM_PREFIX + routineId, requireDoubleConfirm)
+                .putBoolean(KEY_ROUTINE_ALLOW_REPEAT_PREFIX + routineId, allowRepeat)
+                .putBoolean(KEY_ROUTINE_ALLOW_HELP_PREFIX + routineId, allowHelp)
+                .apply();
+    }
+
+    public boolean hasRoutineRestrictions(int routineId) {
+        return pref.getBoolean(KEY_ROUTINE_RESTRICTIONS_ENABLED_PREFIX + routineId, false);
+    }
+
+    public boolean getRoutineDoubleConfirmRequired(int routineId) {
+        if (hasRoutineRestrictions(routineId)) {
+            return pref.getBoolean(KEY_ROUTINE_DOUBLE_CONFIRM_PREFIX + routineId, isAssistDoubleConfirmEnabled());
+        }
+
+        return isAssistDoubleConfirmEnabled();
+    }
+
+    public boolean isRoutineRepeatAllowed(int routineId) {
+        if (hasRoutineRestrictions(routineId)) {
+            return pref.getBoolean(KEY_ROUTINE_ALLOW_REPEAT_PREFIX + routineId, true);
+        }
+
+        return true;
+    }
+
+    public boolean isRoutineHelpAllowed(int routineId) {
+        if (hasRoutineRestrictions(routineId)) {
+            return pref.getBoolean(KEY_ROUTINE_ALLOW_HELP_PREFIX + routineId, true);
+        }
+
+        return true;
+    }
+
+    public void clearRoutineRestrictions(int routineId) {
+        pref.edit()
+                .remove(KEY_ROUTINE_RESTRICTIONS_ENABLED_PREFIX + routineId)
+                .remove(KEY_ROUTINE_DOUBLE_CONFIRM_PREFIX + routineId)
+                .remove(KEY_ROUTINE_ALLOW_REPEAT_PREFIX + routineId)
+                .remove(KEY_ROUTINE_ALLOW_HELP_PREFIX + routineId)
+                .apply();
     }
 
     public void clear() {

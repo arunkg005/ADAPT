@@ -9,12 +9,15 @@
     <LinearLayout
         android:id="@+id/llFocusedContent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp">
+        android:gravity="center_horizontal"
+        android:padding="24dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnCaretakerUnlock"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:id="@+id/tvAssistHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ADAPT ASSIST"
@@ -22,43 +25,205 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:letterSpacing="0.2"
-            android:layout_marginBottom="48dp"/>
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/tvAssistGreeting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="Focused support is active. We will guide one step at a time."
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardAssistSession"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="1dp"
+            app:strokeColor="@color/lightBlue"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Assist Session"
+                    android:textAllCaps="true"
+                    android:textColor="@color/primaryBlue"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAssistSessionSummary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Voice ON | Large text ON | Double confirm ON | Adaptive prompts ON"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnReadGuidance"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/lightBlue"
+                        android:text="Read Guidance"
+                        android:textAllCaps="false"
+                        android:textColor="@color/primaryBlue" />
+
+                    <Button
+                        android:id="@+id/btnConfigureAssistSession"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/primaryBlue"
+                        android:text="Setup Session"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnConfigureRoutineRestrictions"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="@color/lightBlue"
+                    android:text="Task-Specific Restrictions"
+                    android:textAllCaps="false"
+                    android:textColor="@color/primaryBlue" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/lightBlue"
+            app:strokeWidth="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/tvAssistRoutineLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Current Routine"
+                    android:textAllCaps="true"
+                    android:textColor="@color/primaryBlue"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAssistRoutineTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="No routine selected"
+                    android:textColor="@color/text_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAssistRoutineDescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Select a routine from Tasks to begin guided support."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvAssistProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Progress: --"
+                    android:textColor="@color/primaryBlue"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <ImageView
+            android:id="@+id/ivAssistLock"
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:src="@android:drawable/ic_lock_lock"
             app:tint="@color/primaryBlue"
-            android:layout_marginBottom="32dp"/>
+            android:layout_marginBottom="20dp"/>
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tvAssistHint"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Focused Mode Active"
-            android:textColor="@color/text_primary"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Only your active routines will be shown here. Distractions are blocked."
+            android:gravity="center"
+            android:text="Hint: Take a breath, read the step slowly, and tap when ready."
             android:textColor="@color/text_secondary"
             android:textSize="16sp"
-            android:gravity="center"
-            android:layout_marginBottom="48dp"/>
+            android:layout_marginBottom="20dp" />
 
         <Button
             android:id="@+id/btnViewActiveTask"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="68dp"
             android:text="Open Current Task"
             android:backgroundTint="@color/primaryBlue"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
-            app:cornerRadius="24dp"/>
+            app:cornerRadius="20dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnNextGuidance"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:text="Next Hint"
+                android:textAllCaps="false"
+                android:textColor="@color/primaryBlue"
+                android:backgroundTint="@color/lightBlue"
+                app:cornerRadius="16dp" />
+
+            <Button
+                android:id="@+id/btnNeedHelpNow"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:text="Need Help"
+                android:textAllCaps="false"
+                android:textColor="@android:color/holo_orange_dark"
+                style="@style/Widget.MaterialComponents.Button.TextButton" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -75,6 +240,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="16dp"
-        android:alpha="0.5"/>
+        android:alpha="0.6"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

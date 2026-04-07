@@ -14,6 +14,14 @@ interface Caregiver extends CaregiverInput {
   updated_at: string;
 }
 
+interface CaregiverUserProfile {
+  id: string;
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+}
+
 export const caregiverService = {
   async getAll(limit: number = 50, offset: number = 0): Promise<Caregiver[]> {
     const result = await query(
@@ -88,6 +96,34 @@ export const caregiverService = {
       [patientId]
     );
     return result.rows;
+  },
+
+  async getByUserId(userId: string): Promise<Caregiver | null> {
+    const result = await query('SELECT * FROM caregivers WHERE user_id = $1 LIMIT 1', [userId]);
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    return result.rows[0];
+  },
+
+  async ensureForUser(user: CaregiverUserProfile): Promise<Caregiver> {
+    const existing = await this.getByUserId(user.id);
+    if (existing) {
+      return existing;
+    }
+
+    const firstName = user.first_name?.trim() || 'Care';
+    const lastName = user.last_name?.trim() || 'Giver';
+
+    const result = await query(
+      `INSERT INTO caregivers (user_id, first_name, last_name, email, phone)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [user.id, firstName, lastName, user.email, user.phone || null]
+    );
+
+    return result.rows[0];
   },
 
   async assignToPatient(patientId: string, caregiverId: string, relationship: string = 'PROFESSIONAL'): Promise<void> {

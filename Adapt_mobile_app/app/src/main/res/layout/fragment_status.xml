@@ -11,20 +11,56 @@
         android:orientation="vertical"
         android:padding="20dp">
 
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/lightBlue"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvHeroTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Welcome back"
+                    android:textColor="@color/text_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvHeroSubtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Care workspace is syncing live patient context."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:text="System Overview"
             android:textColor="@color/text_secondary"
             android:textSize="18sp"
-            android:layout_marginBottom="20dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="2"
             android:alignmentMode="alignMargins"
+            android:columnCount="2"
             android:columnOrderPreserved="false"
             android:useDefaultMargins="true">
 
@@ -33,32 +69,34 @@
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
                 android:background="@drawable/glass_card_bg"
-                android:orientation="vertical"
-                android:padding="16dp"
+                android:elevation="2dp"
                 android:gravity="center"
-                android:elevation="2dp">
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@android:drawable/ic_menu_compass"
-                    app:tint="@color/primaryBlue"/>
+                    app:tint="@color/primaryBlue" />
 
                 <TextView
+                    android:id="@+id/tvMetricOneValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:text="72 BPM"
                     android:textColor="@color/text_primary"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="8dp"/>
+                    android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvMetricOneLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Heart Rate"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -66,32 +104,34 @@
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
                 android:background="@drawable/glass_card_bg"
-                android:orientation="vertical"
-                android:padding="16dp"
+                android:elevation="2dp"
                 android:gravity="center"
-                android:elevation="2dp">
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@android:drawable/ic_menu_mylocation"
-                    app:tint="@color/primaryBlue"/>
+                    app:tint="@color/primaryBlue" />
 
                 <TextView
+                    android:id="@+id/tvMetricTwoValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:text="Walking"
                     android:textColor="@color/text_primary"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="8dp"/>
+                    android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvMetricTwoLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="IoT Surveillance"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -99,32 +139,34 @@
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
                 android:background="@drawable/glass_card_bg"
-                android:orientation="vertical"
-                android:padding="16dp"
+                android:elevation="2dp"
                 android:gravity="center"
-                android:elevation="2dp">
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@android:drawable/ic_notification_overlay"
-                    app:tint="@color/primaryBlue"/>
+                    app:tint="@color/primaryBlue" />
 
                 <TextView
+                    android:id="@+id/tvMetricThreeValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:text="Low"
                     android:textColor="@color/text_primary"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="8dp"/>
+                    android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvMetricThreeLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Stress Level"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -132,32 +174,34 @@
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
                 android:background="@drawable/glass_card_bg"
-                android:orientation="vertical"
-                android:padding="16dp"
+                android:elevation="2dp"
                 android:gravity="center"
-                android:elevation="2dp">
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@android:drawable/ic_lock_idle_alarm"
-                    app:tint="@color/primaryBlue"/>
+                    app:tint="@color/primaryBlue" />
 
                 <TextView
+                    android:id="@+id/tvMetricFourValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:text="7.5h"
                     android:textColor="@color/text_primary"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="8dp"/>
+                    android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvMetricFourLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Rest Quality"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp" />
             </LinearLayout>
 
         </GridLayout>
@@ -165,37 +209,95 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/glass_card_bg"
-            android:orientation="vertical"
-            android:padding="20dp"
             android:layout_marginTop="16dp"
-            android:elevation="2dp">
+            android:background="@drawable/glass_card_bg"
+            android:elevation="2dp"
+            android:orientation="vertical"
+            android:padding="20dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Weekly Analysis"
                 android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                android:textSize="18sp"/>
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvWeeklySummary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="Overall independence score has improved by 12% this week. Cognitive load remains within optimal range."
                 android:textColor="@color/text_secondary"
-                android:layout_marginTop="8dp"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/btnViewDetails"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="View Detailed Graphs"
                 android:layout_marginTop="16dp"
                 android:backgroundTint="@color/primaryBlue"
+                android:text="View Detailed Graphs"
                 android:textColor="@color/white"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/glass_card_bg"
+            android:elevation="2dp"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Patient Workspace"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvWorkspaceHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Live patient workspace"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/btnAddPatient"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="@color/primaryBlue"
+                android:text="Add Patient Workspace"
+                android:textAllCaps="false"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/tvWorkspaceEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/glass_card_bg"
+                android:padding="12dp"
+                android:text="No patients available yet."
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPatientWorkspace"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false" />
         </LinearLayout>
 
     </LinearLayout>

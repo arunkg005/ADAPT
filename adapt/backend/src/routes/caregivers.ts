@@ -1,11 +1,11 @@
 import { Router, Response } from 'express';
 import { caregiverService } from '../services/caregiverService.js';
-import { authMiddleware, AuthRequest } from '../middleware/auth.js';
+import { authMiddleware, AuthRequest, requireRoles } from '../middleware/auth.js';
 
 const router = Router();
 
 // GET /api/caregivers
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: AuthRequest, res: Response) => {
   try {
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
     const offset = parseInt(req.query.offset as string) || 0;
@@ -20,7 +20,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/caregivers/:id
-router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/:id', authMiddleware, requireRoles('ADMIN', 'CAREGIVER'), async (req: AuthRequest, res: Response) => {
   try {
     const caregiver = await caregiverService.getById(req.params.id);
     res.json(caregiver);
@@ -30,7 +30,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/caregivers
-router.post('/', authMiddleware, async (req: any, res: Response) => {
+router.post('/', authMiddleware, requireRoles('ADMIN'), async (req: any, res: Response) => {
   try {
     const { first_name, last_name, email, phone } = req.body;
 
@@ -52,7 +52,7 @@ router.post('/', authMiddleware, async (req: any, res: Response) => {
 });
 
 // PUT /api/caregivers/:id
-router.put('/:id', authMiddleware, async (req: any, res: Response) => {
+router.put('/:id', authMiddleware, requireRoles('ADMIN'), async (req: any, res: Response) => {
   try {
     const caregiver = await caregiverService.update(req.params.id, req.body);
     res.json(caregiver);
@@ -62,7 +62,7 @@ router.put('/:id', authMiddleware, async (req: any, res: Response) => {
 });
 
 // DELETE /api/caregivers/:id
-router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.delete('/:id', authMiddleware, requireRoles('ADMIN'), async (req: AuthRequest, res: Response) => {
   try {
     await caregiverService.delete(req.params.id);
     res.json({ message: 'Caregiver deleted successfully' });
