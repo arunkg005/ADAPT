@@ -81,3 +81,13 @@ pg_data/
 *.pem
 docs/Project_ADAPT.rar
 PROJECT_BASH_COMMANDS.txt
+
+# -----------------------------
+# Local-only documentation (keep in dev env, not in git)
+# -----------------------------
+adapt/FAST_WORKFLOW.md
+PROJECT_COMPLETE_DOCUMENTATION.md
+Adapt_mobile_app/FINAL_VERSION_MODULE_PLAN.md
+adapt/LOCAL_SETUP.md
+Adapt_mobile_app/LOCAL_SETUP.md
+Adapt_mobile_app/DEPLOYMENT.md
