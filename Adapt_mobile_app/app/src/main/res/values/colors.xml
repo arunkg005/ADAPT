@@ -1,28 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 3-Pallet Rule: White (Base), Blue (Primary), Light Blue (Secondary) -->
     <color name="white">#FFFFFF</color>
-    <color name="primaryBlue">#1976D2</color>
-    <color name="lightBlue">#E3F2FD</color>
-
-    <!-- Theme Aliases -->
-    <color name="colorPrimary">@color/primaryBlue</color>
-    <color name="colorPrimaryDark">#1565C0</color>
-    <color name="colorAccent">@color/lightBlue</color>
-
-    <!-- UI Backgrounds -->
-    <color name="windowBackground">#FFFFFF</color>
-    <color name="cardBackground">#F8F9FA</color>
-
-    <!-- Glassmorphism assets for White Theme -->
-    <color name="glass_white">#B3FFFFFF</color> <!-- 70% White -->
-    <color name="glass_stroke">#4D1976D2</color> <!-- 30% Blue stroke -->
-
     <color name="black">#000000</color>
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#757575</color>
 
-    <!-- For Gradient backgrounds if needed -->
-    <color name="bg_gradient_start">#FFFFFF</color>
-    <color name="bg_gradient_end">#E3F2FD</color>
+    <!-- Brand: calm clinical blue + neutral slate (WCAG-friendly on light surfaces) -->
+    <color name="primaryBlue">#1D4ED8</color>
+    <color name="primaryBlueDark">#1E3A8A</color>
+    <color name="lightBlue">#EFF6FF</color>
+    <color name="lightBlueStrong">#DBEAFE</color>
+
+    <color name="colorPrimary">@color/primaryBlue</color>
+    <color name="colorPrimaryDark">@color/primaryBlueDark</color>
+    <color name="colorAccent">#0D9488</color>
+
+    <color name="windowBackground">#F8FAFC</color>
+    <color name="cardBackground">#FFFFFF</color>
+    <color name="surface_muted">#F1F5F9</color>
+
+    <color name="glass_white">#E6FFFFFF</color>
+    <color name="glass_stroke">#261D4ED8</color>
+
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#475569</color>
+    <color name="text_tertiary">#94A3B8</color>
+
+    <color name="success">#059669</color>
+    <color name="success_surface">#D1FAE5</color>
+    <color name="warning">#D97706</color>
+    <color name="danger">#DC2626</color>
+    <color name="danger_surface">#FEE2E2</color>
+    <color name="warning_surface">#FFFBEB</color>
+    <color name="warning_border">#FCD34D</color>
+    <color name="warning_text">#B45309</color>
+
+    <color name="info_surface">#E0F2FE</color>
+    <color name="info_border">#7DD3FC</color>
+
+    <color name="bg_gradient_start">#F8FAFC</color>
+    <color name="bg_gradient_end">#EFF6FF</color>
+
+    <color name="surface_elevated">#FFFFFF</color>
+    <color name="input_surface">#F1F5F9</color>
+    <color name="icon_muted">#CBD5E1</color>
+    <color name="white_70">#B3FFFFFF</color>
+    <color name="divider">#E2E8F0</color>
+
+    <color name="nav_header_gradient_start">#1E3A8A</color>
+    <color name="nav_header_gradient_end">#1D4ED8</color>
+
+    <color name="bottom_nav_surface">#FCFCFD</color>
+    <color name="bottom_nav_indicator">#DBEAFE</color>
+
+    <color name="assist_voice_tint">#0D9488</color>
 </resources>

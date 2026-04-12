@@ -47,6 +47,19 @@ public final class NetworkClient {
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(authInterceptor)
+                .addInterceptor(chain -> {
+                    Request request = chain.request();
+                    android.util.Log.d("ADAPT_NETWORK", String.format("--> %s %s", request.method(), request.url()));
+                    
+                    try {
+                        okhttp3.Response response = chain.proceed(request);
+                        android.util.Log.d("ADAPT_NETWORK", String.format("<-- %d %s %s", response.code(), request.method(), request.url()));
+                        return response;
+                    } catch (java.io.IOException e) {
+                        android.util.Log.e("ADAPT_NETWORK", String.format("<-- ERROR %s %s: %s", request.method(), request.url(), e.getMessage()));
+                        throw e;
+                    }
+                })
                 .build();
 
         return new Retrofit.Builder()

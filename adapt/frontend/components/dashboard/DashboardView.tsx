@@ -52,6 +52,18 @@ interface DashboardSettings {
   refreshIntervalMinutes: string;
 }
 
+type ChatMessageRole = "user" | "assistant" | "system";
+
+interface ChatMessage {
+  id: string;
+  role: ChatMessageRole;
+  text: string;
+  actionItems?: string[];
+  safetyFlags?: string[];
+  confidence?: number;
+  timestamp: number;
+}
+
 type DashboardTab = "patients" | "tasklab" | "analysis" | "chat" | "settings";
 
 async function apiRequest<T>(apiBase: string, path: string, token: string, options?: { method?: string; body?: unknown }): Promise<T> {
@@ -115,7 +127,12 @@ const DashboardView = ({ token, user, apiBase, onLogout }: DashboardViewProps) =
   // Chat state
   const [chatPrompt, setChatPrompt] = useState("");
   const [chatBusy, setChatBusy] = useState(false);
-  const [chatMessages, setChatMessages] = useState<string[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+
+  const activePatient = useMemo(
+    () => patients.find((patient) => patient.id === activePatientId.trim()) || null,
+    [patients, activePatientId],
+  );
 
   const caregiverName = useMemo(() => {
     const joined = `${user.first_name || ""} ${user.last_name || ""}`.trim();
@@ -364,7 +381,23 @@ const DashboardView = ({ token, user, apiBase, onLogout }: DashboardViewProps) =
     try {
       const res = await apiRequest<any>(apiBase, "/ai/task-lab/generate", token, {
         method: "POST",
-        body: { prompt: taskPrompt },
+        body: {
+          prompt: taskPrompt,
+          patientProfile: activePatient
+            ? {
+                id: activePatient.id,
+                first_name: activePatient.first_name,
+                last_name: activePatient.last_name,
+                cognitive_condition: activePatient.cognitive_condition,
+                risk_level: activePatient.risk_level,
+              }
+            : undefined,
+          constraints: activePatient?.risk_level
+            ? {
+                riskLevel: activePatient.risk_level,
+              }
+            : undefined,
+        },
       });
       setGeneratedDraft(res);
       setTaskStatus("AI draft generated. Review and publish to Task Lab.");
@@ -463,16 +496,37 @@ const DashboardView = ({ token, user, apiBase, onLogout }: DashboardViewProps) =
   };
 
   const sendChat = async () => {
-    if (!chatPrompt.trim()) {
+    const prompt = chatPrompt.trim();
+    if (!prompt) {
       return;
     }
+
+    const userMessage: ChatMessage = {
+      id: `chat-user-${Date.now()}`,
+      role: "user",
+      text: prompt,
+      timestamp: Date.now(),
+    };
+
+    setChatMessages((prev) => [...prev, userMessage]);
+    setChatPrompt("");
     setChatBusy(true);
+
     try {
+      const conversationHistory = chatMessages
+        .filter((message) => message.role !== "system")
+        .map((message) => ({
+          role: message.role,
+          content: message.text,
+        }));
+
       const payload = await apiRequest<any>(apiBase, "/ai/chat", token, {
         method: "POST",
         body: {
-          prompt: chatPrompt,
+          prompt,
           patientId: activePatientId.trim() || undefined,
+          roleContext: user.role || "CAREGIVER",
+          conversationHistory,
         },
       });
 
@@ -482,19 +536,31 @@ const DashboardView = ({ token, user, apiBase, onLogout }: DashboardViewProps) =
       const safetyFlags = Array.isArray(payload.safetyFlags)
         ? payload.safetyFlags
         : [];
-      const actionLines = actionItems.map((item: string) => `- ${item}`).join("\n");
-      const flags = safetyFlags.length > 0 ? safetyFlags.join(", ") : "None";
 
       setChatMessages((prev) => [
         ...prev,
-        `You: ${chatPrompt}`,
-        `Assistant: ${payload.reply}\nActions:\n${actionLines}\nSafety Flags: ${flags}`,
+        {
+          id: `chat-assistant-${Date.now()}`,
+          role: "assistant",
+          text: typeof payload.reply === "string" ? payload.reply : "No response text received.",
+          actionItems,
+          safetyFlags,
+          confidence:
+            typeof payload.confidence === "number" && Number.isFinite(payload.confidence)
+              ? Math.max(0, Math.min(1, payload.confidence))
+              : undefined,
+          timestamp: Date.now(),
+        },
       ]);
-      setChatPrompt("");
     } catch (e) {
       setChatMessages((prev) => [
         ...prev,
-        `System: ${e instanceof Error ? e.message : "Unable to contact AI endpoint."}`,
+        {
+          id: `chat-system-${Date.now()}`,
+          role: "system",
+          text: e instanceof Error ? e.message : "Unable to contact AI endpoint.",
+          timestamp: Date.now(),
+        },
       ]);
     } finally {
       setChatBusy(false);

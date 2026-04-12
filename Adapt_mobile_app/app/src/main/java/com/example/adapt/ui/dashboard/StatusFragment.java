@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.adapt.R;
+import com.example.adapt.ui.assistant.AiAssistantActivity;
 import com.example.adapt.data.network.dto.ApiListResponse;
 import com.example.adapt.data.network.dto.BackendAlert;
 import com.example.adapt.data.network.dto.BackendDevice;
@@ -90,6 +91,15 @@ public class StatusFragment extends Fragment {
         bindViews(view);
         viewModel = new ViewModelProvider(this).get(RoutineViewModel.class);
         prefManager = new PrefManager(requireContext());
+
+        View btnShortcutAssist = view.findViewById(R.id.btnShortcutAssist);
+        if (btnShortcutAssist != null) {
+            btnShortcutAssist.setOnClickListener(v -> startActivity(new Intent(getActivity(), AssistModeActivity.class)));
+        }
+        View btnShortcutAi = view.findViewById(R.id.btnShortcutAi);
+        if (btnShortcutAi != null) {
+            btnShortcutAi.setOnClickListener(v -> startActivity(new Intent(getActivity(), AiAssistantActivity.class)));
+        }
 
         initWorkspaceSection();
         applyDefaultMetrics();
@@ -355,13 +365,53 @@ public class StatusFragment extends Fragment {
 
         EditText etFirstName = dialogView.findViewById(R.id.etPatientFirstName);
         EditText etLastName = dialogView.findViewById(R.id.etPatientLastName);
+        EditText etAge = dialogView.findViewById(R.id.etPatientAge);
+        EditText etDob = dialogView.findViewById(R.id.etPatientDob);
         EditText etCondition = dialogView.findViewById(R.id.etPatientCondition);
-        EditText etRisk = dialogView.findViewById(R.id.etPatientRisk);
-        EditText etDeviceName = dialogView.findViewById(R.id.etDeviceName);
-        EditText etDeviceType = dialogView.findViewById(R.id.etDeviceType);
+
+        final String[] selectedDeviceType = {"wearable"};
+        View tileWearable = dialogView.findViewById(R.id.tileWearable);
+        View tileBedSensor = dialogView.findViewById(R.id.tileBedSensor);
+        View tileHomeHub = dialogView.findViewById(R.id.tileHomeHub);
+        View tileAddCustom = dialogView.findViewById(R.id.tileAddCustom);
+
+        // Simple tile selection logic
+        View.OnClickListener tileListener = v -> {
+            tileWearable.setActivated(false);
+            tileBedSensor.setActivated(false);
+            tileHomeHub.setActivated(false);
+            tileAddCustom.setActivated(false);
+            v.setActivated(true);
+
+            if (v.getId() == R.id.tileWearable) selectedDeviceType[0] = "wearable";
+            else if (v.getId() == R.id.tileBedSensor) selectedDeviceType[0] = "bed_sensor";
+            else if (v.getId() == R.id.tileHomeHub) selectedDeviceType[0] = "home_hub";
+            else if (v.getId() == R.id.tileAddCustom) selectedDeviceType[0] = "other";
+        };
+
+        tileWearable.setOnClickListener(tileListener);
+        tileBedSensor.setOnClickListener(tileListener);
+        tileHomeHub.setOnClickListener(tileListener);
+        tileAddCustom.setOnClickListener(tileListener);
+        tileWearable.setActivated(true);
+
+        // Date picker for DOB
+        etDob.setOnClickListener(v -> {
+            com.google.android.material.datepicker.MaterialDatePicker<Long> datePicker =
+                    com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
+                            .setTitleText("Select Date of Birth")
+                            .setSelection(com.google.android.material.datepicker.MaterialDatePicker.todayInUtcMilliseconds())
+                            .build();
+
+            datePicker.addOnPositiveButtonClickListener(selection -> {
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                etDob.setText(sdf.format(new java.util.Date(selection)));
+            });
+            datePicker.show(getParentFragmentManager(), "DOB_PICKER");
+        });
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Add Patient Workspace")
+                .setTitle("Add New Patient")
                 .setView(dialogView)
                 .setNegativeButton("Cancel", (d, which) -> d.dismiss())
                 .setPositiveButton("Create", null)
@@ -372,37 +422,44 @@ public class StatusFragment extends Fragment {
             btnCreate.setOnClickListener(v -> {
                 String firstName = valueOrEmpty(etFirstName.getText());
                 String lastName = valueOrEmpty(etLastName.getText());
+                String dob = valueOrEmpty(etDob.getText());
                 String condition = valueOrEmpty(etCondition.getText());
-                String risk = normalizeRisk(valueOrEmpty(etRisk.getText()));
-                String deviceName = valueOrEmpty(etDeviceName.getText());
-                String deviceType = valueOrEmpty(etDeviceType.getText());
 
                 if (firstName.isEmpty()) {
                     etFirstName.setError("First name is required");
                     etFirstName.requestFocus();
                     return;
                 }
-
+                
                 if (lastName.isEmpty()) {
                     etLastName.setError("Last name is required");
                     etLastName.requestFocus();
                     return;
                 }
 
-                if (deviceType.isEmpty()) {
-                    deviceType = "wearable";
+                if (dob.isEmpty()) {
+                    etDob.setError("Date of birth is required");
+                    etDob.requestFocus();
+                    return;
                 }
 
                 PatientCreateRequest request = new PatientCreateRequest(
                         firstName,
                         lastName,
+                        dob,
                         condition.isEmpty() ? null : condition,
-                        risk,
+                        "MEDIUM", // Default risk
                         3000
                 );
 
                 btnCreate.setEnabled(false);
-                createPatientWorkspace(request, deviceName, deviceType, dialog, btnCreate);
+                android.util.Log.d("ADAPT_DIALOG", "Create button clicked. Request body details: " +
+                        "Name: " + firstName + " " + lastName +
+                        ", DOB: " + dob +
+                        ", Condition: " + condition);
+
+                // Background connection logic (e.g., default to auto-detect)
+                createPatientWorkspace(request, selectedDeviceType[0], selectedDeviceType[0], dialog, btnCreate, "auto");
             });
         });
 
@@ -414,7 +471,8 @@ public class StatusFragment extends Fragment {
             String deviceName,
             String deviceType,
             AlertDialog dialog,
-            Button btnCreate
+            Button btnCreate,
+            String connectionMethod
     ) {
         viewModel.createPatient(request).enqueue(new Callback<BackendPatient>() {
             @Override
@@ -430,19 +488,24 @@ public class StatusFragment extends Fragment {
                 }
 
                 BackendPatient createdPatient = response.body();
-                if (createdPatient.getId() == null || createdPatient.getId().trim().isEmpty() || deviceName.isEmpty()) {
+                if (createdPatient.getId() == null || createdPatient.getId().trim().isEmpty()) {
                     Toast.makeText(requireContext(), "Patient workspace added.", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
                     refreshBackendSnapshot();
                     return;
                 }
 
+                // Enhanced device request including connection capabilities
+                List<String> capabilities = new ArrayList<>();
+                capabilities.add("sensor_stream");
+                capabilities.add("conn_" + connectionMethod);
+
                 DeviceCreateRequest deviceRequest = new DeviceCreateRequest(
                         createdPatient.getId().trim(),
                         deviceName,
                         deviceType,
-                        "android",
-                        Collections.singletonList("sensor_stream")
+                        "iot_device",
+                        capabilities
                 );
 
                 viewModel.createDevice(deviceRequest).enqueue(new Callback<BackendDevice>() {
@@ -480,8 +543,9 @@ public class StatusFragment extends Fragment {
                     return;
                 }
 
+                android.util.Log.e("ADAPT_DIALOG", "Patient onboarding failed: " + t.getMessage(), t);
                 btnCreate.setEnabled(true);
-                Toast.makeText(requireContext(), "Patient onboarding failed.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Patient onboarding failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

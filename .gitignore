@@ -79,6 +79,31 @@ pg_data/
 *.jks
 *.keystore
 *.pem
+*.pfx
+*.p12
+*.crt
+*.cer
+*.key
+*.kdbx
+*.ovpn
+*.mobileprovision
+*.gpg
+*.asc
+**/.envrc
+**/*.secret
+**/secrets/
+**/private/
+
+# -----------------------------
+# Archives / exports (non-core)
+# -----------------------------
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+
 docs/Project_ADAPT.rar
 PROJECT_BASH_COMMANDS.txt
 

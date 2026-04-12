@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/windowBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,12 +22,11 @@
 
         <!-- Session Info Card -->
         <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.Adapt.Card.Surface"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="24dp"
             app:cardElevation="2dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="@color/lightBlue"
             android:layout_marginBottom="16dp">
 
             <LinearLayout
@@ -39,7 +38,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Session Information"
+                    android:text="@string/profile_session_title"
                     android:textColor="@color/primaryBlue"
                     android:textStyle="bold"
                     android:textSize="14sp"
@@ -76,10 +75,11 @@
 
         <!-- Assistive Mode Card -->
         <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.Adapt.Card.Surface"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="24dp"
-            app:cardElevation="4dp"
+            app:cardElevation="2dp"
             app:strokeWidth="2dp"
             app:strokeColor="@color/primaryBlue"
             android:layout_marginBottom="16dp">
@@ -117,26 +117,24 @@
                     android:textSize="12sp"
                     android:layout_marginTop="4dp"/>
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEnterAssistMode"
+                    style="@style/Widget.Adapt.Button.Primary"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:text="Start Focused Session"
                     android:layout_marginTop="16dp"
-                    android:backgroundTint="@color/primaryBlue"
-                    android:textColor="@color/white"
-                    app:cornerRadius="16dp"/>
+                    />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <!-- App Settings & Permissions -->
         <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.Adapt.Card.Surface"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="24dp"
             app:cardElevation="2dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="@color/lightBlue"
             android:layout_marginBottom="16dp">
 
             <LinearLayout
@@ -166,7 +164,7 @@
                     android:id="@+id/tvPermissionStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Background Monitoring: Active"
+                    android:text="@string/profile_monitoring_status"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     android:layout_marginTop="12dp"/>
@@ -175,21 +173,21 @@
                     android:id="@+id/tvInternetStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Cloud Sync: Connected"
+                    android:text="@string/profile_sync_status"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     android:layout_marginTop="4dp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogout"
+            style="@style/Widget.Adapt.Button.Text"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="Sign Out"
             android:layout_marginTop="16dp"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:textColor="@color/text_secondary"/>
+            />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

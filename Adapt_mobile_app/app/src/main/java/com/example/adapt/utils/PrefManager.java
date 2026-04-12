@@ -27,6 +27,11 @@ public class PrefManager {
     private static final String KEY_TASK_LAB_DRAFT_TITLE = "task_lab_draft_title";
     private static final String KEY_TASK_LAB_DRAFT_DESCRIPTION = "task_lab_draft_description";
     private static final String KEY_TASK_LAB_DRAFT_TIME = "task_lab_draft_time";
+    private static final String KEY_TASK_LAB_DRAFT_TASK_TYPE = "task_lab_draft_task_type";
+    private static final String KEY_TASK_LAB_DRAFT_RISK_LEVEL = "task_lab_draft_risk_level";
+    private static final String KEY_TASK_LAB_DRAFT_COMPLEXITY = "task_lab_draft_complexity";
+    private static final String KEY_TASK_LAB_DRAFT_TEMPLATE_KEY = "task_lab_draft_template_key";
+    private static final String KEY_TASK_LAB_DRAFT_STEPS_JSON = "task_lab_draft_steps_json";
     private static final String KEY_ASSIST_VOICE_GUIDANCE_ENABLED = "assist_voice_guidance_enabled";
     private static final String KEY_ASSIST_LARGE_TEXT_ENABLED = "assist_large_text_enabled";
     private static final String KEY_ASSIST_DOUBLE_CONFIRM_ENABLED = "assist_double_confirm_enabled";
@@ -204,10 +209,37 @@ public class PrefManager {
     }
 
     public void saveTaskLabDraft(String title, String description, String scheduledTime) {
+        saveTaskLabDraft(
+            title,
+            description,
+            scheduledTime,
+            "OTHER",
+            "MEDIUM",
+            "MEDIUM",
+            null,
+            ""
+        );
+        }
+
+        public void saveTaskLabDraft(
+            String title,
+            String description,
+            String scheduledTime,
+            String taskType,
+            String riskLevel,
+            String complexity,
+            String templateKey,
+            String stepsJson
+        ) {
         pref.edit()
                 .putString(KEY_TASK_LAB_DRAFT_TITLE, title)
                 .putString(KEY_TASK_LAB_DRAFT_DESCRIPTION, description)
                 .putString(KEY_TASK_LAB_DRAFT_TIME, scheduledTime)
+            .putString(KEY_TASK_LAB_DRAFT_TASK_TYPE, taskType)
+            .putString(KEY_TASK_LAB_DRAFT_RISK_LEVEL, riskLevel)
+            .putString(KEY_TASK_LAB_DRAFT_COMPLEXITY, complexity)
+            .putString(KEY_TASK_LAB_DRAFT_TEMPLATE_KEY, templateKey)
+            .putString(KEY_TASK_LAB_DRAFT_STEPS_JSON, stepsJson)
                 .apply();
     }
 
@@ -228,11 +260,36 @@ public class PrefManager {
         return pref.getString(KEY_TASK_LAB_DRAFT_TIME, "09:00 AM");
     }
 
+    public String getTaskLabDraftTaskType() {
+        return pref.getString(KEY_TASK_LAB_DRAFT_TASK_TYPE, "OTHER");
+    }
+
+    public String getTaskLabDraftRiskLevel() {
+        return pref.getString(KEY_TASK_LAB_DRAFT_RISK_LEVEL, "MEDIUM");
+    }
+
+    public String getTaskLabDraftComplexity() {
+        return pref.getString(KEY_TASK_LAB_DRAFT_COMPLEXITY, "MEDIUM");
+    }
+
+    public String getTaskLabDraftTemplateKey() {
+        return pref.getString(KEY_TASK_LAB_DRAFT_TEMPLATE_KEY, null);
+    }
+
+    public String getTaskLabDraftStepsJson() {
+        return pref.getString(KEY_TASK_LAB_DRAFT_STEPS_JSON, "");
+    }
+
     public void clearTaskLabDraft() {
         pref.edit()
                 .remove(KEY_TASK_LAB_DRAFT_TITLE)
                 .remove(KEY_TASK_LAB_DRAFT_DESCRIPTION)
                 .remove(KEY_TASK_LAB_DRAFT_TIME)
+                .remove(KEY_TASK_LAB_DRAFT_TASK_TYPE)
+                .remove(KEY_TASK_LAB_DRAFT_RISK_LEVEL)
+                .remove(KEY_TASK_LAB_DRAFT_COMPLEXITY)
+                .remove(KEY_TASK_LAB_DRAFT_TEMPLATE_KEY)
+                .remove(KEY_TASK_LAB_DRAFT_STEPS_JSON)
                 .apply();
     }
 

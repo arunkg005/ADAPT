@@ -1,6 +1,8 @@
 package com.example.adapt.data.network;
 
 import com.example.adapt.data.network.dto.AlertCreateRequest;
+import com.example.adapt.data.network.dto.AiChatRequest;
+import com.example.adapt.data.network.dto.AiChatResponse;
 import com.example.adapt.data.network.dto.AssistNextActionRequest;
 import com.example.adapt.data.network.dto.AssistNextActionResponse;
 import com.example.adapt.data.network.dto.ApiListResponse;
@@ -79,6 +81,9 @@ public interface ApiService {
 
     @POST("ai/task-lab/generate")
     Call<TaskLabGenerateResponse> generateTaskLabDraft(@Body TaskLabGenerateRequest request);
+
+    @POST("ai/chat")
+    Call<AiChatResponse> chatWithAssistant(@Body AiChatRequest request);
 
     @POST("task-lab/plans")
     Call<TaskPlanResponse> createTaskLabPlan(@Body TaskPlanCreateRequest request);

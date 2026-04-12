@@ -94,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_account || itemId == R.id.nav_settings) {
                 bottomNav.setSelectedItemId(R.id.nav_profile);
+            } else if (itemId == R.id.nav_task_lab) {
+                loadFragment(new TaskLabFragment());
             } else if (itemId == R.id.nav_help || itemId == R.id.nav_assist_mode) {
                 startActivity(new Intent(this, AssistModeActivity.class));
             } else if (itemId == R.id.nav_ai_assistant) {
@@ -120,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new StatusFragment();
             } else if (itemId == R.id.nav_logs) {
                 selectedFragment = new LogsFragment();
+            } else if (itemId == R.id.nav_task_lab) {
+                selectedFragment = new TaskLabFragment();
             } else if (itemId == R.id.nav_tasks) {
                 selectedFragment = new RoutineFragment();
             } else if (itemId == R.id.nav_profile) {
@@ -145,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         fabTaskLab = findViewById(R.id.fabTaskLab);
         fabAiAssistant = findViewById(R.id.fabAiAssistant);
 
-        fabTaskLab.setOnClickListener(v -> loadFragment(new TaskLabFragment()));
+        fabTaskLab.setOnClickListener(v -> bottomNav.setSelectedItemId(R.id.nav_task_lab));
         fabAiAssistant.setOnClickListener(v -> startActivity(new Intent(this, AiAssistantActivity.class)));
 
         updateAiAssistantVisibility();

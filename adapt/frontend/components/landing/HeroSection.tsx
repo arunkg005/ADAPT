@@ -1,6 +1,5 @@
-import { MouseEvent } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Shield } from "lucide-react";
+import { ArrowRight, Download, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HeroSectionProps {
@@ -9,15 +8,30 @@ interface HeroSectionProps {
   isLoggedIn: boolean;
 }
 
-const HeroSection = ({ onLogin, onOpenDashboard, isLoggedIn }: HeroSectionProps) => {
-  const handleLoginClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    onLogin();
-  };
+const appScreens = [
+  {
+    title: "Assist Mode",
+    description: "Step-by-step guided routines",
+    color: "from-primary to-primary/80",
+    steps: ["Morning medication", "Breakfast prep", "Mobility exercise"],
+  },
+  {
+    title: "Task Guardian",
+    description: "Smart reminders & escalation",
+    color: "from-accent to-accent/80",
+    steps: ["Reminder sent", "Patient confirmed", "Caregiver notified"],
+  },
+  {
+    title: "Care Summary",
+    description: "Real-time sync to dashboard",
+    color: "from-success to-success/80",
+    steps: ["Tasks completed: 8/10", "Mood: Positive", "Notes synced"],
+  },
+];
 
+const HeroSection = ({ onLogin, onOpenDashboard, isLoggedIn }: HeroSectionProps) => {
   return (
     <section className="relative min-h-[85vh] flex items-center gradient-hero-bg overflow-hidden">
-      {/* Decorative circles */}
       <div className="absolute top-20 right-10 w-72 h-72 rounded-full bg-accent/10 blur-3xl" />
       <div className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-primary/5 blur-3xl" />
 
@@ -45,15 +59,17 @@ const HeroSection = ({ onLogin, onOpenDashboard, isLoggedIn }: HeroSectionProps)
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Button variant="hero" size="xl" asChild>
-                <a href="/login" onClick={handleLoginClick}>
-                  Login
-                  <ArrowRight className="ml-1 h-5 w-5" />
-                </a>
+              <Button
+                variant="hero"
+                size="xl"
+                onClick={isLoggedIn ? onOpenDashboard : onLogin}
+              >
+                {isLoggedIn ? "Continue to Dashboard" : "Login"}
+                <ArrowRight className="ml-1 h-5 w-5" />
               </Button>
-              {isLoggedIn && (
-                <Button variant="hero-outline" size="xl" onClick={onOpenDashboard}>
-                  Open Dashboard
+              {!isLoggedIn && (
+                <Button variant="hero-outline" size="xl" onClick={onLogin}>
+                  Sign In
                 </Button>
               )}
             </div>
@@ -70,55 +86,92 @@ const HeroSection = ({ onLogin, onOpenDashboard, isLoggedIn }: HeroSectionProps)
             </div>
           </motion.div>
 
+          {/* Mobile App Showcase */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="hidden lg:grid gap-4"
+            className="hidden lg:flex flex-col items-center gap-6"
           >
-            {/* Visual cards */}
-            <div className="glass-panel p-6 space-y-4">
-              <p className="text-xs font-bold uppercase tracking-widest text-accent">How it runs</p>
-              <h3 className="text-xl font-heading font-bold text-foreground">Plan, Guide, Review</h3>
-              <div className="space-y-3">
-                {["Routine planned", "Assist mode active", "Care summary synced"].map((step, i) => (
-                  <div key={step} className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-lg gradient-primary-bg flex items-center justify-center text-primary-foreground text-sm font-bold">
-                      {i + 1}
-                    </span>
-                    <span className="text-sm text-foreground font-medium">{step}</span>
-                  </div>
-                ))}
+            <div className="relative">
+              <div className="w-[270px] rounded-[2.5rem] border-[6px] border-foreground/90 bg-card shadow-2xl overflow-hidden">
+                <div className="h-8 bg-foreground/90 flex items-center justify-center">
+                  <div className="w-20 h-4 rounded-full bg-foreground/70" />
+                </div>
+                <div className="gradient-primary-bg px-5 py-3">
+                  <p className="text-primary-foreground/70 text-xs font-semibold uppercase tracking-widest">ADAPT Assist</p>
+                  <p className="text-primary-foreground font-heading font-bold text-lg mt-1">Good Morning</p>
+                  <p className="text-primary-foreground/80 text-sm">3 routines scheduled</p>
+                </div>
+                <div className="p-3 space-y-2 bg-background min-h-[260px]">
+                  {appScreens.map((screen, i) => (
+                    <motion.div
+                      key={screen.title}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 + i * 0.15 }}
+                      className="glass-panel p-2.5 space-y-1.5"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${screen.color}`} />
+                        <p className="text-xs font-bold text-foreground">{screen.title}</p>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">{screen.description}</p>
+                      <div className="space-y-0.5">
+                        {screen.steps.map((step, j) => (
+                          <div key={j} className="flex items-center gap-1.5">
+                            <CheckCircle className="w-3 h-3 text-success flex-shrink-0" />
+                            <span className="text-[10px] text-foreground/80">{step}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                <div className="h-10 border-t border-border bg-card flex items-center justify-around px-6">
+                  {["Home", "Tasks", "Profile"].map((tab) => (
+                    <div key={tab} className="flex flex-col items-center gap-0.5">
+                      <div className="w-3 h-3 rounded bg-muted" />
+                      <span className="text-[8px] text-muted-foreground">{tab}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8 }}
+                className="absolute -right-8 top-16 glass-panel px-3 py-2 shadow-lg"
+              >
+                <p className="text-[10px] font-bold text-accent">Live Sync</p>
+                <p className="text-[9px] text-muted-foreground">Dashboard updated</p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1 }}
+                className="absolute -left-6 bottom-20 glass-panel px-3 py-2 shadow-lg"
+              >
+                <p className="text-[10px] font-bold text-success">Offline Ready</p>
+                <p className="text-[9px] text-muted-foreground">Works without WiFi</p>
+              </motion.div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="glass-panel p-5 space-y-2">
-                <p className="text-xs font-bold uppercase tracking-widest text-accent">Live context</p>
-                <h4 className="text-lg font-heading font-bold text-foreground">Today at a glance</h4>
-                <div className="space-y-3 pt-2">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Routines completed</p>
-                    <div className="h-2.5 rounded-full bg-muted overflow-hidden">
-                      <div className="h-full rounded-full gradient-primary-bg w-3/4" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Assist sessions synced</p>
-                    <div className="h-2.5 rounded-full bg-muted overflow-hidden">
-                      <div className="h-full rounded-full gradient-accent-bg w-1/2" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="glass-panel p-5 flex flex-col items-center justify-center text-center space-y-2">
-                <div className="w-12 h-12 rounded-xl gradient-accent-bg flex items-center justify-center">
-                  <Shield className="h-6 w-6 text-accent-foreground" />
-                </div>
-                <p className="text-sm font-semibold text-foreground">HIPAA Ready</p>
-                <p className="text-xs text-muted-foreground">Role-based security</p>
-              </div>
-            </div>
+            <Button
+              variant="hero"
+              size="lg"
+              onClick={() => window.open("#", "_blank")}
+              className="w-full max-w-[270px]"
+            >
+              <Download className="mr-2 h-5 w-5" />
+              Download APK
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Button>
+            <p className="text-xs text-muted-foreground text-center max-w-[270px]">
+              Android 8.0+ | v1.0.0 | 24 MB
+            </p>
           </motion.div>
         </div>
       </div>

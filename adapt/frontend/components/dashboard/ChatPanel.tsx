@@ -3,8 +3,20 @@ import { MessageSquare, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+type ChatMessageRole = "user" | "assistant" | "system";
+
+interface ChatMessage {
+  id: string;
+  role: ChatMessageRole;
+  text: string;
+  actionItems?: string[];
+  safetyFlags?: string[];
+  confidence?: number;
+  timestamp: number;
+}
+
 interface ChatPanelProps {
-  messages: string[];
+  messages: ChatMessage[];
   prompt: string;
   onSetPrompt: (val: string) => void;
   onSend: () => void;
@@ -37,12 +49,15 @@ const ChatPanel = ({ messages, prompt, onSetPrompt, onSend, busy }: ChatPanelPro
         {messages.length === 0 && (
           <p className="text-xs text-muted-foreground text-center py-8">No messages yet. Start a conversation.</p>
         )}
-        {messages.map((msg, i) => {
-          const isUser = msg.startsWith("You:");
-          const isSystem = msg.startsWith("System:");
+        {messages.map((msg) => {
+          const isUser = msg.role === "user";
+          const isSystem = msg.role === "system";
+          const hasActionItems = Array.isArray(msg.actionItems) && msg.actionItems.length > 0;
+          const hasSafetyFlags = Array.isArray(msg.safetyFlags) && msg.safetyFlags.length > 0;
+
           return (
             <div
-              key={i}
+              key={msg.id}
               className={`rounded-xl px-4 py-3 text-sm whitespace-pre-wrap ${
                 isUser
                   ? "bg-primary/10 text-foreground ml-8"
@@ -51,7 +66,39 @@ const ChatPanel = ({ messages, prompt, onSetPrompt, onSend, busy }: ChatPanelPro
                   : "bg-secondary text-foreground mr-8"
               }`}
             >
-              {msg}
+              {!isUser && !isSystem && <p className="text-[11px] uppercase tracking-wider opacity-70 mb-1">Assistant</p>}
+              {isUser && <p className="text-[11px] uppercase tracking-wider opacity-70 mb-1">You</p>}
+              {isSystem && <p className="text-[11px] uppercase tracking-wider opacity-70 mb-1">System</p>}
+
+              <p>{msg.text}</p>
+
+              {hasActionItems && (
+                <div className="mt-3 space-y-1">
+                  <p className="text-[11px] uppercase tracking-wider opacity-70">Action Items</p>
+                  <ul className="list-disc list-inside text-xs space-y-1">
+                    {msg.actionItems?.map((item, index) => (
+                      <li key={`${msg.id}-action-${index}`}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {hasSafetyFlags && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {msg.safetyFlags?.map((flag, index) => (
+                    <span
+                      key={`${msg.id}-flag-${index}`}
+                      className="px-2 py-1 rounded-md bg-accent/15 text-accent text-[10px] font-semibold"
+                    >
+                      {flag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {typeof msg.confidence === "number" && Number.isFinite(msg.confidence) && (
+                <p className="mt-2 text-[11px] opacity-75">Confidence: {Math.round(msg.confidence * 100)}%</p>
+              )}
             </div>
           );
         })}

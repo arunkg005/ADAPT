@@ -15,7 +15,7 @@
     <string name="full_name">Full Name</string>
     <string name="patient">Patient</string>
     <string name="caregiver">Caregiver</string>
-    <string name="nav_status">Status</string>
+    <string name="nav_status">Home</string>
     <string name="nav_logs">Logs</string>
     <string name="nav_tasks">Tasks</string>
     <string name="nav_profile">Profile</string>
@@ -24,4 +24,51 @@
     <string name="nav_assist_mode">Assist Mode</string>
     <string name="nav_dark_mode">Dark Mode</string>
     <string name="nav_about">About ADAPT</string>
+
+    <string name="nav_header_tagline">Your assistive care workspace.</string>
+    <string name="section_care_workspace">Care Status</string>
+    <string name="section_quick_actions">Quick Tools</string>
+    <string name="section_reminders_alerts">Notifications</string>
+    <string name="section_live_workspace">Live Monitoring</string>
+    <string name="section_analysis_reports">Care Progress</string>
+    <string name="section_patient_workspaces">Patients</string>
+    <string name="reminders_alerts_body">Safety reminders and system updates will appear here if anything needs your attention.</string>
+    <string name="action_assist_mode">Help</string>
+    <string name="action_ai_assistant">Ask AI</string>
+    <string name="action_view_analytics">View Progress</string>
+    <string name="action_add_patient_workspace">New Patient</string>
+    <string name="cd_open_task_lab">Open task lab</string>
+    <string name="cd_open_ai_assistant">Open AI assistant</string>
+    <string name="cd_send_message">Send message</string>
+
+    <string name="ai_channel_title">Generative and assist channel</string>
+    <string name="ai_channel_subtitle">Use text for precise requests. Voice input is for hands-free use when it is safe and appropriate for the patient setting.</string>
+    <string name="ai_voice_input">Voice input (hands-free)</string>
+    <string name="ai_prompt_hint">Ask something…</string>
+    <string name="quick_medication">Medication</string>
+    <string name="quick_fall_risk">Fall risk</string>
+    <string name="quick_routine">Routine</string>
+    <string name="draft_plan_label">Draft plan</string>
+    <string name="draft_plan_empty_title">No draft yet</string>
+    <string name="draft_plan_empty_body">Send a prompt to generate a Task Lab draft.</string>
+    <string name="draft_plan_time_placeholder">Suggested time: --</string>
+    <string name="send_to_task_lab">Send to Task Lab</string>
+
+    <string name="assist_hands_free_label">Hands-free assist</string>
+    <string name="assist_hands_free_body">Assist Mode is built for large type, simple steps, and optional voice guidance. Rule-based checks from your care plan validate steps before marking them complete.</string>
+    <string name="status_hero_subtitle">Everything is running smoothly.</string>
+    <string name="status_metric_system_health">System Health</string>
+    <string name="status_workspace_monitoring">Active Monitoring</string>
+    <string name="logs_header_subtitle">System activity history</string>
+    <string name="logs_syncing_status">Syncing with cloud…</string>
+    <string name="tasks_header_title">Daily Tasks</string>
+    <string name="tasks_header_subtitle">Your guided care routine</string>
+    <string name="profile_session_title">Your Account</string>
+    <string name="profile_monitoring_status">Safety Monitoring: Active</string>
+    <string name="profile_sync_status">All data saved</string>
+    <string name="task_lab_header_title">Care Planner</string>
+    <string name="task_lab_header_subtitle">Build routines from templates or AI.</string>
+    <string name="task_lab_templates_section">Routine Templates</string>
+    <string name="task_lab_ai_section">Smart Planner</string>
+    <string name="task_lab_ai_subtitle">Describe a goal, and AI will build the steps.</string>
 </resources>

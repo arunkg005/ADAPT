@@ -69,6 +69,9 @@ public class PatientWorkspaceAdapter extends RecyclerView.Adapter<PatientWorkspa
         private final TextView tvCondition;
         private final TextView tvSnapshot;
         private final Button btnAnalyze;
+        private final View cardLiveFeed;
+        private final TextView tvLiveStatus;
+        private final TextView tvLiveMetric;
 
         PatientViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -77,6 +80,9 @@ public class PatientWorkspaceAdapter extends RecyclerView.Adapter<PatientWorkspa
             tvCondition = itemView.findViewById(R.id.tvWorkspaceCondition);
             tvSnapshot = itemView.findViewById(R.id.tvWorkspaceSnapshot);
             btnAnalyze = itemView.findViewById(R.id.btnWorkspaceAnalyze);
+            cardLiveFeed = itemView.findViewById(R.id.cardLiveFeed);
+            tvLiveStatus = itemView.findViewById(R.id.tvLiveStatus);
+            tvLiveMetric = itemView.findViewById(R.id.tvLiveMetric);
         }
 
         void bind(BackendPatient patient) {
@@ -105,7 +111,17 @@ public class PatientWorkspaceAdapter extends RecyclerView.Adapter<PatientWorkspa
             tvPatientName.setText(fullName);
             tvRiskBadge.setText(risk + " RISK");
             tvCondition.setText(condition);
-            tvSnapshot.setText(String.format(Locale.US, "Live snapshot: %d connected device(s)", onlineDevices));
+            tvSnapshot.setText(String.format(Locale.US, "Connected devices: %d", onlineDevices));
+
+            // Show Live Feed only if devices are connected
+            if (onlineDevices > 0) {
+                cardLiveFeed.setVisibility(View.VISIBLE);
+                // Simulated live data logic
+                tvLiveStatus.setText("Receiving live data...");
+                tvLiveMetric.setText("Heart Rate: 72 bpm | Status: Stable");
+            } else {
+                cardLiveFeed.setVisibility(View.GONE);
+            }
 
             btnAnalyze.setOnClickListener(v -> {
                 if (listener != null) {

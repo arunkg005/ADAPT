@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.Adapt.Card.Surface"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="1dp"
-    app:strokeColor="@color/lightBlue">
+    android:layout_marginVertical="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,10 +13,9 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <!-- Status Indicator Bar (Industry Standard) -->
         <View
             android:id="@+id/vStatusIndicator"
-            android:layout_width="6dp"
+            android:layout_width="4dp"
             android:layout_height="match_parent"
             android:background="@color/primaryBlue" />
 
@@ -27,15 +23,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp"
+            android:padding="14dp"
             android:gravity="center_vertical">
 
-            <!-- Source Icon -->
             <FrameLayout
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/glass_card_bg"
-                android:padding="10dp">
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_status_badge"
+                android:padding="8dp">
                 <ImageView
                     android:id="@+id/ivLogIcon"
                     android:layout_width="match_parent"
@@ -49,7 +44,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="12dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -58,37 +53,35 @@
                     android:layout_height="wrap_content"
                     android:text="Medication Taken"
                     android:textColor="@color/text_primary"
-                    android:textStyle="bold"
-                    android:textSize="16sp"/>
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvLogDescription"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="IoT Surveillance"
+                    android:text="Details"
                     android:textColor="@color/text_secondary"
-                    android:textSize="13sp"/>
+                    android:textSize="12sp"
+                    android:layout_marginTop="2dp" />
 
                 <TextView
                     android:id="@+id/tvLogPatient"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Patient: General"
+                    android:text="Patient: John Doe"
                     android:textColor="@color/primaryBlue"
                     android:textSize="11sp"
-                    android:textStyle="bold" />
+                    android:layout_marginTop="2dp" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/tvLogTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="08:15 AM"
-                android:textColor="@color/primaryBlue"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:text="10:30 AM"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp" />
         </LinearLayout>
-
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

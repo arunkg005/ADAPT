@@ -3,25 +3,77 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@color/windowBackground"
+    android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarAiAssistant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/windowBackground"
+        android:elevation="0dp"
         app:navigationIcon="@android:drawable/ic_menu_revert"
         app:navigationIconTint="@color/primaryBlue"
-        app:title="AI Assistant"
+        app:title="@string/nav_ai_assistant"
         app:titleCentered="true"
-        app:titleTextColor="@color/primaryBlue" />
+        app:titleTextColor="@color/text_primary" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/adapt_screen_padding_sm">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@color/surface_muted"
+            app:cardCornerRadius="@dimen/adapt_card_radius"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/divider"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    style="@style/TextAppearance.Adapt.SectionLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ai_channel_title" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:lineSpacingExtra="2dp"
+                    android:text="@string/ai_channel_subtitle"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVoiceHandsFree"
+                    style="@style/Widget.Adapt.Button.Secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/ai_voice_input"
+                    android:textSize="14sp"
+                    app:icon="@android:drawable/ic_btn_speak_now"
+                    app:iconGravity="textStart"
+                    app:iconPadding="10dp"
+                    app:iconTint="@color/assist_voice_tint" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <HorizontalScrollView
             android:layout_width="match_parent"
@@ -33,146 +85,145 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnQuickMedication"
+                    style="@style/Widget.Adapt.Button.Secondary"
                     android:layout_width="wrap_content"
-                    android:layout_height="42dp"
+                    android:layout_height="40dp"
                     android:layout_marginEnd="8dp"
-                    android:text="Medication"
-                    android:textAllCaps="false"
-                    android:textColor="@color/primaryBlue"
-                    android:backgroundTint="@color/lightBlue" />
+                    android:text="@string/quick_medication"
+                    android:textSize="13sp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnQuickFallRisk"
+                    style="@style/Widget.Adapt.Button.Secondary"
                     android:layout_width="wrap_content"
-                    android:layout_height="42dp"
+                    android:layout_height="40dp"
                     android:layout_marginEnd="8dp"
-                    android:text="Fall Risk"
-                    android:textAllCaps="false"
-                    android:textColor="@color/primaryBlue"
-                    android:backgroundTint="@color/lightBlue" />
+                    android:text="@string/quick_fall_risk"
+                    android:textSize="13sp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnQuickRoutine"
+                    style="@style/Widget.Adapt.Button.Secondary"
                     android:layout_width="wrap_content"
-                    android:layout_height="42dp"
-                    android:text="Routine"
-                    android:textAllCaps="false"
-                    android:textColor="@color/primaryBlue"
-                    android:backgroundTint="@color/lightBlue" />
+                    android:layout_height="40dp"
+                    android:text="@string/quick_routine"
+                    android:textSize="13sp" />
             </LinearLayout>
         </HorizontalScrollView>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardGeneratedPlan"
+            style="@style/Widget.Adapt.Card.Tint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:cardCornerRadius="16dp"
-            app:strokeColor="@color/lightBlue"
-            app:strokeWidth="1dp">
+            android:layout_marginTop="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="14dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Generated Plan Draft"
-                    android:textAllCaps="true"
+                    android:letterSpacing="0.05"
+                    android:text="@string/draft_plan_label"
                     android:textColor="@color/primaryBlue"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvGeneratedPlanTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="No draft yet"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/draft_plan_empty_title"
                     android:textColor="@color/text_primary"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvGeneratedPlanDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Send a prompt and the assistant will produce a Task Lab draft."
+                    android:layout_marginTop="3dp"
+                    android:text="@string/draft_plan_empty_body"
                     android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/tvGeneratedPlanTime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Suggested time: --"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/draft_plan_time_placeholder"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textSize="11sp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSendToTaskLab"
+                    style="@style/Widget.Adapt.Button.Primary"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
                     android:layout_marginTop="10dp"
-                    android:backgroundTint="@color/primaryBlue"
                     android:enabled="false"
-                    android:text="Send Draft to Task Lab"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    android:text="@string/send_to_task_lab"
+                    android:textSize="14sp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_marginTop="12dp"
-            android:background="@drawable/glass_card_bg"
-            android:padding="12dp">
+            android:layout_weight="1"
+            android:background="@drawable/bg_input_field"
+            android:padding="14dp">
 
             <TextView
                 android:id="@+id/tvConversation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:lineSpacingExtra="3dp"
                 android:textColor="@color/text_primary"
-                android:textSize="15sp" />
+                android:textSize="14sp" />
         </androidx.core.widget.NestedScrollView>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/etAssistantPrompt"
                 android:layout_width="0dp"
-                android:layout_height="52dp"
+                android:layout_height="48dp"
                 android:layout_weight="1"
-                android:background="@drawable/glass_card_bg"
-                android:hint="Ask the assistant..."
-                android:padding="12dp"
+                android:autofillHints=""
+                android:background="@drawable/bg_input_field"
+                android:hint="@string/ai_prompt_hint"
+                android:importantForAutofill="no"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="3"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
                 android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_secondary" />
+                android:textColorHint="@color/text_secondary"
+                android:textSize="14sp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSendPrompt"
-                android:layout_width="wrap_content"
-                android:layout_height="52dp"
-                android:layout_marginStart="10dp"
-                android:text="Send"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/primaryBlue" />
+                style="@style/Widget.Adapt.Button.IconPrimary"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/cd_send_message"
+                app:icon="@drawable/ic_gemini_star"
+                app:iconGravity="textStart" />
         </LinearLayout>
-
     </LinearLayout>
-
 </LinearLayout>

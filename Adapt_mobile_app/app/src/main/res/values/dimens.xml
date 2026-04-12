@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="adapt_screen_padding">20dp</dimen>
+    <dimen name="adapt_screen_padding_sm">16dp</dimen>
+    <dimen name="adapt_card_radius">16dp</dimen>
+    <dimen name="adapt_card_radius_lg">20dp</dimen>
+    <dimen name="adapt_button_height">52dp</dimen>
+    <dimen name="adapt_touch_min">48dp</dimen>
+    <dimen name="adapt_section_gap">24dp</dimen>
+    <dimen name="adapt_elevation_nav">3dp</dimen>
+</resources>

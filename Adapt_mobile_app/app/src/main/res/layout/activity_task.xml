@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/windowBackground">
 
     <!-- Minimalist Header with Context -->
     <LinearLayout
@@ -136,7 +136,7 @@
             android:layout_marginTop="16dp"
             android:text="Wait, tell me again"
             android:textSize="16sp"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/Widget.Adapt.Button.Text"
             android:textColor="@color/primaryBlue"
             android:textAllCaps="false"/>
 
@@ -147,8 +147,8 @@
             android:layout_marginTop="8dp"
             android:text="I Need Help"
             android:textAllCaps="false"
-            android:textColor="@android:color/holo_orange_dark"
-            style="@style/Widget.MaterialComponents.Button.TextButton"/>
+            android:textColor="@color/danger"
+            style="@style/Widget.Adapt.Button.Text"/>
 
     </LinearLayout>
 

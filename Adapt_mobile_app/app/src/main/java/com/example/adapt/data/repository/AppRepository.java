@@ -15,6 +15,8 @@ import com.example.adapt.data.model.Task;
 import com.example.adapt.data.model.TaskLog;
 import com.example.adapt.data.network.ApiService;
 import com.example.adapt.data.network.NetworkClient;
+import com.example.adapt.data.network.dto.AiChatRequest;
+import com.example.adapt.data.network.dto.AiChatResponse;
 import com.example.adapt.data.network.dto.ApiListResponse;
 import com.example.adapt.data.network.dto.BackendAlert;
 import com.example.adapt.data.network.dto.BackendDevice;
@@ -186,5 +188,9 @@ public class AppRepository {
             EvaluateTelemetryRequest request
     ) {
         return apiService.evaluateTelemetry(patientId, request);
+    }
+
+    public Call<AiChatResponse> chatWithAssistant(AiChatRequest request) {
+        return apiService.chatWithAssistant(request);
     }
 }

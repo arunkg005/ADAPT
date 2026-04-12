@@ -23,6 +23,15 @@ const getRequiredOrDefault = (
   return fallback;
 };
 
+const parsePositiveInt = (value: string | undefined, fallback: number): number => {
+  const parsed = parseInt(value || '', 10);
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed;
+  }
+
+  return fallback;
+};
+
 const jwtSecret = getRequiredOrDefault('JWT_SECRET', 'change-this-secret-in-development', {
   requiredInProduction: true,
 });
@@ -71,5 +80,13 @@ export const config = {
             process.env.ENGINE_SERVICE_PORT ? `:${process.env.ENGINE_SERVICE_PORT}` : ''
           }`
         : 'http://localhost:4001'),
+  },
+
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY?.trim() || '',
+    model: process.env.GEMINI_MODEL?.trim() || 'gemini-2.0-flash',
+    timeoutMs: parsePositiveInt(process.env.GEMINI_TIMEOUT_MS, 15000),
+    maxOutputTokens: parsePositiveInt(process.env.GEMINI_MAX_OUTPUT_TOKENS, 1024),
+    systemInstruction: process.env.GEMINI_SYSTEM_INSTRUCTION?.trim() || '',
   },
 };
