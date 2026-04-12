@@ -20,6 +20,41 @@ interface AuthResponse {
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:3001/api";
 const TOKEN_KEY = "adapt_web_token";
 const USER_KEY = "adapt_web_user";
+const AUTH_REQUEST_TIMEOUT_MS = 12000;
+
+const postAuthRequest = async (path: string, payload: Record<string, unknown>) => {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), AUTH_REQUEST_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(`${API_BASE}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+      cache: "no-store",
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error((data as { error?: string }).error || `Request failed (${response.status})`);
+    }
+
+    return data as AuthResponse;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error("Sign-in request timed out. Please verify backend API is live and try again.");
+    }
+
+    if (error instanceof TypeError) {
+      throw new Error("Cannot reach backend API at http://localhost:3001. Start backend and try again.");
+    }
+
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+};
 
 const LoginPage = () => {
   const router = useRouter();
@@ -59,18 +94,12 @@ const LoginPage = () => {
     setAuthLoading(true);
     setAuthError("");
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, platform: "WEB" }),
+      const payload = await postAuthRequest("/auth/login", {
+        email,
+        password,
+        platform: "WEB",
       });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error((data as { error?: string }).error || `Request failed (${res.status})`);
-      }
-
-      persistSession(await res.json());
+      persistSession(payload);
     } catch (e) {
       setAuthError(e instanceof Error ? e.message : "Unable to sign in.");
     } finally {
@@ -87,24 +116,14 @@ const LoginPage = () => {
     setAuthLoading(true);
     setAuthError("");
     try {
-      const res = await fetch(`${API_BASE}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          password,
-          first_name: firstName,
-          last_name: lastName,
-          platform: "WEB",
-        }),
+      const payload = await postAuthRequest("/auth/register", {
+        email,
+        password,
+        first_name: firstName,
+        last_name: lastName,
+        platform: "WEB",
       });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error((data as { error?: string }).error || `Request failed (${res.status})`);
-      }
-
-      persistSession(await res.json());
+      persistSession(payload);
     } catch (e) {
       setAuthError(e instanceof Error ? e.message : "Unable to create account.");
     } finally {

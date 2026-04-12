@@ -25,6 +25,10 @@ const AuthPage = ({ onBack, onLogin, onRegister, onDashboard, isLoggedIn, userEm
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (authLoading) {
+      return;
+    }
+
     if (mode === "login") {
       await onLogin(email, password);
     } else {
@@ -33,9 +37,9 @@ const AuthPage = ({ onBack, onLogin, onRegister, onDashboard, isLoggedIn, userEm
   };
 
   return (
-    <div className="min-h-screen gradient-hero-bg flex items-center justify-center p-6">
-      <div className="absolute top-20 right-20 w-80 h-80 rounded-full bg-accent/10 blur-3xl" />
-      <div className="absolute bottom-20 left-20 w-96 h-96 rounded-full bg-primary/5 blur-3xl" />
+    <div className="relative min-h-screen gradient-hero-bg flex items-center justify-center p-6">
+      <div className="pointer-events-none absolute top-20 right-20 w-80 h-80 rounded-full bg-accent/10 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-20 left-20 w-96 h-96 rounded-full bg-primary/5 blur-3xl" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -45,7 +49,7 @@ const AuthPage = ({ onBack, onLogin, onRegister, onDashboard, isLoggedIn, userEm
         {/* Left side - branding */}
         <div className="hidden md:flex flex-col justify-between">
           <div>
-            <Button variant="ghost" size="sm" onClick={onBack} className="mb-8 text-muted-foreground">
+            <Button type="button" variant="ghost" size="sm" onClick={onBack} className="mb-8 text-muted-foreground">
               <ArrowLeft className="mr-2 h-4 w-4" /> Back to Landing
             </Button>
             <h2 className="text-3xl font-heading font-bold text-foreground mb-4">Caretaker Access</h2>
@@ -69,7 +73,7 @@ const AuthPage = ({ onBack, onLogin, onRegister, onDashboard, isLoggedIn, userEm
 
         {/* Right side - form */}
         <div className="glass-panel p-8 space-y-6">
-          <Button variant="ghost" size="sm" onClick={onBack} className="md:hidden mb-2 text-muted-foreground">
+          <Button type="button" variant="ghost" size="sm" onClick={onBack} className="md:hidden mb-2 text-muted-foreground">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back
           </Button>
 
@@ -83,10 +87,10 @@ const AuthPage = ({ onBack, onLogin, onRegister, onDashboard, isLoggedIn, userEm
                 <p className="text-sm text-muted-foreground">Signed in as {userEmail}</p>
               </div>
               <div className="space-y-3">
-                <Button variant="hero" size="lg" className="w-full" onClick={onDashboard}>
+                <Button type="button" variant="hero" size="lg" className="w-full" onClick={onDashboard}>
                   Open Dashboard
                 </Button>
-                <Button variant="ghost" size="lg" className="w-full" onClick={onBack}>
+                <Button type="button" variant="ghost" size="lg" className="w-full" onClick={onBack}>
                   Use another account
                 </Button>
               </div>
@@ -125,10 +129,16 @@ const AuthPage = ({ onBack, onLogin, onRegister, onDashboard, isLoggedIn, userEm
                 </div>
 
                 {authError && (
-                  <p className="text-sm font-medium text-destructive bg-destructive/10 rounded-lg px-4 py-2">{authError}</p>
+                  <p
+                    role="status"
+                    aria-live="polite"
+                    className="text-sm font-medium text-destructive bg-destructive/10 rounded-lg px-4 py-2"
+                  >
+                    {authError}
+                  </p>
                 )}
 
-                <Button variant="hero" size="lg" className="w-full" disabled={authLoading}>
+                <Button type="submit" variant="hero" size="lg" className="w-full" disabled={authLoading}>
                   {authLoading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
                 </Button>
 
