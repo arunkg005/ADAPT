@@ -563,7 +563,7 @@ def patient_dashboard(request, patient_id):
 
 @login_required
 def patient_settings(request, patient_id):
-	patient = _resolve_patient_instance(patient_id, user)
+	patient = _resolve_patient_instance(patient_id, request.user)
 	if request.method == "POST" and request.POST.get("action") == "delete":
 		patient_name = patient.name
 		patient.delete()

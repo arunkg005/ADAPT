@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -8,8 +9,8 @@ from .models import ClinicalSource, Patient, PatientDisease, PatientDocument, Pa
 from .services import extract_structured_clinical_data, generate_patient_summary
 
 
-def _sidebar_patient_cards():
-	patients = Patient.objects.order_by("name")
+def _sidebar_patient_cards(user):
+	patients = Patient.objects.filter(user=user).order_by("name")
 	return [
 		{
 			"id": patient.id,
@@ -22,28 +23,31 @@ def _sidebar_patient_cards():
 	]
 
 
-def _shell_context(extra=None):
-	profile = _get_or_create_caretaker_profile()
+def _shell_context(request, extra=None):
+	profile = _get_or_create_caretaker_profile(request.user)
 	context = {
 		"caretaker": _caretaker_context(profile),
-		"sidebar_patients": _sidebar_patient_cards(),
+		"sidebar_patients": _sidebar_patient_cards(request.user),
 		"active_nav": "patients",
 	}
 	if extra:
 		context.update(extra)
 	return context
 
+@login_required
 def index(request):
-	patients = Patient.objects.order_by("-created_at")
-	return render(request, "patients/index.html", _shell_context({"patients": patients}))
+	patients = Patient.objects.filter(user=request.user).order_by("-created_at")
+	return render(request, "patients/index.html", _shell_context(request, {"patients": patients}))
 
 
+@login_required
 def add_patient(request):
 	if request.method == "POST":
 		form = PatientCreateForm(request.POST, request.FILES)
 		if form.is_valid():
 			with transaction.atomic():
 				patient = form.save(commit=False)
+				patient.user = request.user
 				patient.history_diseases = form.get_disease_history()
 				patient.save()
 				_sync_manual_clinical_entries(patient)
@@ -71,9 +75,10 @@ def add_patient(request):
 	else:
 		form = PatientCreateForm()
 
-	return render(request, "patients/add_patient.html", _shell_context({"form": form}))
+	return render(request, "patients/add_patient.html", _shell_context(request, {"form": form}))
 
 
+@login_required
 def disease_management(request, patient_id):
 	patient = get_object_or_404(Patient, id=patient_id)
 	disease_form = PatientDiseaseForm(prefix="disease")
@@ -112,7 +117,7 @@ def disease_management(request, patient_id):
 	return render(
 		request,
 		"patients/disease_management.html",
-		_shell_context({
+		_shell_context(request, {
 			"patient": patient,
 			"disease_form": disease_form,
 			"sensitivity_form": sensitivity_form,
@@ -122,6 +127,7 @@ def disease_management(request, patient_id):
 	)
 
 
+@login_required
 def medication_management(request, patient_id):
 	patient = get_object_or_404(Patient, id=patient_id)
 	medication_form = PatientMedicationForm(prefix="med")
@@ -147,7 +153,7 @@ def medication_management(request, patient_id):
 	return render(
 		request,
 		"patients/medication_management.html",
-		_shell_context({
+		_shell_context(request, {
 			"patient": patient,
 			"medication_form": medication_form,
 			"medications": patient.medication_entries.all(),
@@ -155,6 +161,7 @@ def medication_management(request, patient_id):
 	)
 
 
+@login_required
 def disease_edit(request, patient_id, disease_id):
 	patient = get_object_or_404(Patient, id=patient_id)
 	disease = get_object_or_404(PatientDisease, id=disease_id, patient=patient)
@@ -172,10 +179,11 @@ def disease_edit(request, patient_id, disease_id):
 	return render(
 		request,
 		"patients/clinical_item_form.html",
-		_shell_context({"patient": patient, "form": form, "title": "Edit Disease", "cancel_url": "patients:disease_management"}),
+		_shell_context(request, {"patient": patient, "form": form, "title": "Edit Disease", "cancel_url": "patients:disease_management"}),
 	)
 
 
+@login_required
 def disease_delete(request, patient_id, disease_id):
 	patient = get_object_or_404(Patient, id=patient_id)
 	disease = get_object_or_404(PatientDisease, id=disease_id, patient=patient)
@@ -189,10 +197,11 @@ def disease_delete(request, patient_id, disease_id):
 	return render(
 		request,
 		"patients/clinical_item_delete.html",
-		_shell_context({"patient": patient, "item": disease, "title": "Delete Disease", "cancel_url": "patients:disease_management"}),
+		_shell_context(request, {"patient": patient, "item": disease, "title": "Delete Disease", "cancel_url": "patients:disease_management"}),
 	)
 
 
+@login_required
 def sensitivity_edit(request, patient_id, sensitivity_id):
 	patient = get_object_or_404(Patient, id=patient_id)
 	sensitivity = get_object_or_404(PatientSensitivity, id=sensitivity_id, patient=patient)
@@ -210,10 +219,11 @@ def sensitivity_edit(request, patient_id, sensitivity_id):
 	return render(
 		request,
 		"patients/clinical_item_form.html",
-		_shell_context({"patient": patient, "form": form, "title": "Edit Allergy/Intolerance", "cancel_url": "patients:disease_management"}),
+		_shell_context(request, {"patient": patient, "form": form, "title": "Edit Allergy/Intolerance", "cancel_url": "patients:disease_management"}),
 	)
 
 
+@login_required
 def sensitivity_delete(request, patient_id, sensitivity_id):
 	patient = get_object_or_404(Patient, id=patient_id)
 	sensitivity = get_object_or_404(PatientSensitivity, id=sensitivity_id, patient=patient)
@@ -227,10 +237,11 @@ def sensitivity_delete(request, patient_id, sensitivity_id):
 	return render(
 		request,
 		"patients/clinical_item_delete.html",
-		_shell_context({"patient": patient, "item": sensitivity, "title": "Delete Allergy/Intolerance", "cancel_url": "patients:disease_management"}),
+		_shell_context(request, {"patient": patient, "item": sensitivity, "title": "Delete Allergy/Intolerance", "cancel_url": "patients:disease_management"}),
 	)
 
 
+@login_required
 def medication_edit(request, patient_id, medication_id):
 	patient = get_object_or_404(Patient, id=patient_id)
 	medication = get_object_or_404(PatientMedication, id=medication_id, patient=patient)
@@ -247,10 +258,11 @@ def medication_edit(request, patient_id, medication_id):
 	return render(
 		request,
 		"patients/clinical_item_form.html",
-		_shell_context({"patient": patient, "form": form, "title": "Edit Medication", "cancel_url": "patients:medication_management"}),
+		_shell_context(request, {"patient": patient, "form": form, "title": "Edit Medication", "cancel_url": "patients:medication_management"}),
 	)
 
 
+@login_required
 def medication_delete(request, patient_id, medication_id):
 	patient = get_object_or_404(Patient, id=patient_id)
 	medication = get_object_or_404(PatientMedication, id=medication_id, patient=patient)
@@ -263,7 +275,7 @@ def medication_delete(request, patient_id, medication_id):
 	return render(
 		request,
 		"patients/clinical_item_delete.html",
-		_shell_context({"patient": patient, "item": medication, "title": "Delete Medication", "cancel_url": "patients:medication_management"}),
+		_shell_context(request, {"patient": patient, "item": medication, "title": "Delete Medication", "cancel_url": "patients:medication_management"}),
 	)
 
 

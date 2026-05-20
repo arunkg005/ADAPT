@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -7,10 +8,10 @@ from .forms import CareItemForm
 from .models import CareItem
 
 
-def _shell_context(extra=None):
+def _shell_context(request, extra=None):
 	"""Build base context for tasks pages so they render inside the app shell."""
 	from dashboard.views import _caretaker_context, _get_or_create_caretaker_profile
-	profile = _get_or_create_caretaker_profile()
+	profile = _get_or_create_caretaker_profile(request.user)
 	context = {
 		"caretaker": _caretaker_context(profile),
 		"active_nav": "task-lab",
@@ -42,10 +43,12 @@ def _get_type_meta(item_type):
 	return TYPE_META[item_type]
 
 
+@login_required
 def index(request):
 	return redirect("dashboard:home")
 
 
+@login_required
 def item_list(request, patient_id, item_type):
 	meta = _get_type_meta(item_type)
 	patient = get_object_or_404(Patient, id=patient_id)
@@ -66,7 +69,7 @@ def item_list(request, patient_id, item_type):
 	return render(
 		request,
 		"tasks/item_list.html",
-		_shell_context({
+		_shell_context(request, {
 			"patient": patient,
 			"items": items,
 			"item_type": item_type,
@@ -77,6 +80,7 @@ def item_list(request, patient_id, item_type):
 	)
 
 
+@login_required
 def item_create(request, patient_id, item_type):
 	meta = _get_type_meta(item_type)
 	patient = get_object_or_404(Patient, id=patient_id)
@@ -97,10 +101,11 @@ def item_create(request, patient_id, item_type):
 	return render(
 		request,
 		"tasks/item_form.html",
-		_shell_context({"patient": patient, "form": form, "item_type": item_type, "meta": meta, "mode": "create"}),
+		_shell_context(request, {"patient": patient, "form": form, "item_type": item_type, "meta": meta, "mode": "create"}),
 	)
 
 
+@login_required
 def item_edit(request, patient_id, item_type, item_id):
 	meta = _get_type_meta(item_type)
 	patient = get_object_or_404(Patient, id=patient_id)
@@ -121,7 +126,7 @@ def item_edit(request, patient_id, item_type, item_id):
 	return render(
 		request,
 		"tasks/item_form.html",
-		_shell_context({
+		_shell_context(request, {
 			"patient": patient,
 			"form": form,
 			"item_type": item_type,
@@ -132,6 +137,7 @@ def item_edit(request, patient_id, item_type, item_id):
 	)
 
 
+@login_required
 def item_delete(request, patient_id, item_type, item_id):
 	meta = _get_type_meta(item_type)
 	patient = get_object_or_404(Patient, id=patient_id)
@@ -144,6 +150,6 @@ def item_delete(request, patient_id, item_type, item_id):
 	return render(
 		request,
 		"tasks/item_confirm_delete.html",
-		_shell_context({"patient": patient, "item": item, "item_type": item_type, "meta": meta}),
+		_shell_context(request, {"patient": patient, "item": item, "item_type": item_type, "meta": meta}),
 	)
 
