@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+COPY ./backend/requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 # ---------- Stage 2: Runtime ----------
@@ -41,7 +41,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=builder /install /usr/local
 
 # Copy project source
-COPY . .
+COPY ./backend .
+COPY ./web /web
 
 # Collect static files (requires SECRET_KEY at build time)
 ARG DJANGO_SECRET_KEY=build-placeholder

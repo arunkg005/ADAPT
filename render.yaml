@@ -3,6 +3,7 @@ services:
   - type: web
     name: adapt-web
     env: python
+    rootDir: backend
     plan: free
     buildCommand: "chmod +x build.sh && ./build.sh"
     startCommand: "gunicorn adapt.wsgi:application --config gunicorn.conf.py"
