@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}AI Assistant | ADAPT{% endblock %}
+
+{% block content %}
+<div class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+        <h2 style="margin:0;">Assistant</h2>
+        {% if not embedded %}
+            <a class="btn" href="{% url 'dashboard:home' %}">Back to Dashboard</a>
+        {% endif %}
+    </div>
+    <p style="margin:8px 0 0; color:var(--muted);">
+        {% if selected_patient %}
+            Current context: {{ selected_patient.name }}
+        {% else %}
+            No patient selected. You can ask general caregiver questions or select a patient.
+        {% endif %}
+    </p>
+</div>
+
+<div class="panel">
+    <form method="get" id="contextForm" class="row-actions" style="align-items:flex-end;">
+        <div>
+            <label for="patient">Select patient context</label>
+            <select id="patient" name="patient" onchange="document.getElementById('contextForm').submit()">
+                <option value="">No patient (general)</option>
+                {% for patient in patient_options %}
+                    <option value="{{ patient.id }}" {% if selected_patient and patient.id == selected_patient.id %}selected{% endif %}>{{ patient.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% if current_session %}
+            <input type="hidden" name="session" value="{{ current_session.id }}">
+        {% endif %}
+        {% if embedded %}
+            <input type="hidden" name="embedded" value="1">
+        {% endif %}
+        <input type="hidden" name="source" value="{{ source }}">
+        <noscript><button class="btn" type="submit">Update</button></noscript>
+    </form>
+</div>
+
+{% if current_session %}
+<div class="panel">
+    <h3 style="margin-top:0;">Session #{{ current_session.id }}</h3>
+    <div style="max-height:380px; overflow:auto; border:1px solid var(--border); border-radius:10px; padding:10px;">
+        {% for m in messages_list %}
+            <div class="panel" style="margin-bottom:8px; background:{% if m.role == 'assistant' %}var(--accent){% else %}var(--panel){% endif %};">
+                <strong>{{ m.get_role_display }}:</strong>
+                <div style="white-space: pre-wrap; margin-top:6px;">{{ m.content }}</div>
+            </div>
+        {% empty %}
+            <p>No messages in this session yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% if proposals %}
+<div class="panel">
+    <h3 style="margin-top:0;">AI Action Proposals (Needs Permission)</h3>
+    {% for p in proposals %}
+        <div class="metric" style="margin-bottom:10px;">
+            <p style="margin:0;"><strong>{{ p.item_type|title }}</strong> - {{ p.operation|title }} - {{ p.title }}</p>
+            <pre style="white-space: pre-wrap; margin:8px 0;">{{ p.payload }}</pre>
+            <form method="post" class="row-actions">
+                {% csrf_token %}
+                <input type="hidden" name="proposal_id" value="{{ p.id }}">
+                <button class="btn primary" type="submit" name="action" value="approve_action">Approve and Apply</button>
+                <button class="btn" type="submit" name="action" value="reject_action">Reject</button>
+            </form>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endif %}
+
+<div class="panel">
+    <form method="post">
+        {% csrf_token %}
+        {% if current_session %}
+            <input type="hidden" name="session" value="{{ current_session.id }}">
+        {% endif %}
+        {% if embedded %}
+            <input type="hidden" name="embedded" value="1">
+        {% endif %}
+        <input type="hidden" name="source" value="{{ source }}">
+        <input type="hidden" name="selected_patient" value="{% if selected_patient %}{{ selected_patient.id }}{% endif %}">
+        <label for="message">Ask Assistant</label>
+        <textarea id="message" name="message" rows="5" placeholder="Ask anything or ask AI to create/manage task/routine/schedule..."></textarea>
+        <div class="row-actions" style="margin-top:12px;">
+            <button class="btn primary" type="submit" name="action" value="send">Send</button>
+        </div>
+    </form>
+</div>
+
+{% if previous_summaries %}
+<div class="panel">
+    <h3 style="margin-top:0;">Previous Session Summaries Used as Context</h3>
+    {% for s in previous_summaries %}
+        <div class="metric" style="white-space: pre-wrap; margin-bottom:10px;">{{ s }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.addEventListener('beforeunload', function () {
+        const sessionId = "{% if current_session %}{{ current_session.id }}{% endif %}";
+        if (!sessionId) {
+            return;
+        }
+
+        const data = new URLSearchParams();
+        data.append('session', sessionId);
+        navigator.sendBeacon('{% url "assistant:close_session" %}', data);
+    });
+</script>
+{% endblock %}

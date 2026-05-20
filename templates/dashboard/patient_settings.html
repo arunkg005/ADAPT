@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Settings | ADAPT{% endblock %}
+
+{% block content %}
+<div class="panel">
+    <h2 style="margin-top:0;">Patient Settings</h2>
+    <p>Patient: {{ patient.name }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+            {% for field in form %}
+                <div class="metric" style="{% if field.field.widget.input_type == 'textarea' or field.name == 'history_diseases_csv' %}grid-column: 1 / span 2;{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div style="color:var(--muted); margin-top:4px; font-size:13px;">{{ field.help_text }}</div>
+                    {% endif %}
+                    <div style="color:var(--destructive);">{{ field.errors }}</div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="row-actions" style="margin-top:12px;">
+            <button class="btn primary" type="submit">Save Changes</button>
+            <a class="btn" href="{% url 'patients:disease_management' patient.id %}">Manage Diseases and Allergies</a>
+            <a class="btn" href="{% url 'patients:medication_management' patient.id %}">Manage Medications</a>
+        </div>
+    </form>
+
+    <hr style="border:none; border-top:1px solid var(--border); margin:18px 0;">
+    <h3 style="margin-top:0; color:#991b1b;">Danger Zone</h3>
+    <p style="color:#7f1d1d;">Deleting a patient permanently removes profile data, documents, tasks, and related history.</p>
+    <form method="post" onsubmit="return confirm('Delete this patient and all related records permanently?');">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="delete">
+        <button class="btn" type="submit" style="background:#fee2e2; border-color:#fecaca; color:#991b1b;">Delete Patient</button>
+    </form>
+
+    <div class="row-actions">
+        <a class="btn" href="{% url 'dashboard:patient_dashboard' patient.id %}">Back to Patient Dashboard</a>
+        <a class="btn" href="{% url 'dashboard:home' %}">Back to Caretaker Dashboard</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Medication Management — {{ patient.name }} | ADAPT{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="page-toolbar table-toolbar">
+        <div class="table-heading-wrap">
+            <p class="section-label">Clinical records</p>
+            <h2 class="panel-title">Medication Management</h2>
+            <span class="patient-count-subscript">{{ patient.name }}</span>
+        </div>
+        <div class="table-toolbar-actions">
+            <a class="btn" href="{% url 'dashboard:patient_dashboard' patient.id %}">Back to dashboard</a>
+        </div>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="row-actions mb-12">
+        <div>
+            <p class="section-label">AI tools</p>
+            <strong>Automated extraction</strong>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <button class="btn primary" type="submit" name="action" value="analyze_medication_docs">Analyze Documents</button>
+        </form>
+    </div>
+    <p class="muted">Upload documents in the patient profile, then use AI to extract medication data automatically.</p>
+</section>
+
+<section class="panel">
+    <p class="section-label">Add manually</p>
+    <h3 class="panel-title" style="margin-top:4px;">New Medication</h3>
+    <form method="post" class="field-grid" style="margin-top:12px;">
+        {% csrf_token %}
+        <div class="field-card">
+            <label for="id_med-name">Medication name</label>
+            {{ medication_form.name }}
+            <div class="form-error">{{ medication_form.name.errors }}</div>
+        </div>
+        <div class="field-card">
+            <label for="id_med-dosage">Dosage</label>
+            {{ medication_form.dosage }}
+            <div class="form-error">{{ medication_form.dosage.errors }}</div>
+        </div>
+        <div class="field-card">
+            <label for="id_med-instructions">Instructions</label>
+            {{ medication_form.instructions }}
+            <div class="form-error">{{ medication_form.instructions.errors }}</div>
+        </div>
+        <div class="field-card">
+            <label for="id_med-notes">Notes</label>
+            {{ medication_form.notes }}
+            <div class="form-error">{{ medication_form.notes.errors }}</div>
+        </div>
+        <div class="field-card--full" style="grid-column: 1 / -1;">
+            <button class="btn primary" type="submit" name="action" value="add_medication">Add Medication</button>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <p class="section-label">Records</p>
+    <h3 class="panel-title" style="margin-top:4px;">Medication List</h3>
+    <div class="table-scroll" style="margin-top:12px;">
+        <table class="table" aria-label="Medication list">
+            <thead><tr><th>Name</th><th>Dosage</th><th>Instructions</th><th>Source</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for m in medications %}
+                    <tr>
+                        <td><strong>{{ m.name }}</strong></td>
+                        <td>{{ m.dosage|default:'-' }}</td>
+                        <td>{{ m.instructions|default:'-' }}</td>
+                        <td><span class="pill">{{ m.get_source_display }}</span></td>
+                        <td>
+                            <div class="table-actions">
+                                <a class="btn btn-action" href="{% url 'patients:medication_edit' patient.id m.id %}">Edit</a>
+                                <a class="btn btn-action" href="{% url 'patients:medication_delete' patient.id m.id %}">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="muted">No medications recorded yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

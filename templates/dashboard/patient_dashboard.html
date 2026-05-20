@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Dashboard | ADAPT{% endblock %}
+
+{% block head %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          surface: 'var(--surface)',
+          'surface-container-lowest': 'var(--surface-strong)',
+          'surface-container-low': 'var(--surface-soft)',
+          'surface-container': 'var(--field-bg)',
+          'on-surface': 'var(--ink)',
+          'on-surface-variant': 'var(--muted)',
+          primary: 'var(--primary)',
+          'on-primary': 'var(--primary-foreground)',
+          'primary-container': 'color-mix(in srgb, var(--primary) 10%, transparent)',
+          secondary: 'var(--accent)',
+          'secondary-container': 'color-mix(in srgb, var(--accent) 15%, transparent)',
+          outline: 'var(--border)',
+          'outline-variant': 'var(--border)',
+        },
+        boxShadow: {
+          'level-1': 'var(--shadow)',
+          'level-2': 'var(--shadow)'
+        }
+      }
+    }
+  }
+</script>
+<style>
+    .patient-shell-tabs .compact-list {
+        padding-left: 1.25rem;
+        gap: 10px;
+    }
+
+    .patient-shell-tabs .compact-list > * {
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .patient-basic-info-card .patient-basic-info-list {
+        padding-left: 1.25rem;
+        gap: 10px;
+    }
+
+    .patient-basic-info-card .patient-basic-info-list li {
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="panel patient-shell-header">
+    <div class="patient-page-header">
+        <div class="patient-title-block">
+            <div>
+                <p class="section-label">Patient dashboard</p>
+                <h2>{{ selected_patient.name }}</h2>
+            </div>
+            <div class="patient-basic-row">
+                <span class="pill">Age {{ selected_patient.age }}</span>
+                <span class="pill">{{ selected_patient.gender }}</span>
+                <span class="pill">{{ selected_patient.diseases|length }} conditions</span>
+            </div>
+
+            <div class="patient-switcher">
+                <button class="btn btn-action patient-switch-toggle" id="patientSwitchToggle" type="button" aria-expanded="false" aria-controls="patientSwitchDropdown">
+                    <strong>{{ selected_patient.name }}</strong>
+                    <span>Switch patient</span>
+                </button>
+                <div class="patient-switch-dropdown" id="patientSwitchDropdown" hidden>
+                    <input class="patient-switch-search" id="patientSwitchSearch" type="search" placeholder="Search patient" aria-label="Search patient">
+                    <div class="patient-switch-list" id="patientSwitchList">
+                        {% for patient in patients %}
+                            <a class="btn btn-action patient-switch-item" data-patient-switch data-search-text="{{ patient.name }} {{ patient.age }} {{ patient.gender }}" href="{% url 'dashboard:patient_dashboard' patient.id %}">
+                                <strong>{{ patient.name }}</strong>
+                                <span>Age {{ patient.age }} • {{ patient.gender }}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row-actions patient-header-actions">
+            <a class="btn" href="{% url 'dashboard:home' %}">Back</a>
+            <a class="btn primary" href="{% url 'dashboard:patient_settings' selected_patient.id %}">Edit</a>
+        </div>
+    </div>
+</section>
+
+<section class="panel patient-shell-tabs">
+    <div class="tabs" aria-label="Patient dashboard sections">
+        <button type="button" class="tab-btn active" data-tab="profile">Profile</button>
+        <button type="button" class="tab-btn" data-tab="task">Task</button>
+        <button type="button" class="tab-btn" data-tab="routine">Routine</button>
+        <button type="button" class="tab-btn" data-tab="schedule">Schedule</button>
+        <button type="button" class="tab-btn" data-tab="clinical">Diseases and medication preference</button>
+        <button type="button" class="tab-btn" data-tab="analysis">Analysis</button>
+    </div>
+
+    <section class="tab-content active" id="tab-profile">
+        <div class="tab-panel">
+            <div class="grid summary-grid">
+                <div class="summary-card">
+                    <span class="section-label">Today</span>
+                    <strong>{{ selected_patient.task_progress.total_today }}</strong>
+                    <span class="muted">Tasks assigned</span>
+                </div>
+                <div class="summary-card">
+                    <span class="section-label">Complete</span>
+                    <strong>{{ selected_patient.task_progress.completed_today }}</strong>
+                    <span class="muted">Finished today</span>
+                </div>
+                <div class="summary-card">
+                    <span class="section-label">Pending</span>
+                    <strong>{{ selected_patient.task_progress.pending_today }}</strong>
+                    <span class="muted">Waiting attention</span>
+                </div>
+                <div class="summary-card">
+                    <span class="section-label">Overdue</span>
+                    <strong>{{ selected_patient.task_progress.overdue }}</strong>
+                    <span class="muted">Needs follow-up</span>
+                </div>
+            </div>
+
+            <div class="subtle-card patient-basic-info-card">
+                <p class="section-label">Basic info</p>
+                <ul class="compact-list patient-basic-info-list">
+                    <li><strong>Allergies:</strong> {{ selected_patient.allergies }}</li>
+                    <li><strong>Current scenario:</strong> {{ selected_patient.current_scenario }}</li>
+                    <li><strong>Doctor guidelines:</strong> {{ selected_patient.doctor_guidelines|default:"Not provided" }}</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="tab-content" id="tab-task">
+        <div class="tab-panel">
+            <div class="subtle-card">
+                <div class="row-actions mb-12">
+                    <div>
+                        <strong>Track progress</strong>
+                        <p class="muted mb-0">Open the progress window for a focused progress view.</p>
+                    </div>
+                    <a class="btn primary" href="{% url 'dashboard:progress' %}?patient_id={{ selected_patient.id }}">Open progress window</a>
+                </div>
+            </div>
+            <div class="subtle-card">
+                <div class="row-actions mb-12">
+                    <div>
+                        <strong>Patient tasks</strong>
+                        <p class="muted mb-0">Open the Task lab window for a focused task mangement.</p>
+                    </div>
+                    <a class="btn primary" href="{% url 'dashboard:task_lab' %}?patient_id={{ selected_patient.id }}">Open Task Lab</a>
+                </div>
+                <div class="compact-list">{% for item in selected_patient.tasks %}<div>{{ item }}</div>{% endfor %}</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tab-content" id="tab-routine">
+        <div class="tab-panel">
+            <div class="p-5 flex flex-col gap-6 bg-transparent">
+              <header class="space-y-1">
+                <h2 class="text-2xl font-bold text-on-surface">Routines</h2>
+                <p class="text-on-surface-variant text-sm">Manage and assign daily routines</p>
+              </header>
+
+              <section class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-lg font-bold text-on-surface">Saved Routines</h3>
+                  <a href="{% url 'dashboard:schedule_routine' %}?patient_id={{ selected_patient.id }}" class="bg-primary text-on-primary px-4 py-2 rounded-full flex items-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
+                    <span class="material-symbols-outlined text-[18px]">add</span>
+                    <span class="font-bold text-xs">Create Routine</span>
+                  </a>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                  {% for item in selected_patient.routine %}
+                  <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant flex justify-between items-center group transition-all hover:shadow-level-2">
+                    <div class="flex items-center gap-4">
+                      <div class="bg-secondary-container p-3 rounded-full text-secondary">
+                        <span class="material-symbols-outlined">wb_sunny</span>
+                      </div>
+                      <div>
+                        <h4 class="font-bold text-primary">{{ item }}</h4>
+                        <p class="text-xs text-on-surface-variant">Routine Item</p>
+                      </div>
+                    </div>
+                    <button class="w-10 h-10 rounded-full hover:bg-surface-container transition-colors flex items-center justify-center text-outline border-none bg-transparent" type="button">
+                      <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </button>
+                  </div>
+                  {% empty %}
+                  <div class="text-center p-8 bg-surface-container-low rounded-2xl border border-dashed border-outline-variant">
+                     <p class="text-on-surface-variant text-sm">No routines configured yet.</p>
+                  </div>
+                  {% endfor %}
+                </div>
+              </section>
+            </div>
+        </div>
+    </section>
+
+    <section class="tab-content" id="tab-schedule">
+        <div class="tab-panel">
+            <div class="p-5 flex flex-col gap-6 bg-transparent">
+              <section>
+                <div class="flex items-center justify-between mb-4">
+                  <h1 class="text-2xl font-black text-primary">Schedule</h1>
+                  <div class="flex items-center gap-1 text-primary">
+                    <span class="text-xs font-bold uppercase tracking-wider">Today</span>
+                  </div>
+                </div>
+                
+                <div class="space-y-6 relative ml-2">
+                  <div class="absolute left-[3.75rem] top-0 bottom-0 w-[1px] bg-outline-variant"></div>
+                  
+                  {% for item in selected_patient.schedule %}
+                  <div class="flex gap-4 relative">
+                    <div class="w-14 shrink-0 flex flex-col items-center pt-1">
+                      <span class="text-[10px] font-black uppercase tracking-tighter text-on-surface-variant">
+                        --:--
+                      </span>
+                    </div>
+                    
+                    <div class="flex-1 bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border-l-4 border-l-primary">
+                      <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-sm font-bold text-primary">{{ item }}</h3>
+                        <span class="material-symbols-outlined text-primary">event</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs font-medium text-on-surface-variant">{{ selected_patient.name }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  {% empty %}
+                  <div class="text-center p-8 bg-surface-container-low rounded-2xl border border-dashed border-outline-variant">
+                     <p class="text-on-surface-variant text-sm">No scheduled items found.</p>
+                  </div>
+                  {% endfor %}
+                </div>
+              </section>
+            </div>
+        </div>
+    </section>
+
+    <section class="tab-content" id="tab-clinical">
+        <div class="tab-panel">
+            <div class="subtle-card">
+                <p class="section-label">Diseases</p>
+                <div class="chip-row">
+                    {% for item in selected_patient.diseases %}
+                        <span class="pill">{{ item }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="subtle-card">
+                <p class="section-label">Medication preference</p>
+                <div class="compact-list">
+                    <div><strong>Medications:</strong> {{ selected_patient.medications|join:", " }}</div>
+                    <div><strong>Reminder:</strong> {% if selected_patient.reminder_preference.enabled %}Enabled{% else %}Disabled{% endif %}</div>
+                    <div><strong>Reminder lead time:</strong> {{ selected_patient.reminder_preference.minutes_before }} min before</div>
+                </div>
+                <div class="row-actions mt-12">
+                    <a class="btn" href="{% url 'patients:medication_management' selected_patient.id %}">Manage medications</a>
+                    <a class="btn" href="{% url 'patients:disease_management' selected_patient.id %}">Manage diseases</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tab-content" id="tab-analysis">
+        <div class="tab-panel">
+            <div class="p-5 flex flex-col gap-6 bg-transparent">
+              <header class="flex flex-col gap-3">
+                <h1 class="text-2xl font-black text-primary">Progress</h1>
+              </header>
+
+              <section class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-primary-container rounded-bl-full pointer-events-none"></div>
+                <h2 class="text-sm font-bold text-on-surface mb-4">Today's Summary</h2>
+                <div class="flex justify-between items-end mb-4">
+                  <div class="flex flex-col">
+                    <span class="text-4xl font-black text-primary">{{ selected_patient.task_progress.completion_percent }}%</span>
+                    <span class="text-xs font-bold text-on-surface-variant mt-1">Overall Completion</span>
+                  </div>
+                </div>
+                <div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+                  <div class="bg-primary h-full rounded-full" style="width: {{ selected_patient.task_progress.completion_percent }}%;"></div>
+                </div>
+              </section>
+
+              <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant shadow-level-1 flex flex-col items-center gap-1 text-center">
+                  <div class="w-8 h-8 rounded-full flex items-center justify-center text-green-600 bg-green-50 mb-1" style="color: var(--success); background: color-mix(in srgb, var(--success) 15%, transparent);">
+                    <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                  </div>
+                  <span class="text-xl font-black text-on-surface">{{ selected_patient.task_progress.completed_today }}</span>
+                  <span class="text-[9px] font-black uppercase tracking-tighter text-outline">Completed</span>
+                </div>
+                
+                <div class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant shadow-level-1 flex flex-col items-center gap-1 text-center">
+                  <div class="w-8 h-8 rounded-full flex items-center justify-center text-secondary bg-secondary-container mb-1">
+                    <span class="material-symbols-outlined text-[18px]">pending</span>
+                  </div>
+                  <span class="text-xl font-black text-on-surface">{{ selected_patient.task_progress.pending_today }}</span>
+                  <span class="text-[9px] font-black uppercase tracking-tighter text-outline">Pending</span>
+                </div>
+                
+                <div class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant shadow-level-1 flex flex-col items-center gap-1 text-center">
+                  <div class="w-8 h-8 rounded-full flex items-center justify-center text-primary bg-primary-container mb-1">
+                    <span class="material-symbols-outlined text-[18px]">assignment</span>
+                  </div>
+                  <span class="text-xl font-black text-on-surface">{{ selected_patient.task_progress.total_today }}</span>
+                  <span class="text-[9px] font-black uppercase tracking-tighter text-outline">Assigned</span>
+                </div>
+              </div>
+
+              <section class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant">
+                <p class="text-sm font-bold text-on-surface mb-2">AI Analysis</p>
+                <div class="text-sm text-on-surface-variant leading-relaxed">
+                  {{ selected_patient.ai_summary|default:"AI summary not generated yet." }}
+                </div>
+              </section>
+            </div>
+        </div>
+    </section>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const buttons = document.querySelectorAll('.tab-btn');
+    const sections = document.querySelectorAll('.tab-content');
+    const patientSwitchToggle = document.getElementById('patientSwitchToggle');
+    const patientSwitchDropdown = document.getElementById('patientSwitchDropdown');
+    const patientSwitchSearch = document.getElementById('patientSwitchSearch');
+    const patientSwitchList = document.getElementById('patientSwitchList');
+
+    patientSwitchToggle?.addEventListener('click', () => {
+        const open = patientSwitchDropdown.hidden;
+        patientSwitchDropdown.hidden = !open;
+        patientSwitchToggle.setAttribute('aria-expanded', String(open));
+        if (open) {
+            window.requestAnimationFrame(() => patientSwitchSearch?.focus());
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!patientSwitchDropdown || !patientSwitchToggle) {
+            return;
+        }
+        if (patientSwitchDropdown.hidden) {
+            return;
+        }
+        if (patientSwitchDropdown.contains(event.target) || patientSwitchToggle.contains(event.target)) {
+            return;
+        }
+        patientSwitchDropdown.hidden = true;
+        patientSwitchToggle.setAttribute('aria-expanded', 'false');
+    });
+
+    patientSwitchSearch?.addEventListener('input', () => {
+        const value = patientSwitchSearch.value.trim().toLowerCase();
+        patientSwitchList.querySelectorAll('[data-patient-switch]').forEach((item) => {
+            const text = (item.dataset.searchText || item.textContent || '').toLowerCase();
+            item.hidden = Boolean(value) && !text.includes(value);
+        });
+    });
+
+    patientSwitchSearch?.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') {
+            return;
+        }
+        const firstMatch = patientSwitchList.querySelector('[data-patient-switch]:not([hidden])');
+        if (firstMatch) {
+            window.location.href = firstMatch.href;
+        }
+    });
+
+    buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const target = button.dataset.tab;
+            buttons.forEach((btn) => btn.classList.remove('active'));
+            sections.forEach((section) => section.classList.remove('active'));
+            button.classList.add('active');
+            document.getElementById(`tab-${target}`).classList.add('active');
+        });
+    });
+</script>
+{% endblock %}

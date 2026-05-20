@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="adapt_background">#FBF8FA</color>
+    <color name="adapt_surface">#FFFFFF</color>
+    <color name="adapt_surface_low">#F5F3F5</color>
+    <color name="adapt_surface_container">#F0EDEF</color>
+    <color name="adapt_primary">#000614</color>
+    <color name="adapt_primary_container">#121F33</color>
+    <color name="adapt_primary_soft">#D6E3FE</color>
+    <color name="adapt_on_primary_soft">#3B475D</color>
+    <color name="adapt_on_surface">#1B1B1D</color>
+    <color name="adapt_on_surface_variant">#44474D</color>
+    <color name="adapt_outline">#C5C6CD</color>
+    <color name="adapt_accent">#FC8125</color>
+    <color name="adapt_secondary">#994700</color>
+    <color name="adapt_accent_soft">#FFDBC8</color>
+    <color name="adapt_success">#0B8F55</color>
+    <color name="adapt_success_soft">#DCFCE7</color>
+    <color name="adapt_warning_soft">#FFE8D5</color>
+    <color name="adapt_error">#BA1A1A</color>
+    <color name="adapt_error_soft">#FFDAD6</color>
+    <color name="adapt_shadow_navy">#14121F33</color>
+</resources>

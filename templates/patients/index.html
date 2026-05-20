@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Patients | ADAPT{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="caretaker-meta">
+        <div>
+            <p class="section-title" style="margin-bottom:8px;">Directory</p>
+            <h2 class="panel-title">All patients</h2>
+            <p class="helper-text" style="margin:8px 0 0;">Use the patient cards to open the workspace or settings quickly.</p>
+        </div>
+        <a class="btn primary" href="{% url 'patients:add_patient' %}">Add Patient</a>
+    </div>
+</section>
+
+{% if patients %}
+    <section class="grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+        {% for patient in patients %}
+            <article class="metric" style="display:flex; flex-direction:column; gap:12px; min-height: 180px;">
+                <div class="patient-card__header">
+                    <strong>{{ patient.name }}</strong>
+                    <span>{{ patient.age }} yrs</span>
+                </div>
+                <div class="muted">{{ patient.get_gender_display }}</div>
+                <div class="row-actions" style="margin-top:auto;">
+                    <a class="btn primary" href="{% url 'dashboard:patient_dashboard' patient.id %}">Open dashboard</a>
+                    <a class="btn" href="{% url 'dashboard:patient_settings' patient.id %}">Settings</a>
+                </div>
+            </article>
+        {% endfor %}
+    </section>
+{% else %}
+    <div class="panel">
+        <p style="margin:0;">No patients yet.</p>
+    </div>
+{% endif %}
+{% endblock %}

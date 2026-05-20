@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">ADAPT</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_task_history">Task Lab</string>
+    <string name="nav_routine">Routine</string>
+    <string name="nav_schedule">Schedule</string>
+    <string name="nav_progress">Progress</string>
+    <string name="menu">Menu</string>
+    <string name="settings">Settings</string>
+    <string name="open_assistant">Open Assist Mode</string>
+    <string name="active_patient_default">Sarah Jenkins active</string>
+    <string name="assistant_title">Assistant</string>
+    <string name="add_task">Add Task</string>
+    <string name="save_task">Save Task</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="care_menu_title">Care Menu</string>
+    <string name="appearance">Appearance</string>
+    <string name="light_mode">Light mode</string>
+    <string name="light_mode_detail">Use the clinical daytime Stitch palette.</string>
+    <string name="dark_mode_detail">Switch off for premium low-light mode.</string>
+</resources>

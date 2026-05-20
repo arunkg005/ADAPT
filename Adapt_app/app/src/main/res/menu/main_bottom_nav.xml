@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/ic_nav_profile"
+        android:title="@string/nav_profile" />
+    <item
+        android:id="@+id/taskHistoryFragment"
+        android:icon="@drawable/ic_nav_task_history"
+        android:title="@string/nav_task_history" />
+    <item
+        android:id="@+id/routineFragment"
+        android:icon="@drawable/ic_nav_routine"
+        android:title="@string/nav_routine" />
+    <item
+        android:id="@+id/scheduleFragment"
+        android:icon="@drawable/ic_nav_schedule"
+        android:title="@string/nav_schedule" />
+    <item
+        android:id="@+id/progressFragment"
+        android:icon="@drawable/ic_nav_progress"
+        android:title="@string/nav_progress" />
+</menu>

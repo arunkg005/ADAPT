@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Profile Settings | ADAPT{% endblock %}
+
+{% block content %}
+<div class="panel">
+    <h2 style="margin-top:0;">Profile Settings</h2>
+    <p>Update caretaker profile, contacts, and reminder preferences.</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+            {% for field in form %}
+                <div class="metric" style="{% if field.field.widget.input_type == 'textarea' %}grid-column: 1 / span 2;{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    <div style="color:#b91c1c;">{{ field.errors }}</div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="row-actions" style="margin-top:12px;">
+            <button class="btn primary" type="submit">Save Profile</button>
+            <a class="btn" href="{% url 'dashboard:home' %}">Back to Caretaker Dashboard</a>
+        </div>
+    </form>
+
+    <hr style="border:none; border-top:1px solid var(--border); margin:18px 0;">
+    <h3 style="margin-top:0; color:#991b1b;">Danger Zone</h3>
+    <p style="color:#7f1d1d;">Delete and reset profile settings to defaults.</p>
+    <form method="post" onsubmit="return confirm('Delete caretaker profile settings and reset to default values?');">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="delete">
+        <button class="btn" type="submit" style="background:#fee2e2; border-color:#fecaca; color:#991b1b;">Delete Profile Settings</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,993 @@
+{% extends "base.html" %}
+
+{% block title %}{% if workspace_mode == 'schedule' %}Schedule Window{% else %}Routine Builder{% endif %} | ADAPT{% endblock %}
+
+{% block head %}
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+    .material-symbols-outlined {
+        font-family: "Material Symbols Outlined";
+        font-weight: normal;
+        font-style: normal;
+        font-size: 20px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        direction: ltr;
+        font-feature-settings: "liga";
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .routine-page {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .routine-hero,
+    .routine-grid {
+        max-width: 1440px;
+    }
+
+    .routine-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .routine-hero__patient {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .routine-patient-lockup {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+    }
+
+    .routine-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 26px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 60%, var(--ink)));
+        color: var(--primary-foreground);
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        box-shadow: 0 18px 30px rgba(15, 23, 42, 0.18);
+        flex: none;
+    }
+
+    .routine-patient-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .routine-patient-copy h1,
+    .routine-section-title,
+    .routine-focus-copy h2 {
+        margin: 0;
+    }
+
+    .routine-patient-copy h1 {
+        font-size: 2rem;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+    }
+
+    .routine-meta-row,
+    .routine-chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .routine-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--muted);
+        font-size: 0.84rem;
+        white-space: nowrap;
+    }
+
+    .routine-chip.accent {
+        color: var(--destructive);
+        border-color: color-mix(in srgb, var(--destructive) 30%, var(--border));
+        background: color-mix(in srgb, var(--destructive) 12%, var(--surface));
+    }
+
+    .routine-focus-copy {
+        text-align: right;
+        min-width: 0;
+    }
+
+    .routine-focus-label {
+        margin: 0 0 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+        font-size: 0.78rem;
+    }
+
+    .routine-focus-copy h2 {
+        font-size: 1.55rem;
+        letter-spacing: -0.02em;
+    }
+
+    .routine-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.8fr) minmax(260px, 0.7fr);
+        gap: 16px;
+        align-items: start;
+    }
+
+    .routine-main {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    .routine-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+        position: sticky;
+        top: 96px; /* Offset for topbar */
+        height: calc(100vh - 120px);
+    }
+
+    .routine-card {
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: var(--surface-strong);
+        box-shadow: var(--shadow);
+    }
+
+    .routine-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+    .routine-section-title {
+        font-size: 1.35rem;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+    }
+
+    .routine-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .routine-span-2 {
+        grid-column: 1 / -1;
+    }
+
+    .routine-input-group label {
+        display: block;
+        margin: 0 0 8px;
+        color: var(--muted);
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .routine-input-group .helptext {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.4;
+    }
+
+    .routine-input-group .errorlist {
+        margin: 8px 0 0;
+        padding-left: 16px;
+        color: var(--destructive);
+        font-size: 0.82rem;
+    }
+
+    .routine-form input,
+    .routine-form select,
+    .routine-form textarea {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface);
+        color: var(--ink);
+        padding: 13px 14px;
+        outline: none;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .routine-form input:focus,
+    .routine-form select:focus,
+    .routine-form textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 24%, transparent);
+    }
+
+    .routine-task-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .routine-task-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 84px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
+    }
+
+    .routine-drag {
+        color: var(--muted);
+        flex: none;
+        font-size: 20px;
+    }
+
+    .routine-task-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+    }
+
+    .routine-task-icon.blue {
+        background: color-mix(in srgb, var(--primary) 18%, var(--surface));
+        color: var(--primary);
+    }
+
+    .routine-task-icon.orange {
+        background: color-mix(in srgb, var(--destructive) 18%, var(--surface));
+        color: var(--destructive);
+    }
+
+    .routine-task-icon.green {
+        background: color-mix(in srgb, var(--success) 18%, var(--surface));
+        color: var(--success);
+    }
+
+    .routine-task-copy {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .routine-task-copy strong {
+        display: block;
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--ink);
+    }
+
+    .routine-task-copy span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 0.84rem;
+        line-height: 1.35;
+    }
+
+    .routine-task-tag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .routine-task-tag.blue {
+        color: var(--primary);
+        background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+    }
+
+    .routine-task-tag.orange {
+        color: var(--destructive);
+        background: color-mix(in srgb, var(--destructive) 10%, var(--surface));
+    }
+
+    .routine-task-tag.green {
+        color: var(--success);
+        background: color-mix(in srgb, var(--success) 10%, var(--surface));
+    }
+
+    .routine-trash-button {
+        width: 26px;
+        height: 26px;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        color: var(--muted);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        cursor: pointer;
+    }
+
+    .routine-add-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    .routine-add-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .routine-add-button {
+        min-height: 40px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 1px solid var(--primary);
+        color: var(--primary);
+        background: color-mix(in srgb, var(--primary) 15%, var(--surface));
+        box-shadow: none;
+        font-size: 0.84rem;
+        line-height: 1;
+    }
+
+    .routine-add-button.outlined {
+        background: var(--surface-strong);
+    }
+
+    .routine-add-button .material-symbols-outlined {
+        font-size: 18px;
+    }
+
+    .routine-add-button:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .routine-schedule-panel {
+        background: var(--surface-strong);
+    }
+
+    .routine-schedule-time {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .routine-schedule-time input {
+        text-align: center;
+        background: var(--surface-soft);
+    }
+
+    .routine-preview-panel {
+        background: linear-gradient(180deg, var(--primary), color-mix(in srgb, var(--primary) 80%, var(--ink)));
+        color: var(--primary-foreground);
+        border-color: var(--primary);
+    }
+
+    .routine-preview-grid {
+        display: grid;
+        gap: 10px;
+        margin: 6px 0 14px;
+    }
+
+    .routine-preview-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 0.92rem;
+    }
+
+    .routine-preview-row span:first-child {
+        color: color-mix(in srgb, var(--primary-foreground) 72%, transparent);
+    }
+
+    .routine-preview-row strong {
+        font-size: 0.98rem;
+    }
+
+    .routine-preview-button {
+        width: 100%;
+        min-height: 58px;
+        border-radius: 14px;
+        font-size: 1rem;
+        box-shadow: 0 16px 26px rgba(37, 99, 235, 0.22);
+    }
+
+    .routine-preview-panel .routine-section-title,
+    .routine-preview-panel .routine-preview-row strong {
+        color: var(--primary-foreground);
+    }
+
+    .routine-preview-panel .btn.primary {
+        background: var(--primary);
+    }
+
+    .routine-empty {
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px dashed var(--border);
+        color: var(--muted);
+        background: var(--surface);
+    }
+
+    @media (max-width: 1180px) {
+        .routine-grid,
+        .routine-hero {
+            grid-template-columns: 1fr;
+        }
+
+        .routine-focus-copy {
+            text-align: left;
+        }
+    }
+
+    @media (max-width: 760px) {
+        .routine-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .routine-card {
+            padding: 14px;
+        }
+
+        .routine-patient-copy h1 {
+            font-size: 1.6rem;
+        }
+
+        .routine-hero__patient {
+            align-items: flex-start;
+        }
+    }
+
+    /* Library Menu Styles */
+    .task-lab-switch-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        z-index: 1000;
+        margin-top: 8px;
+        width: 340px;
+        background: var(--surface-strong);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: var(--shadow-xl);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .task-lab-switch-menu[hidden] {
+        display: none;
+    }
+
+    .task-lab-switch-item {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 12px 16px;
+        border: none;
+        background: none;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .task-lab-switch-item:hover {
+        background: var(--surface);
+    }
+
+    .task-lab-switch-item strong {
+        display: block;
+        font-size: 0.95rem;
+        color: var(--ink);
+    }
+
+    .task-lab-switch-item span {
+        font-size: 0.8rem;
+        color: var(--muted);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="routine-page">
+    <section class="panel routine-hero">
+        <div class="routine-hero__patient">
+            <div class="routine-patient-lockup">
+                <div class="routine-avatar" aria-hidden="true">{{ routine_initials }}</div>
+                <div class="routine-patient-copy">
+                    {% if selected_patient %}
+                        <h1>{{ selected_patient.name }}</h1>
+                        <div class="routine-meta-row">
+                            <span class="pill">{{ selected_patient.age }} Years Old</span>
+                        </div>
+                    {% else %}
+                        <h1>Routine Builder</h1>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if selected_patient %}
+                <div class="routine-focus-copy">
+                    <h2>Routine Builder</h2>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    {% if selected_patient %}
+        <section class="routine-grid">
+            <div class="routine-main">
+                <form class="routine-form" method="post" action="{% url workspace_action_name %}?patient_id={{ selected_patient.id }}" id="routine-form">
+                    {% csrf_token %}
+                    <article class="routine-card">
+                        <div class="routine-card-header">
+                            <h2 class="routine-section-title">Routine Info</h2>
+                        </div>
+
+                        {% if routine_form.non_field_errors %}
+                            <div class="errorlist">{{ routine_form.non_field_errors }}</div>
+                        {% endif %}
+
+                        <div class="routine-form-grid">
+                            <div class="routine-input-group routine-span-2">
+                                <label for="{{ routine_form.title.id_for_label }}">Routine Name</label>
+                                {{ routine_form.title }}
+                                {{ routine_form.title.errors }}
+                            </div>
+                            <div class="routine-input-group routine-span-2">
+                                <label for="{{ routine_form.description.id_for_label }}">Description</label>
+                                {{ routine_form.description }}
+                                {{ routine_form.description.errors }}
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="routine-card">
+                        <div class="routine-add-card-header">
+                            <h2 class="routine-section-title">Add Tasks</h2>
+                            <div class="routine-add-actions">
+                                <div style="position: relative;">
+                                    <button class="btn routine-add-button" type="button" id="library-btn">
+                                        <span class="material-symbols-outlined">library_add</span>
+                                        Add from Library
+                                    </button>
+                                    <div class="task-lab-switch-menu" id="library-menu" hidden>
+                                        <div style="padding: 12px; border-bottom: 1px solid var(--border); background: var(--surface); font-weight: 700; font-size: 0.85rem;">Task Library</div>
+                                        <div style="max-height: 300px; overflow-y: auto;">
+                                            {% if task_items %}
+                                                {% for task in task_items %}
+                                                    <button type="button" class="task-lab-switch-item library-item-btn" data-task-id="{{ task.id }}">
+                                                        <strong>{{ task.title }}</strong>
+                                                        <span>{{ task.description|truncatechars:60 }}</span>
+                                                    </button>
+                                                {% endfor %}
+                                            {% else %}
+                                                <div style="padding: 16px; text-align: center; color: var(--muted); font-size: 0.85rem;">No tasks found in history.</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'dashboard:task_lab' %}?patient_id={{ selected_patient.id }}" class="btn routine-add-button outlined">
+                                    <span class="material-symbols-outlined">add_circle</span>
+                                    Open Task Lab
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="routine-task-list">
+                            {% for item in routine_items %}
+                            <div class="routine-task-row">
+                                <span class="material-symbols-outlined routine-drag" aria-hidden="true">drag_indicator</span>
+                                <div class="routine-task-icon {{ item.priority|lower }}">
+                                    <span class="material-symbols-outlined">{% if item.priority == 'high' %}priority_high{% elif item.priority == 'low' %}low_priority{% else %}task_alt{% endif %}</span>
+                                </div>
+                                <div class="routine-task-copy">
+                                    <strong>{{ item.title }}</strong>
+                                    <span>{{ item.description|truncatechars:60 }}</span>
+                                </div>
+                                <span class="routine-task-tag {{ item.priority|lower }}">{{ item.get_priority_display }}</span>
+                                <button class="routine-trash-button" type="button" aria-label="Delete task">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </div>
+                            {% empty %}
+                            <div class="routine-empty" style="text-align: center; padding: 40px 20px;">
+                                <div style="font-size: 2rem; margin-bottom: 12px; opacity: 0.5;">📋</div>
+                                <strong>No tasks in this routine yet</strong>
+                                <p style="color: var(--muted); font-size: 0.85rem; margin-top: 4px;">Use the buttons above to add from history or create new ones.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </article>
+                </form>
+            </div>
+
+            <aside class="routine-sidebar">
+                <article class="routine-card" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+                    <div class="routine-card-header">
+                        <h2 class="routine-section-title">Scheduling Management</h2>
+                    </div>
+
+                    <div class="premium-calendar">
+                        <div class="calendar-field" id="schedule-calendar-field">
+                            <span>15.11.2024</span>
+                            <span class="material-symbols-outlined">calendar_month</span>
+                        </div>
+
+                        <div class="calendar-card-wrapper" id="schedule-calendar-card">
+                            <div class="calendar-card">
+                                <div class="calendar-header">
+                                    <div class="calendar-title">
+                                        <span>November 2024</span>
+                                        <span class="material-symbols-outlined" style="font-size: 1rem; color: var(--muted); cursor: pointer;">edit</span>
+                                    </div>
+                                    <div class="calendar-nav">
+                                        <button type="button" class="calendar-nav-btn">
+                                            <span class="material-symbols-outlined">chevron_left</span>
+                                        </button>
+                                        <button type="button" class="calendar-nav-btn">
+                                            <span class="material-symbols-outlined">chevron_right</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="calendar-grid">
+                                    <div class="calendar-weekday">Mo</div>
+                                    <div class="calendar-weekday">Tu</div>
+                                    <div class="calendar-weekday">We</div>
+                                    <div class="calendar-weekday">Th</div>
+                                    <div class="calendar-weekday">Fr</div>
+                                    <div class="calendar-weekday">Sa</div>
+                                    <div class="calendar-weekday">Su</div>
+
+                                    <div class="calendar-day muted">28</div>
+                                    <div class="calendar-day muted">29</div>
+                                    <div class="calendar-day muted">30</div>
+                                    <div class="calendar-day muted">31</div>
+                                    <div class="calendar-day">1</div>
+                                    <div class="calendar-day">2</div>
+                                    <div class="calendar-day">3</div>
+
+                                    <div class="calendar-day">4</div>
+                                    <div class="calendar-day">5</div>
+                                    <div class="calendar-day">6</div>
+                                    <div class="calendar-day">7</div>
+                                    <div class="calendar-day">8</div>
+                                    <div class="calendar-day">9</div>
+                                    <div class="calendar-day">10</div>
+
+                                    <div class="calendar-day">11</div>
+                                    <div class="calendar-day">12</div>
+                                    <div class="calendar-day">13</div>
+                                    <div class="calendar-day">14</div>
+                                    <div class="calendar-day active">15</div>
+                                    <div class="calendar-day">16</div>
+                                    <div class="calendar-day">17</div>
+
+                                    <div class="calendar-day">18</div>
+                                    <div class="calendar-day">19</div>
+                                    <div class="calendar-day">20</div>
+                                    <div class="calendar-day">21</div>
+                                    <div class="calendar-day">22</div>
+                                    <div class="calendar-day">23</div>
+                                    <div class="calendar-day">24</div>
+
+                                    <div class="calendar-day">25</div>
+                                    <div class="calendar-day">26</div>
+                                    <div class="calendar-day">27</div>
+                                    <div class="calendar-day">28</div>
+                                    <div class="calendar-day">29</div>
+                                    <div class="calendar-day">30</div>
+                                    <div class="calendar-day muted">1</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="routine-input-group" style="margin-top: 8px;">
+                            <label>Time Window</label>
+                            <div class="routine-schedule-time" style="display: flex; gap: 8px;">
+                                <input type="text" id="routine-start-time" value="07:30 AM" aria-label="Start time" placeholder="hh:mm AM" maxlength="8" style="flex: 1; padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--ink); text-align: center;">
+                                <input type="text" id="routine-end-time" value="09:00 AM" aria-label="End time" placeholder="hh:mm AM" maxlength="8" style="flex: 1; padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--ink); text-align: center;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="height: 1px; background: var(--border); margin: 20px -14px 14px;"></div>
+
+                    <div class="timeline-header" style="border-bottom: none; padding: 0 0 10px; background: transparent;">
+                        <div class="timeline-header-day">Sun</div>
+                        <div class="timeline-header-date">28</div>
+                    </div>
+                    
+                    <div class="timeline-scroll-area" id="routine-timeline-scroll" style="margin: 0 -14px; padding: 10px 14px; border-top: 1px solid var(--border); position: relative;">
+                        <!-- Highlight for the selected Time Window -->
+                        <div id="timeline-window-highlight" style="position: absolute; left: 58px; right: 14px; background: color-mix(in srgb, var(--success) 10%, transparent); border: 1px dashed var(--success); border-left: 4px solid var(--success); border-radius: 4px; pointer-events: none; transition: top 0.3s ease, height 0.3s ease; top: 82px; height: 72px; z-index: 1;"></div>
+
+                        <!-- 24 Hour Blocks -->
+                        <div class="timeline-hour"><span class="timeline-time-label">6am</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">7am</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">8am</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">9am</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">10am</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">11am</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">12pm</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">1pm</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">2pm</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">3pm</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">4pm</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">5pm</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">6pm</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">7pm</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">8pm</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">9pm</span></div>
+                        <div class="timeline-hour"><span class="timeline-time-label">10pm</span></div>
+
+                        <!-- Mapped Events -->
+                        <div class="timeline-event accent" style="top: 226px; height: 36px; left: 58px; right: 14px;">
+                            <span class="timeline-event-time">10:30 AM</span>
+                            <span class="timeline-event-title">Morning Vitals</span>
+                        </div>
+                        
+                        <div class="timeline-event primary" style="top: 394px; height: 48px; left: 58px; right: 14px;">
+                            <span class="timeline-event-time">2:00 PM</span>
+                            <span class="timeline-event-title">Physio Walk</span>
+                        </div>
+
+                        {% for item in routine_items %}
+                            {% if item.due_at %}
+                            <!-- Dynamic items would be positioned here via inline styles calculated in the template or JS -->
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </article>
+
+                <div style="margin-top: 16px;">
+                    <button class="btn primary routine-preview-button" style="width: 100%" type="submit" form="routine-form">Save Routine</button>
+                </div>
+            </aside>
+        </section>
+    {% else %}
+        <section class="panel">
+            <div class="routine-empty">No patients are available yet. Add a patient before building a routine.</div>
+        </section>
+    {% endif %}
+</section>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const libraryBtn = document.getElementById('library-btn');
+        const libraryMenu = document.getElementById('library-menu');
+
+        if (libraryBtn && libraryMenu) {
+            libraryBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                libraryMenu.hidden = !libraryMenu.hidden;
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!libraryMenu.contains(e.target) && e.target !== libraryBtn) {
+                    libraryMenu.hidden = true;
+                }
+            });
+        }
+
+        // Logic for adding from library would go here (e.g. AJAX or adding to hidden form field)
+        const libraryItems = document.querySelectorAll('.library-item-btn');
+        libraryItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const taskId = this.dataset.taskId;
+                console.log('Selected task from library:', taskId);
+                libraryMenu.hidden = true;
+                alert('Task selected! In a full implementation, this would clone the task into this routine.');
+            });
+        });
+
+        // Calendar dropdown toggle
+        const calendarField = document.getElementById('schedule-calendar-field');
+        const calendarCard = document.getElementById('schedule-calendar-card');
+        
+        if (calendarField && calendarCard) {
+            calendarField.addEventListener('click', function(e) {
+                e.stopPropagation();
+                calendarCard.classList.toggle('open');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!calendarCard.contains(e.target) && e.target !== calendarField && !calendarField.contains(e.target)) {
+                    calendarCard.classList.remove('open');
+                }
+            });
+        }
+
+        // Interactive Calendar Days
+        const calendarDays = document.querySelectorAll('.calendar-day:not(.muted)');
+        const calendarFieldSpan = document.querySelector('#schedule-calendar-field span:first-child');
+        const timelineDay = document.querySelector('.timeline-header-day');
+        const timelineDate = document.querySelector('.timeline-header-date');
+        const calendarTitle = document.querySelector('.calendar-title span');
+
+        calendarDays.forEach(day => {
+            day.addEventListener('click', function(e) {
+                e.stopPropagation();
+                // Remove active from all
+                document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('active'));
+                this.classList.add('active');
+
+                const dateNum = this.textContent.trim();
+                const titleParts = calendarTitle.textContent.trim().split(' '); // e.g. "November 2024"
+                const monthName = titleParts[0];
+                const year = titleParts[1];
+
+                // Convert to a JS Date to get the weekday
+                const monthIndex = new Date(`${monthName} 1, 2000`).getMonth();
+                const selectedDate = new Date(year, monthIndex, parseInt(dateNum));
+                const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                
+                // Update Timeline Header
+                if (timelineDay && timelineDate) {
+                    timelineDay.textContent = weekdays[selectedDate.getDay()];
+                    timelineDate.textContent = dateNum;
+                }
+
+                // Update Calendar Pill
+                if (calendarFieldSpan) {
+                    const monthPadded = (monthIndex + 1).toString().padStart(2, '0');
+                    const datePadded = dateNum.padStart(2, '0');
+                    calendarFieldSpan.textContent = `${datePadded}.${monthPadded}.${year}`;
+                }
+
+                // Close calendar
+                if (calendarCard) {
+                    calendarCard.classList.remove('open');
+                }
+            });
+        });
+
+        // Interactive Timeline Highlight & Time Input Formatting
+        const startTimeInput = document.getElementById('routine-start-time');
+        const endTimeInput = document.getElementById('routine-end-time');
+        const highlightBlock = document.getElementById('timeline-window-highlight');
+        
+        function formatTimeInput(e) {
+            let val = e.target.value.toUpperCase().replace(/[^0-9AMP:]/g, '');
+            
+            // Auto insert colon
+            if (val.length > 2 && !val.includes(':')) {
+                val = val.substring(0, 2) + ':' + val.substring(2);
+            }
+            
+            // Format AM/PM spacing
+            val = val.replace(/(AM|PM)/, ' $1').replace(/\s+/g, ' ');
+            e.target.value = val;
+        }
+
+        function validateTimeInput(e) {
+            let val = e.target.value.trim().toUpperCase();
+            
+            // Allow basic shortcuts (e.g., "7" -> "07:00 AM", "14" -> "02:00 PM")
+            if (/^\d{1,2}$/.test(val)) {
+                let hr = parseInt(val);
+                let ampm = 'AM';
+                if (hr >= 12) {
+                    ampm = 'PM';
+                    if (hr > 12) hr -= 12;
+                }
+                if (hr === 0) hr = 12;
+                val = `${hr.toString().padStart(2, '0')}:00 ${ampm}`;
+            }
+
+            const regex = /^(\d{1,2}):(\d{1,2})\s*(AM|PM)?$/;
+            const match = val.match(regex);
+            if (match) {
+                let hr = parseInt(match[1]);
+                let min = parseInt(match[2]);
+                let ampm = match[3] || 'AM';
+
+                if (hr > 12) hr = 12;
+                if (hr === 0) hr = 12;
+                if (min > 59) min = 59;
+
+                e.target.value = `${hr.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')} ${ampm}`;
+            }
+            updateTimelineHighlight();
+        }
+
+        function updateTimelineHighlight() {
+            if (!startTimeInput || !endTimeInput || !highlightBlock) return;
+
+            const parseTime = (timeStr) => {
+                if (!timeStr) return null;
+                const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+                if (!match) return null;
+                
+                let hr = parseInt(match[1]);
+                const min = parseInt(match[2]);
+                const ampm = match[3].toUpperCase();
+
+                if (hr === 12 && ampm === 'AM') hr = 0;
+                if (hr !== 12 && ampm === 'PM') hr += 12;
+
+                return hr + min / 60;
+            };
+
+            const startHour = parseTime(startTimeInput.value);
+            const endHour = parseTime(endTimeInput.value);
+
+            if (startHour !== null && endHour !== null) {
+                // Timeline starts at 6 AM
+                const timelineStartHour = 6;
+                const pxPerHour = 48; // Each timeline-hour block is 48px high
+                const paddingTop = 10; // .timeline-scroll-area has 10px top padding
+
+                let offsetStart = startHour - timelineStartHour;
+                let duration = endHour - startHour;
+
+                // Handle times past midnight or invalid ranges
+                if (offsetStart < 0) offsetStart += 24; 
+                if (duration < 0) duration += 24;
+
+                const topPx = paddingTop + (offsetStart * pxPerHour);
+                const heightPx = duration * pxPerHour;
+
+                highlightBlock.style.top = `${topPx}px`;
+                highlightBlock.style.height = `${heightPx}px`;
+            }
+        }
+
+        if (startTimeInput && endTimeInput) {
+            startTimeInput.addEventListener('input', formatTimeInput);
+            endTimeInput.addEventListener('input', formatTimeInput);
+            
+            startTimeInput.addEventListener('blur', validateTimeInput);
+            endTimeInput.addEventListener('blur', validateTimeInput);
+
+            // Trigger initially
+            updateTimelineHighlight();
+        }
+    });
+</script>
+{% endblock %}

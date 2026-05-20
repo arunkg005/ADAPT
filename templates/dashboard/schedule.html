@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.calendar-shell { border:1px solid var(--border); border-radius:20px; overflow:hidden; background:var(--surface-strong); }
+
+/* HEADER */
+.calendar-header { display:flex; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border);}
+.calendar-header-left, .calendar-header-right { display:flex; gap:10px; align-items:center; }
+
+/* MONTH */
+.calendar-month { display:grid; grid-template-columns:repeat(7,1fr); }
+.calendar-day-box { height:110px; border:1px solid var(--border); padding:6px; cursor:pointer; position:relative;}
+.event-bar { height:5px; background:var(--primary); border-radius:4px; margin-top:3px; }
+
+/* WEEK/DAY */
+.calendar-time { display:grid; grid-template-columns:60px 1fr; position:relative;}
+.time-label { height:60px; font-size:12px; color:var(--muted); }
+.time-slot { height:60px; border-bottom:1px solid var(--border); position:relative; cursor:pointer;}
+
+/* EVENTS */
+.event { position:absolute; left:10%; width:80%; background:var(--primary); color:#fff; border-radius:6px; padding:4px; cursor:pointer; }
+
+/* POPUP */
+.popup { position:fixed; top:30%; left:50%; transform:translateX(-50%);
+background:var(--surface); border:1px solid var(--border); padding:16px; border-radius:14px; display:none; z-index:999; }
+
+/* FORM */
+.form-box { position:fixed; bottom:20px; right:20px; background:var(--surface);
+padding:14px; border:1px solid var(--border); border-radius:12px; display:none; }
+</style>
+
+<div class="calendar-shell">
+
+<!-- HEADER -->
+<div class="calendar-header">
+    <div class="calendar-header-left">
+        <button onclick="today()">Today</button>
+        <button onclick="prev()">‹</button>
+        <button onclick="next()">›</button>
+        <h3 id="title"></h3>
+    </div>
+
+    <div class="calendar-header-right">
+        <input type="date" onchange="jump(this.value)">
+        <select id="view" onchange="changeView()">
+            <option value="month">Month</option>
+            <option value="week">Week</option>
+            <option value="day">Day</option>
+        </select>
+        <button onclick="openForm()">+</button>
+    </div>
+</div>
+
+<div id="viewContainer"></div>
+</div>
+
+<!-- POPUP -->
+<div id="popup" class="popup"></div>
+
+<!-- FORM -->
+<div id="form" class="form-box">
+    <input id="f_title" placeholder="title"><br>
+    <input id="f_time" placeholder="hour"><br>
+    <button onclick="save()">save</button>
+</div>
+
+<script>
+let view="month";
+let current=new Date();
+let events=[];
+
+/* ---------- RENDER ---------- */
+function render(){
+    if(view==="month") renderMonth();
+    if(view==="week") renderWeek();
+    if(view==="day") renderDay();
+}
+
+/* ---------- HEADER ---------- */
+function updateTitle(){
+    if(view==="month"){
+        title.innerText=current.toLocaleString('default',{month:'long',year:'numeric'});
+    }
+    if(view==="day"){
+        title.innerText=current.toDateString();
+    }
+    if(view==="week"){
+        let start=new Date(current);
+        start.setDate(current.getDate()-current.getDay());
+        let end=new Date(start); end.setDate(start.getDate()+6);
+
+        title.innerText=`${start.getDate()}–${end.getDate()} ${end.toLocaleString('default',{month:'short'})} ${end.getFullYear()}`;
+    }
+}
+
+/* ---------- MONTH ---------- */
+function renderMonth(){
+    updateTitle();
+    let c=document.getElementById("viewContainer");
+    c.innerHTML='<div class="calendar-month"></div>';
+    let grid=c.firstChild;
+
+    let first=new Date(current.getFullYear(),current.getMonth(),1).getDay();
+    let days=new Date(current.getFullYear(),current.getMonth()+1,0).getDate();
+
+    for(let i=0;i<first;i++){
+        grid.appendChild(document.createElement("div"));
+    }
+
+    for(let d=1;d<=days;d++){
+        let box=document.createElement("div");
+        box.className="calendar-day-box";
+        box.innerHTML=`<strong>${d}</strong>`;
+
+        box.onclick=()=>openForm(null,d);
+
+        events.forEach(e=>{
+            if(sameDay(e.date,new Date(current.getFullYear(),current.getMonth(),d))){
+                let bar=document.createElement("div");
+                bar.className="event-bar";
+                bar.onclick=(x)=>{x.stopPropagation();show(e);}
+                box.appendChild(bar);
+            }
+        });
+
+        grid.appendChild(box);
+    }
+}
+
+/* ---------- WEEK ---------- */
+function renderWeek(){
+    updateTitle();
+    let c=document.getElementById("viewContainer");
+    c.innerHTML='<div class="calendar-time"></div>';
+    let grid=c.firstChild;
+
+    let start=new Date(current);
+    start.setDate(current.getDate()-current.getDay());
+
+    for(let h=0;h<24;h++){
+        let label=document.createElement("div");
+        label.className="time-label";
+        label.innerText=h+":00";
+
+        let slot=document.createElement("div");
+        slot.className="time-slot";
+        slot.onclick=()=>openForm(h,start);
+
+        grid.appendChild(label);
+        grid.appendChild(slot);
+    }
+
+    events.forEach(e=>{
+        if(inWeek(e.date,start)){
+            let ev=document.createElement("div");
+            ev.className="event";
+            ev.style.top=(e.time*60)+"px";
+            ev.innerText=e.title;
+            ev.onclick=(x)=>{x.stopPropagation();show(e);}
+            grid.appendChild(ev);
+        }
+    });
+}
+
+/* ---------- DAY ---------- */
+function renderDay(){
+    updateTitle();
+    let c=document.getElementById("viewContainer");
+    c.innerHTML='<div class="calendar-time"></div>';
+    let grid=c.firstChild;
+
+    for(let h=0;h<24;h++){
+        let label=document.createElement("div");
+        label.className="time-label";
+        label.innerText=h+":00";
+
+        let slot=document.createElement("div");
+        slot.className="time-slot";
+        slot.onclick=()=>openForm(h,current);
+
+        grid.appendChild(label);
+        grid.appendChild(slot);
+    }
+
+    events.forEach(e=>{
+        if(sameDay(e.date,current)){
+            let ev=document.createElement("div");
+            ev.className="event";
+            ev.style.top=(e.time*60)+"px";
+            ev.innerText=e.title;
+            ev.onclick=(x)=>{x.stopPropagation();show(e);}
+            grid.appendChild(ev);
+        }
+    });
+}
+
+/* ---------- FORM ---------- */
+function openForm(hour=null,date=current){
+    form.style.display="block";
+    f_time.value=hour??"";
+    form.dataset.date=date;
+}
+
+function save(){
+    events.push({
+        title:f_title.value,
+        time:parseInt(f_time.value)||0,
+        date:new Date(form.dataset.date)
+    });
+    form.style.display="none";
+    render();
+}
+
+/* ---------- POPUP ---------- */
+function show(e){
+    popup.style.display="block";
+    popup.innerHTML=`
+        <h3>${e.title}</h3>
+        <p>${e.date.toDateString()}</p>
+        <p>${e.time}:00</p>
+        <button>Edit</button>
+    `;
+}
+
+/* ---------- NAV ---------- */
+function today(){ current=new Date(); render(); }
+function prev(){ current.setDate(current.getDate()-1); render(); }
+function next(){ current.setDate(current.getDate()+1); render(); }
+function changeView(){ view=viewSelect(); render(); }
+function viewSelect(){ return document.getElementById("view").value; }
+function jump(v){ current=new Date(v); render(); }
+
+/* ---------- HELPERS ---------- */
+function sameDay(a,b){ return new Date(a).toDateString()===new Date(b).toDateString(); }
+function inWeek(d,start){
+    let end=new Date(start); end.setDate(start.getDate()+6);
+    return d>=start && d<=end;
+}
+
+render();
+</script>
+
+{% endblock %}

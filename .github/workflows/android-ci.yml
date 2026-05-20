@@ -1,0 +1,98 @@
+# ============================================================
+# ADAPT — Android CI Pipeline
+# ============================================================
+# Triggers on push/PR affecting the Adapt_app directory.
+# Runs lint, unit tests, and builds a release AAB.
+# ============================================================
+
+name: Android CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Adapt_app/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "Adapt_app/**"
+  # Manual trigger for release builds
+  workflow_dispatch:
+    inputs:
+      build_release:
+        description: "Build release AAB?"
+        required: false
+        default: "false"
+
+defaults:
+  run:
+    working-directory: Adapt_app
+
+jobs:
+  # ── Lint & Test ─────────────────────────────────────────
+  test:
+    name: Lint & Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Android Lint
+        run: ./gradlew lint
+
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest
+
+      - name: Upload lint results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-results
+          path: Adapt_app/app/build/reports/lint-results-debug.html
+
+  # ── Build Release AAB ──────────────────────────────────
+  build-release:
+    name: Build Release AAB
+    needs: test
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event.inputs.build_release == 'true')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Decode keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
+
+      - name: Build release AAB
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew bundleRelease
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: adapt-release-aab
+          path: Adapt_app/app/build/outputs/bundle/release/*.aab
+          retention-days: 30

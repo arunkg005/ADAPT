@@ -1,0 +1,30 @@
+services:
+  # ── Django API & Web Dashboard Service ──────────────────
+  - type: web
+    name: adapt-web
+    env: python
+    plan: free
+    buildCommand: "chmod +x build.sh && ./build.sh"
+    startCommand: "gunicorn adapt.wsgi:application --config gunicorn.conf.py"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: adapt-db
+          property: connectionString
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: CELERY_TASK_ALWAYS_EAGER
+        value: "1"
+      - key: GEMINI_API_KEY
+        sync: false # Must be set manually in the Render dashboard
+
+databases:
+  # ── Managed PostgreSQL Instance (Free Tier) ─────────────
+  - name: adapt-db
+    plan: free
+    databaseName: adapt_db
+    user: adapt_user

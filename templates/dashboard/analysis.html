@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Progress Window | ADAPT{% endblock %}
+
+{% block head %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          surface: 'var(--surface)',
+          'surface-container-lowest': 'var(--surface-strong)',
+          'surface-container-low': 'var(--surface-soft)',
+          'surface-container': 'var(--field-bg)',
+          'on-surface': 'var(--ink)',
+          'on-surface-variant': 'var(--muted)',
+          primary: 'var(--primary)',
+          'on-primary': 'var(--primary-foreground)',
+          'primary-container': 'color-mix(in srgb, var(--primary) 10%, transparent)',
+          secondary: 'var(--accent)',
+          'secondary-container': 'color-mix(in srgb, var(--accent) 15%, transparent)',
+          outline: 'var(--border)',
+          'outline-variant': 'var(--border)',
+        },
+        boxShadow: {
+          'level-1': 'var(--shadow)',
+          'level-2': 'var(--shadow)'
+        }
+      }
+    }
+  }
+</script>
+<style>
+    .app-frame {
+        background: var(--bg);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="p-5 flex flex-col gap-6 max-w-4xl mx-auto w-full">
+  <header class="flex flex-col gap-3">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-black text-primary">Progress</h1>
+        <a href="{% url 'dashboard:home' %}" class="text-sm font-bold text-primary hover:underline">Back to Dashboard</a>
+    </div>
+    <div class="relative">
+      <form id="patient-select-form" method="GET" action="{% url 'dashboard:progress' %}">
+          <select name="patient_id" onchange="document.getElementById('patient-select-form').submit()" class="appearance-none w-full bg-surface-container-low text-primary font-bold text-sm rounded-2xl px-4 py-3 pr-10 focus:ring-2 focus:ring-primary border-none shadow-level-1 cursor-pointer">
+            {% if not selected_patient %}
+                <option value="" disabled selected>Select a patient</option>
+            {% endif %}
+            {% for p in patients %}
+                <option value="{{ p.id }}" {% if selected_patient and selected_patient.id == p.id %}selected{% endif %}>{{ p.name }}</option>
+            {% endfor %}
+          </select>
+      </form>
+      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-primary">
+        <span class="material-symbols-outlined">expand_more</span>
+      </div>
+    </div>
+  </header>
+
+  {% if selected_patient %}
+  <section class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-32 h-32 bg-primary-container rounded-bl-full pointer-events-none"></div>
+    <h2 class="text-sm font-bold text-on-surface mb-4">Summary</h2>
+    <div class="flex justify-between items-end mb-4">
+      <div class="flex flex-col">
+        <span class="text-4xl font-black text-primary">{{ analysis_metrics.tasks_completed_percent }}%</span>
+        <span class="text-xs font-bold text-on-surface-variant mt-1">Overall Completion</span>
+      </div>
+      <div class="flex items-center gap-1 text-secondary bg-secondary-container px-2 py-1 rounded-lg">
+        <span class="material-symbols-outlined text-[16px]">trending_up</span>
+        <span class="text-[10px] font-black tracking-tight">{{ analysis_metrics.active_routines }} Active Routines</span>
+      </div>
+    </div>
+    <div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+      <div class="bg-primary h-full rounded-full" style="width: {{ analysis_metrics.tasks_completed_percent }}%;"></div>
+    </div>
+  </section>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant flex flex-col gap-2">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center text-primary bg-primary-container mb-1">
+        <span class="material-symbols-outlined">pill</span>
+      </div>
+      <span class="text-xs font-bold text-on-surface-variant">Medication</span>
+      <span class="text-xl font-black text-on-surface">{% if selected_patient.medications|length > 0 %}Tracked{% else %}None{% endif %}</span>
+      <span class="text-[10px] font-medium text-outline">Status</span>
+    </div>
+    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant flex flex-col gap-2">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center text-secondary bg-secondary-container mb-1">
+        <span class="material-symbols-outlined">directions_walk</span>
+      </div>
+      <span class="text-xs font-bold text-on-surface-variant">Activity</span>
+      <span class="text-xl font-black text-on-surface">{% if analysis_metrics.missed_tasks == 0 %}High{% else %}Low{% endif %}</span>
+      <span class="text-[10px] font-medium text-outline">Level</span>
+    </div>
+  </div>
+
+  <section class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-full flex items-center justify-center bg-surface-container text-on-surface">
+        <span class="material-symbols-outlined">psychology</span>
+      </div>
+      <div class="flex flex-col">
+        <span class="font-bold text-primary">Cognitive Score</span>
+        <span class="text-xs text-on-surface-variant italic">Stable Trend</span>
+      </div>
+    </div>
+    <span class="material-symbols-outlined text-outline">horizontal_rule</span>
+  </section>
+
+  <section class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-sm font-bold text-on-surface">Task Completion Trend</h2>
+      <span class="text-[10px] font-black uppercase text-on-surface-variant bg-surface-container px-2 py-1 rounded-lg">7 Days</span>
+    </div>
+    <div class="h-32 flex items-end justify-between px-2">
+      {% for val in analysis_trend %}
+        <div class="flex flex-col items-center gap-2 flex-1">
+          <div 
+            class="w-full max-w-[20px] rounded-t-lg transition-all duration-1000 {% if forloop.last %}bg-primary{% else %}bg-primary-container{% endif %}" 
+            style="height: {{ val }}%;"
+          ></div>
+          <span class="text-[10px] font-black {% if forloop.last %}text-primary{% else %}text-on-surface-variant/40{% endif %}">
+            {% cycle 'M' 'T' 'W' 'T' 'F' 'S' 'S' %}
+          </span>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="mt-2 border-t border-outline-variant"></div>
+  </section>
+
+  <div class="grid grid-cols-3 gap-3 mb-4">
+    <div class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant shadow-level-1 flex flex-col items-center gap-1 text-center">
+      <div class="w-8 h-8 rounded-full flex items-center justify-center mb-1 text-green-600 bg-green-50" style="color: var(--success); background: color-mix(in srgb, var(--success) 15%, transparent);">
+        <span class="material-symbols-outlined text-[18px]">check_circle</span>
+      </div>
+      <span class="text-xl font-black text-on-surface">{{ selected_patient.task_progress.completed_today }}</span>
+      <span class="text-[9px] font-black uppercase tracking-tighter text-outline">Completed</span>
+    </div>
+    <div class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant shadow-level-1 flex flex-col items-center gap-1 text-center">
+      <div class="w-8 h-8 rounded-full flex items-center justify-center mb-1 text-secondary bg-secondary-container">
+        <span class="material-symbols-outlined text-[18px]">pending</span>
+      </div>
+      <span class="text-xl font-black text-on-surface">{{ analysis_metrics.missed_tasks }}</span>
+      <span class="text-[9px] font-black uppercase tracking-tighter text-outline">Missed</span>
+    </div>
+    <div class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant shadow-level-1 flex flex-col items-center gap-1 text-center">
+      <div class="w-8 h-8 rounded-full flex items-center justify-center mb-1 text-primary bg-primary-container">
+        <span class="material-symbols-outlined text-[18px]">assignment</span>
+      </div>
+      <span class="text-xl font-black text-on-surface">{{ selected_patient.task_progress.total_today }}</span>
+      <span class="text-[9px] font-black uppercase tracking-tighter text-outline">Assigned</span>
+    </div>
+  </div>
+
+  <section class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant mb-2">
+    <p class="text-sm font-bold text-on-surface mb-2">Clinical Insight</p>
+    <div class="text-sm text-on-surface-variant leading-relaxed">
+      {{ clinical_insight|default:"No insight available." }}
+    </div>
+  </section>
+
+  <section class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant mb-8">
+    <p class="text-sm font-bold text-on-surface mb-2">AI Summary</p>
+    <div class="text-sm text-on-surface-variant leading-relaxed">
+      {{ selected_patient.ai_summary|default:"AI summary not generated yet." }}
+    </div>
+  </section>
+
+  {% else %}
+  <div class="flex items-center justify-center p-12 bg-surface-container-low rounded-2xl border border-dashed border-outline-variant mt-8">
+      <p class="text-on-surface-variant">Please select a patient to view progress.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

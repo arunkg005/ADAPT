@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/adapt_background">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/create_routine_top_bar"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:background="@drawable/bg_top_bar"
+        android:elevation="8dp"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:text="Create Routine"
+            android:textColor="@color/adapt_on_surface"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/profile_badge"
+            app:layout_constraintStart_toEndOf="@id/back_button"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/profile_badge"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/bg_small_circle_primary"
+            android:gravity="center"
+            android:text="AD"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:id="@+id/create_routine_scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/save_routine_footer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/create_routine_top_bar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:paddingBottom="28dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.08"
+                android:text="ROUTINE INFO"
+                android:textColor="@color/adapt_on_surface"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginTop="18dp"
+                android:background="@drawable/bg_card"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ROUTINE NAME"
+                    android:textColor="@color/adapt_on_surface"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/routine_name_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_time_box"
+                    android:hint="e.g. Morning Vitals Check"
+                    android:paddingHorizontal="18dp"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:text="DESCRIPTION"
+                    android:textColor="@color/adapt_on_surface"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/routine_description_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="92dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_time_box"
+                    android:gravity="top"
+                    android:hint="Briefly describe the purpose of this routine..."
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:padding="18dp"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="38dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:letterSpacing="0.08"
+                    android:text="ADD TASKS"
+                    android:textColor="@color/adapt_on_surface"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/library_button"
+                    android:layout_width="92dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_card"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:text="+ Library"
+                    android:textColor="@color/adapt_on_surface"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/lab_button"
+                    android:layout_width="76dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_card"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:text="Lab"
+                    android:textColor="@color/adapt_secondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/routine_tasks_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/add_routine_task_button"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_dashed_button"
+                android:gravity="center"
+                android:text="+  Add New Task"
+                android:textColor="@color/adapt_on_surface"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="38dp"
+                android:letterSpacing="0.08"
+                android:text="SCHEDULING MANAGEMENT"
+                android:textColor="@color/adapt_on_surface"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:background="@drawable/bg_card"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="20dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="November 2024  ✎"
+                        android:textColor="@color/adapt_on_surface"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/previous_month_button"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:gravity="center"
+                        android:text="&lt;"
+                        android:textColor="@color/adapt_on_surface"
+                        android:textSize="28sp" />
+
+                    <TextView
+                        android:id="@+id/next_month_button"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:gravity="center"
+                        android:text="&gt;"
+                        android:textColor="@color/adapt_on_surface"
+                        android:textSize="28sp" />
+                </LinearLayout>
+
+                <GridLayout
+                    android:id="@+id/calendar_grid"
+                    android:layout_width="match_parent"
+                    android:layout_height="154dp"
+                    android:columnCount="7"
+                    android:paddingHorizontal="18dp"
+                    android:paddingVertical="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="118dp"
+                    android:background="@color/adapt_surface_low"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TIME WINDOW"
+                        android:textColor="@color/adapt_on_surface"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/start_time_button"
+                            android:layout_width="0dp"
+                            android:layout_height="46dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_time_box"
+                            android:gravity="center"
+                            android:text="07:30 AM"
+                            android:textColor="@color/adapt_on_surface"
+                            android:textSize="17sp" />
+
+                        <TextView
+                            android:layout_width="44dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="to"
+                            android:textColor="@color/adapt_on_surface_variant"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/end_time_button"
+                            android:layout_width="0dp"
+                            android:layout_height="46dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_time_box"
+                            android:gravity="center"
+                            android:text="09:00 AM"
+                            android:textColor="@color/adapt_on_surface"
+                            android:textSize="17sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="286dp"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/selected_date_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:gravity="center"
+                        android:text="SUN\n28"
+                        android:textColor="@color/adapt_on_surface"
+                        android:textSize="19sp"
+                        android:textStyle="bold" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="190dp"
+                        android:layout_marginStart="26dp">
+
+                        <TextView
+                            android:layout_width="42dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|top"
+                            android:text="8am"
+                            android:textColor="@color/adapt_on_surface_variant"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="42dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|center_vertical"
+                            android:text="9am"
+                            android:textColor="@color/adapt_on_surface_variant"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="42dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|bottom"
+                            android:text="10am"
+                            android:textColor="@color/adapt_on_surface_variant"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/scheduled_block"
+                            android:layout_width="match_parent"
+                            android:layout_height="88dp"
+                            android:layout_marginStart="42dp"
+                            android:layout_marginTop="28dp"
+                            android:background="@drawable/bg_scheduled_block"
+                            android:gravity="center"
+                            android:text="SCHEDULED"
+                            android:textColor="@color/adapt_on_primary_soft"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/save_routine_footer"
+        android:layout_width="0dp"
+        android:layout_height="88dp"
+        android:background="@color/adapt_surface"
+        android:elevation="12dp"
+        android:gravity="center"
+        android:padding="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/save_routine_button"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_primary_button"
+            android:text="Save Routine"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

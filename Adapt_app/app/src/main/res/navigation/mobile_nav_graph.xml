@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_nav_graph"
+    app:startDestination="@id/profileFragment">
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.adapt.ui.ProfileFragment"
+        android:label="@string/nav_profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/taskHistoryFragment"
+        android:name="com.example.adapt.ui.TaskHistoryFragment"
+        android:label="@string/nav_task_history"
+        tools:layout="@layout/fragment_task_history" />
+
+    <fragment
+        android:id="@+id/routineFragment"
+        android:name="com.example.adapt.ui.RoutineFragment"
+        android:label="@string/nav_routine"
+        tools:layout="@layout/fragment_routine" />
+
+    <fragment
+        android:id="@+id/scheduleFragment"
+        android:name="com.example.adapt.ui.ScheduleFragment"
+        android:label="@string/nav_schedule"
+        tools:layout="@layout/fragment_schedule" />
+
+    <fragment
+        android:id="@+id/progressFragment"
+        android:name="com.example.adapt.ui.ProgressFragment"
+        android:label="@string/nav_progress"
+        tools:layout="@layout/fragment_progress" />
+</navigation>

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Caretaker Dashboard | ADAPT{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="page-toolbar table-toolbar">
+        <div class="table-heading-wrap">
+            <h3 class="panel-title">Patient list</h3>
+            <span class="patient-count-subscript">{{ patients|length }} patients</span>
+        </div>
+        <div class="table-toolbar-actions">
+            <a class="btn primary" href="{% url 'patients:add_patient' %}">Add Patient</a>
+        </div>
+    </div>
+
+    {% if patients %}
+        <div class="table-scroll">
+            <table class="table patient-table" aria-label="Patient list">
+                <thead>
+                    <tr>
+                        <th>Sr No.</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Disease</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patient in patients %}
+                        <tr data-patient-card data-search-text="{{ patient.name }} {{ patient.age }} {{ patient.gender }} {% if patient.diseases %}{% for disease in patient.diseases %}{{ disease }} {% endfor %}{% endif %}" data-search-href="{% url 'dashboard:patient_dashboard' patient.id %}">
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <strong>{{ patient.name }}</strong>
+                            </td>
+                            <td>{{ patient.age }}</td>
+                            <td>{{ patient.gender }}</td>
+                            <td>
+                                <div class="patient-disease-cell">
+                                    {% if patient.diseases %}
+                                        {% for disease in patient.diseases %}
+                                            <span class="pill">{{ disease }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="muted">General care</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="btn btn-action" href="{% url 'dashboard:patient_dashboard' patient.id %}">Open dashboard</a>
+                                    <a class="btn btn-action" href="{% url 'dashboard:patient_settings' patient.id %}">Edit</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">No patients yet. Add the first profile to begin.</div>
+    {% endif %}
+</section>
+{% endblock %}

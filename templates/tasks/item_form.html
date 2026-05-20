@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == 'create' %}Add{% else %}Edit{% endif %} {{ meta.label }} — {{ patient.name }} | ADAPT{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="page-toolbar table-toolbar">
+        <div class="table-heading-wrap">
+            <p class="section-label">{{ patient.name }}</p>
+            <h2 class="panel-title">{% if mode == 'create' %}Add{% else %}Edit{% endif %} {{ meta.label }}</h2>
+            <span class="patient-count-subscript">{{ meta.description }}</span>
+        </div>
+        <div class="table-toolbar-actions">
+            <a class="btn" href="{% url 'tasks:item_list' patient.id item_type %}">Cancel</a>
+        </div>
+    </div>
+</section>
+
+<section class="panel">
+    <form method="post">
+        {% csrf_token %}
+        <div class="field-grid">
+            <div class="field-card field-card--full">
+                <label for="id_title">Title</label>
+                {{ form.title }}
+                <div class="form-error">{{ form.title.errors }}</div>
+            </div>
+            <div class="field-card field-card--full">
+                <label for="id_description">Description</label>
+                {{ form.description }}
+                <div class="form-error">{{ form.description.errors }}</div>
+            </div>
+            <div class="field-card field-card--full">
+                <label for="id_notes">Steps / Notes</label>
+                {{ form.notes }}
+                <div class="form-error">{{ form.notes.errors }}</div>
+            </div>
+            <div class="field-card">
+                <label for="id_status">Status</label>
+                {{ form.status }}
+                <div class="form-error">{{ form.status.errors }}</div>
+            </div>
+            <div class="field-card">
+                <label for="id_priority">Priority</label>
+                {{ form.priority }}
+                {% if form.priority.help_text %}<p class="muted form-note">{{ form.priority.help_text }}</p>{% endif %}
+                <div class="form-error">{{ form.priority.errors }}</div>
+            </div>
+            <div class="field-card">
+                <label for="id_due_at">Due At</label>
+                {{ form.due_at }}
+                <div class="form-error">{{ form.due_at.errors }}</div>
+            </div>
+            <div class="field-card">
+                <label for="id_recurrence_mode">Recurrence</label>
+                {{ form.recurrence_mode }}
+                <div class="form-error">{{ form.recurrence_mode.errors }}</div>
+            </div>
+            <div class="field-card field-card--full">
+                <label>Recurrence Days</label>
+                <div class="chip-row" style="margin-top:4px;">{{ form.recurrence_weekday_choices }}</div>
+                <div class="form-error">{{ form.recurrence_weekday_choices.errors }}</div>
+            </div>
+            <div class="field-card field-card--full">
+                <label for="id_recurrence_dates">Recurrence Dates / Day Numbers</label>
+                {{ form.recurrence_dates }}
+                <div class="form-error">{{ form.recurrence_dates.errors }}</div>
+            </div>
+            <div class="field-card">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    {{ form.reminder_enabled }}
+                    <span>Enable reminder</span>
+                </label>
+                <div class="form-error">{{ form.reminder_enabled.errors }}</div>
+            </div>
+            <div class="field-card">
+                <label for="id_reminder_minutes_before">Reminder minutes before</label>
+                {{ form.reminder_minutes_before }}
+                <div class="form-error">{{ form.reminder_minutes_before.errors }}</div>
+            </div>
+        </div>
+        <div class="form-actions" style="margin-top:14px;">
+            <button class="btn primary" type="submit">Save</button>
+            <a class="btn" href="{% url 'tasks:item_list' patient.id item_type %}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

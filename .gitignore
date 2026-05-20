@@ -1,0 +1,56 @@
+# ============================================================
+# ADAPT Project — Git Ignore
+# ============================================================
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# ---------- Virtual Environment ----------
+.venv/
+venv/
+ENV/
+
+# ---------- Environment / Secrets ----------
+.env
+.env.local
+!.env.production
+
+# ---------- Django ----------
+staticfiles/
+media/
+db.sqlite3
+*.log
+
+# ---------- IDE ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Docker (runtime volumes) ----------
+nginx/certs/*.pem
+nginx/certs/*.key
+
+# ---------- Android (handled by Adapt_app/.gitignore) ----------
+Adapt_app/.gradle/
+Adapt_app/build/
+Adapt_app/app/build/
+Adapt_app/local.properties
+*.jks
+*.keystore
+
+# ---------- Dumps ----------
+Dumps/

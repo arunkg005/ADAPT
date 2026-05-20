@@ -1,0 +1,49 @@
+# ============================================================
+# Docker build context exclusions
+# ============================================================
+
+# Version control
+.git
+.gitignore
+
+# Virtual environment
+.venv
+venv
+
+# Android app (separate build pipeline)
+Adapt_app/
+
+# IDE / Editor
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+
+# Environment files (secrets injected at runtime)
+.env
+.env.*
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Docs & dumps
+Dumps/
+*.md
+system_architecture.md
+
+# Media (mounted as volume)
+media/
+
+# Nginx (mounted separately)
+nginx/
+
+# CI/CD
+.github/

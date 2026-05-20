@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Signed Out | ADAPT{% endblock %}
+
+{% block content %}
+<div class="panel">
+    <p class="section-title" style="margin-bottom:8px;">Session</p>
+    <h2 class="panel-title">Signed out</h2>
+    <p class="helper-text" style="margin-top:10px; max-width: 60ch;">
+        You have been taken out of the active caregiver session. Return to the dashboard or the landing page when you are ready to continue.
+    </p>
+    <div class="row-actions" style="margin-top:14px;">
+        <a class="btn primary" href="{% url 'dashboard:home' %}">Return to dashboard</a>
+        <a class="btn" href="{% url 'home' %}">Go to landing page</a>
+    </div>
+</div>
+{% endblock %}

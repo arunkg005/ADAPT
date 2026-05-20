@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Disease Management — {{ patient.name }} | ADAPT{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="page-toolbar table-toolbar">
+        <div class="table-heading-wrap">
+            <p class="section-label">Clinical records</p>
+            <h2 class="panel-title">Diseases, Allergies &amp; Intolerances</h2>
+            <span class="patient-count-subscript">{{ patient.name }}</span>
+        </div>
+        <div class="table-toolbar-actions">
+            <a class="btn" href="{% url 'dashboard:patient_dashboard' patient.id %}">Back to dashboard</a>
+        </div>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="row-actions mb-12">
+        <div>
+            <p class="section-label">AI tools</p>
+            <strong>Automated extraction</strong>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <button class="btn primary" type="submit" name="action" value="analyze_disease_docs">Analyze Documents</button>
+        </form>
+    </div>
+    <p class="muted">Upload documents in the patient profile, then use AI to extract diseases, allergies, and intolerances automatically.</p>
+</section>
+
+<section class="panel">
+    <p class="section-label">Add manually</p>
+    <h3 class="panel-title" style="margin-top:4px;">New Disease</h3>
+    <form method="post" class="field-grid" style="margin-top:12px;">
+        {% csrf_token %}
+        <div class="field-card">
+            <label for="id_disease-name">Disease name</label>
+            {{ disease_form.name }}
+            <div class="form-error">{{ disease_form.name.errors }}</div>
+        </div>
+        <div class="field-card">
+            <label for="id_disease-notes">Notes</label>
+            {{ disease_form.notes }}
+            <div class="form-error">{{ disease_form.notes.errors }}</div>
+        </div>
+        <div class="field-card--full" style="grid-column: 1 / -1;">
+            <button class="btn primary" type="submit" name="action" value="add_disease">Add Disease</button>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <p class="section-label">Add manually</p>
+    <h3 class="panel-title" style="margin-top:4px;">New Allergy / Intolerance</h3>
+    <form method="post" class="field-grid" style="margin-top:12px;">
+        {% csrf_token %}
+        <div class="field-card">
+            <label for="id_sensitivity-name">Name</label>
+            {{ sensitivity_form.name }}
+            <div class="form-error">{{ sensitivity_form.name.errors }}</div>
+        </div>
+        <div class="field-card">
+            <label for="id_sensitivity-kind">Type</label>
+            {{ sensitivity_form.kind }}
+            <div class="form-error">{{ sensitivity_form.kind.errors }}</div>
+        </div>
+        <div class="field-card">
+            <label for="id_sensitivity-severity">Severity</label>
+            {{ sensitivity_form.severity }}
+            <div class="form-error">{{ sensitivity_form.severity.errors }}</div>
+        </div>
+        <div class="field-card">
+            <label for="id_sensitivity-notes">Notes</label>
+            {{ sensitivity_form.notes }}
+            <div class="form-error">{{ sensitivity_form.notes.errors }}</div>
+        </div>
+        <div class="field-card--full" style="grid-column: 1 / -1;">
+            <button class="btn primary" type="submit" name="action" value="add_sensitivity">Add Allergy / Intolerance</button>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <p class="section-label">Records</p>
+    <h3 class="panel-title" style="margin-top:4px;">Diseases</h3>
+    <div class="table-scroll" style="margin-top:12px;">
+        <table class="table" aria-label="Disease list">
+            <thead><tr><th>Name</th><th>Notes</th><th>Source</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for d in diseases %}
+                    <tr>
+                        <td><strong>{{ d.name }}</strong></td>
+                        <td>{{ d.notes|default:'-' }}</td>
+                        <td><span class="pill">{{ d.get_source_display }}</span></td>
+                        <td>
+                            <div class="table-actions">
+                                <a class="btn btn-action" href="{% url 'patients:disease_edit' patient.id d.id %}">Edit</a>
+                                <a class="btn btn-action" href="{% url 'patients:disease_delete' patient.id d.id %}">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="muted">No diseases recorded yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel">
+    <p class="section-label">Records</p>
+    <h3 class="panel-title" style="margin-top:4px;">Allergies &amp; Intolerances</h3>
+    <div class="table-scroll" style="margin-top:12px;">
+        <table class="table" aria-label="Allergy and intolerance list">
+            <thead><tr><th>Name</th><th>Type</th><th>Severity</th><th>Source</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for s in sensitivities %}
+                    <tr>
+                        <td><strong>{{ s.name }}</strong></td>
+                        <td><span class="pill">{{ s.get_kind_display }}</span></td>
+                        <td>{{ s.severity|default:'-' }}</td>
+                        <td><span class="pill">{{ s.get_source_display }}</span></td>
+                        <td>
+                            <div class="table-actions">
+                                <a class="btn btn-action" href="{% url 'patients:sensitivity_edit' patient.id s.id %}">Edit</a>
+                                <a class="btn btn-action" href="{% url 'patients:sensitivity_delete' patient.id s.id %}">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="muted">No allergy or intolerance records yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

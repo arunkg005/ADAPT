@@ -1,0 +1,250 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ADAPT Care Platform</title>
+
+  <style>
+    body {
+      --background: #f5f7fa;
+      --foreground: #1a2233;
+      --primary: #1a2233;
+      --primary-foreground: #f8fafc;
+      --accent: #ff9f43;
+      --success: #22c55e;
+      --muted: #e5e7eb;
+      --card: #fff;
+      --border: #e5e7eb;
+      --gradient-hero: linear-gradient(135deg, #fff7ed 0%, #e3eafc 50%, #f5f7fa 100%);
+      --gradient-primary: linear-gradient(135deg, #1a2233 0%, #2c3654 100%);
+      font-family: 'Inter', Arial, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .gradient-hero-bg {
+      background: var(--gradient-hero);
+    }
+
+    .hero-section {
+      min-height: 85vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg-accent {
+      position: absolute;
+      top: 80px; right: 40px;
+      width: 18rem; height: 18rem;
+      border-radius: 50%;
+      background: rgba(255, 159, 67, 0.1);
+      filter: blur(48px);
+      z-index: 0;
+    }
+
+    .hero-bg-primary {
+      position: absolute;
+      bottom: 40px; left: 40px;
+      width: 24rem; height: 24rem;
+      border-radius: 50%;
+      background: rgba(26, 34, 51, 0.05);
+      filter: blur(48px);
+      z-index: 0;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 4rem;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (min-width: 1024px) {
+      .hero-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      background: rgba(255, 159, 67, 0.1);
+      border: 1px solid rgba(255, 159, 67, 0.2);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.95rem;
+      color: var(--accent);
+    }
+
+    .badge-dot {
+      width: 0.5rem; height: 0.5rem;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      font-family: 'Space Grotesk', Arial, sans-serif;
+      line-height: 1.1;
+      margin: 0;
+    }
+
+    .text-gradient-primary {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 1.15rem;
+      color: #6b7280;
+      max-width: 32rem;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 2rem;
+      border-radius: 0.75rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    .btn-hero {
+      background: var(--gradient-primary);
+      color: var(--primary-foreground);
+    }
+
+    .btn-hero:hover {
+      opacity: 0.9;
+    }
+
+    .hero-chips {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      padding-top: 0.5rem;
+    }
+
+    .chip {
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.6);
+      color: #6b7280;
+      font-size: 1rem;
+    }
+
+    .footer {
+      padding: 3rem 0;
+      text-align: center;
+      background: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <section class="hero-section gradient-hero-bg">
+    <div class="hero-bg-accent"></div>
+    <div class="hero-bg-primary"></div>
+
+    <div class="container">
+      <div class="hero-grid">
+
+        <!-- LEFT CONTENT -->
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="badge-dot"></span>
+            <span>ADAPT Care Platform</span>
+          </div>
+
+          <h1 class="hero-title">
+            A cleaner caregiver workflow
+            <span class="text-gradient-primary">from planning to follow-through.</span>
+          </h1>
+
+          <p class="hero-desc">
+            ADAPT connects the caregiver web console and Android assist experience,
+            so routines, reminders, and outcomes stay in one coordinated loop.
+          </p>
+
+          <div class="hero-actions">
+            {% if request.user.is_authenticated %}
+            <a href="{% url 'dashboard:home' %}" class="btn btn-hero">
+              Go to Dashboard
+            </a>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-hero">
+              Log In
+            </a>
+            <a href="{% url 'register' %}" class="btn" style="border: 1px solid var(--border); color: var(--foreground); background: transparent;">
+              Sign Up
+            </a>
+            {% endif %}
+          </div>
+
+          <div class="hero-chips">
+            <span class="chip">Caregiver-first operations</span>
+            <span class="chip">Android assist integration</span>
+            <span class="chip">Handover continuity</span>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE (kept minimal for clarity, your UI preserved above) -->
+        <div></div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p><strong>ADAPT Care Platform</strong></p>
+    <p style="opacity:0.7;">Cognitive assistance for caregiver workflows</p>
+  </footer>
+
+</body>
+</html>

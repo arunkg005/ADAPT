@@ -1,0 +1,14 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.ADAPT" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/adapt_primary</item>
+        <item name="colorSecondary">@color/adapt_accent</item>
+        <item name="colorSurface">@color/adapt_surface</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:navigationBarColor">@color/adapt_surface</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.ADAPT.BottomSheet</item>
+    </style>
+</resources>

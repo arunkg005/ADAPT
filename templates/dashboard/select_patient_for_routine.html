@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">{{ heading|default:"Select a patient" }}</h2>
+    <div class="patient-list">
+    {% for patient in patients %}
+        <a href="?patient_id={{ patient.id }}" class="patient-card">
+            <div class="patient-card__header">
+                <strong>{{ patient.name }}</strong>
+                <span>{{ patient.age }} yrs, {{ patient.gender }}</span>
+            </div>
+        </a>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

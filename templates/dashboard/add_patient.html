@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Add Patient | ADAPT{% endblock %}
+
+{% block content %}
+<div class="panel">
+    <p class="section-title" style="margin-bottom:8px;">Add patient</p>
+    <h2 class="panel-title">Use the new patient form</h2>
+    <p class="helper-text" style="margin-top:10px; max-width: 60ch;">
+        The full patient creation flow now lives in the patients workspace so it can use the sticky action bar and grouped form layout.
+    </p>
+    <div class="row-actions" style="margin-top:14px;">
+        <a class="btn primary" href="{% url 'patients:add_patient' %}">Open new patient form</a>
+        <a class="btn" href="{% url 'dashboard:home' %}">Back to dashboard</a>
+    </div>
+</div>
+{% endblock %}

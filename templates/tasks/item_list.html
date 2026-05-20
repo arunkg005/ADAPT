@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}{{ meta.label }} — {{ patient.name }} | ADAPT{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="page-toolbar table-toolbar">
+        <div class="table-heading-wrap">
+            <p class="section-label">{{ meta.label }}</p>
+            <h2 class="panel-title">{{ patient.name }}</h2>
+            <span class="patient-count-subscript">{{ meta.description }}</span>
+        </div>
+        <div class="table-toolbar-actions">
+            <a class="btn" href="{% url 'dashboard:patient_dashboard' patient.id %}">Back to dashboard</a>
+            <a class="btn primary" href="{% url 'tasks:item_create' patient.id item_type %}">Add {{ meta.label }}</a>
+        </div>
+    </div>
+</section>
+
+{% if item_type == 'routine' %}
+<section class="panel">
+    <p class="section-label">Patient-level setting</p>
+    <h3 class="panel-title" style="margin-top:4px;">Routine Reminder</h3>
+    <p class="muted">This setting applies to all routine items for this patient.</p>
+    <form method="post" style="margin-top:12px;">
+        {% csrf_token %}
+        <div class="field-grid">
+            <div class="field-card">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="checkbox" name="routine_reminder_enabled" {% if routine_reminder_enabled %}checked{% endif %} style="width:auto; padding:0; border:0; box-shadow:none; accent-color:var(--primary);">
+                    Enable routine reminder
+                </label>
+            </div>
+            <div class="field-card">
+                <label for="routine_minutes">Minutes before</label>
+                <input id="routine_minutes" type="number" name="routine_reminder_minutes_before" min="0" value="{{ routine_reminder_minutes_before }}">
+            </div>
+        </div>
+        <div class="form-actions" style="margin-top:12px;">
+            <button class="btn primary" type="submit">Save Reminder Settings</button>
+        </div>
+    </form>
+</section>
+{% endif %}
+
+<section class="panel">
+    <div class="table-scroll">
+        <table class="table patient-table" aria-label="{{ meta.label }} list">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Due</th>
+                    <th>Recurrence</th>
+                    <th>Reminder</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.title }}</strong>
+                            <div class="muted" style="margin-top:4px;">{{ item.description|default:'-' }}</div>
+                        </td>
+                        <td><span class="pill">{{ item.get_status_display }}</span></td>
+                        <td><span class="pill">{{ item.get_priority_display }}</span></td>
+                        <td>{{ item.due_at|default:'-' }}</td>
+                        <td>
+                            {{ item.get_recurrence_mode_display }}
+                            {% if item.recurrence_weekdays %}
+                                <div class="muted">Days: {{ item.recurrence_weekdays }}</div>
+                            {% endif %}
+                            {% if item.recurrence_dates %}
+                                <div class="muted">Dates: {{ item.recurrence_dates }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.reminder_enabled %}
+                                <span class="pill">{{ item.reminder_minutes_before }} min</span>
+                            {% else %}
+                                <span class="muted">Off</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <a class="btn btn-action" href="{% url 'tasks:item_edit' patient.id item_type item.id %}">Edit</a>
+                                <a class="btn btn-action" href="{% url 'tasks:item_delete' patient.id item_type item.id %}">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="muted">No {{ item_type }} records yet. Use the button above to add one.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

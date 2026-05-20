@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Delete {{ meta.label }} | ADAPT{% endblock %}
+
+{% block content %}
+<section class="panel panel-danger">
+    <div class="page-toolbar table-toolbar">
+        <div class="table-heading-wrap">
+            <p class="section-label">Confirm action</p>
+            <h2 class="panel-title">Delete {{ meta.label }}</h2>
+        </div>
+    </div>
+
+    <p style="margin-top:12px;">Are you sure you want to delete <strong>"{{ item.title }}"</strong> for {{ patient.name }}?</p>
+    <p class="muted">This action cannot be undone.</p>
+
+    <form method="post" class="form-actions" style="margin-top:14px;">
+        {% csrf_token %}
+        <button class="btn danger" type="submit">Confirm Delete</button>
+        <a class="btn" href="{% url 'tasks:item_list' patient.id item_type %}">Cancel</a>
+    </form>
+</section>
+{% endblock %}
