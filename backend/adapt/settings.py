@@ -150,6 +150,8 @@ else:
         if origin.strip()
     ]
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 # ---------- Security (production only) ----------
 if not DEBUG:
     SECURE_SSL_REDIRECT = True

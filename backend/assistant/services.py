@@ -83,7 +83,7 @@ def _call_model(prompt):
         return "AI is in fallback mode because Gemini API key is missing."
 
     genai.configure(api_key=api_key)
-    model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+    model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     model = genai.GenerativeModel(model_name=model_name)
     response = model.generate_content(prompt)
     return (getattr(response, "text", "") or "").strip()

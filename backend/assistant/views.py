@@ -6,6 +6,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 from dashboard.views import _caretaker_context, _get_or_create_caretaker_profile
 from patients.models import Patient
@@ -17,6 +18,7 @@ from .services import apply_action_proposal, generate_assistant_reply, generate_
 IDLE_TIMEOUT_MINUTES = 20
 
 @login_required
+@xframe_options_sameorigin
 def index(request, patient_id=None):
 	patient_id = patient_id or request.GET.get("patient")
 	session_id = request.GET.get("session")
@@ -53,10 +55,20 @@ def index(request, patient_id=None):
 			current_session = _handle_send(request, current_session, selected_patient, source)
 		elif action in {"approve_action", "reject_action"} and current_session:
 			_handle_action_resolution(request, current_session, action)
-			return redirect(f"/assistant/?session={current_session.id}")
+			redirect_url = f"/assistant/?session={current_session.id}"
+			if embedded:
+				redirect_url += "&embedded=1"
+			if source:
+				redirect_url += f"&source={source}"
+			return redirect(redirect_url)
 
 		if current_session:
-			return redirect(f"/assistant/?session={current_session.id}")
+			redirect_url = f"/assistant/?session={current_session.id}"
+			if embedded:
+				redirect_url += "&embedded=1"
+			if source:
+				redirect_url += f"&source={source}"
+			return redirect(redirect_url)
 
 	sessions = ChatSession.objects.order_by("-created_at")[:15]
 	patient_options = Patient.objects.order_by("name")

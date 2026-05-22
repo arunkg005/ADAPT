@@ -59,7 +59,7 @@ def generate_patient_summary(patient, documents: Iterable):
 
     try:
         genai.configure(api_key=api_key)
-        model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+        model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         model = genai.GenerativeModel(model_name=model_name)
 
         content_parts = [prompt]
@@ -119,7 +119,7 @@ def extract_structured_clinical_data(patient, documents: Iterable):
 
     try:
         genai.configure(api_key=api_key)
-        model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+        model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         model = genai.GenerativeModel(model_name=model_name)
 
         content_parts = [prompt]

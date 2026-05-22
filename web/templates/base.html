@@ -1480,139 +1480,7 @@
             flex-direction: column;
         }
 
-        .voice-shell {
-            max-width: 640px;
-            width: calc(100vw - 32px);
-        }
 
-        .voice-inner {
-            gap: 12px;
-        }
-
-        .voice-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .voice-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-
-        .voice-transcript {
-            max-height: 340px;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 4px;
-        }
-
-        .voice-message {
-            max-width: 84%;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            padding: 10px 12px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            background: var(--surface);
-        }
-
-        .voice-message.user {
-            margin-left: auto;
-            background: color-mix(in srgb, var(--primary) 12%, var(--surface-strong));
-        }
-
-        .voice-message.ai {
-            margin-right: auto;
-        }
-
-        .voice-message time {
-            font-size: 0.72rem;
-            color: var(--muted);
-        }
-
-        .voice-mic-row {
-            display: flex;
-            justify-content: center;
-            padding-top: 4px;
-        }
-
-        .voice-mic {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            background: linear-gradient(135deg, var(--surface-strong), var(--surface));
-            color: var(--primary);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
-            position: relative;
-            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-        }
-
-        .voice-mic svg {
-            width: 18px;
-            height: 18px;
-            display: block;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .voice-mic-icon.pause {
-            display: none;
-        }
-
-        .voice-mic[data-mode="speaking"] .voice-mic-icon.mic,
-        .voice-mic[data-mode="paused"] .voice-mic-icon.mic,
-        .voice-mic[data-mode="listening"] .voice-mic-icon.mic {
-            display: none;
-        }
-
-        .voice-mic[data-mode="speaking"] .voice-mic-icon.pause,
-        .voice-mic[data-mode="paused"] .voice-mic-icon.pause,
-        .voice-mic[data-mode="listening"] .voice-mic-icon.pause {
-            display: block;
-        }
-
-        @keyframes voiceMicPulse {
-            from {
-                box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12), 0 0 0 0 color-mix(in srgb, var(--primary) 28%, transparent);
-            }
-
-            to {
-                box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12), 0 0 0 8px color-mix(in srgb, var(--primary) 12%, transparent);
-            }
-        }
-
-        .voice-mic[data-mode="speaking"] {
-            border-color: var(--primary);
-            background: color-mix(in srgb, var(--primary) 16%, var(--surface-strong));
-            animation: voiceMicPulse 1.1s ease-in-out infinite alternate;
-        }
-
-        .voice-mic[data-mode="paused"] {
-            border-color: var(--primary);
-            background: color-mix(in srgb, var(--primary) 10%, var(--surface-strong));
-            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12), 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent);
-        }
-
-        .voice-mic[data-mode="listening"] {
-            border-color: var(--accent);
-            background: color-mix(in srgb, var(--accent) 14%, var(--surface-strong));
-            animation: voiceMicPulse 1.2s ease-in-out infinite alternate;
-        }
 
         .theme-grid {
             display: grid;
@@ -1761,7 +1629,8 @@
 
         .embedded-view {
             min-height: 100vh;
-            padding: 16px;
+            padding: 0;
+            overflow: hidden;
         }
 
         @media (max-width: 1180px) {
@@ -1962,16 +1831,8 @@
         <div class="backdrop" id="chatBackdrop"></div>
 
         <section class="chat-drawer" id="chatDrawer" aria-hidden="true" aria-label="Assistant drawer">
-            <div class="chat-drawer__header">
-                <div>
-                    <p class="dialog-eyebrow">Assistant</p>
-                    <h3>Gemini-style chat</h3>
-                    <div class="muted">Click to open, long press for voice.</div>
-                </div>
-                <button class="icon-button" id="chatDrawerClose" type="button" aria-label="Close assistant">×</button>
-            </div>
-            <div class="chat-drawer__body">
-                <iframe class="chat-frame" src="{% url 'assistant:index' %}?source=caretaker&embedded=1" title="Assistant chat"></iframe>
+            <div class="chat-drawer__body" style="flex: 1; min-height: 0;">
+                <iframe class="chat-frame" id="chatFrame" src="about:blank" data-src="{% url 'assistant:index' %}?source=caretaker&embedded=1" title="Assistant chat"></iframe>
             </div>
         </section>
 
@@ -1985,45 +1846,6 @@
                 <a class="btn primary block" href="{% url 'dashboard:signout' %}">Sign out</a>
             </div>
         </div>
-        <dialog class="dialog-shell voice-shell" id="voiceAssistantDialog">
-            <div class="dialog-inner voice-inner">
-                <div class="voice-header">
-                    <div class="voice-title">Voice chat</div>
-                    <button class="icon-button" type="button" data-dialog-close aria-label="Close voice assistant">×</button>
-                </div>
-                <div class="voice-transcript" id="voiceTranscript" aria-label="Voice transcript">
-                    <div class="voice-message ai">
-                        <strong>Assistant</strong>
-                        <span>Ready. Tell me what to do next.</span>
-                        <time datetime="">now</time>
-                    </div>
-                    <div class="voice-message user">
-                        <strong>You</strong>
-                        <span>Show patients due today.</span>
-                        <time datetime="">now</time>
-                    </div>
-                    <div class="voice-message ai">
-                        <strong>Assistant</strong>
-                        <span>Here are the likely matches and next actions.</span>
-                        <time datetime="">now</time>
-                    </div>
-                </div>
-                <div class="voice-mic-row">
-                    <button class="voice-mic" id="voiceMicButton" type="button" aria-label="Talk to assistant" aria-pressed="false">
-                                <svg class="voice-mic-icon mic" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 18a4 4 0 0 0 4-4V8a4 4 0 1 0-8 0v6a4 4 0 0 0 4 4Z" />
-                            <path d="M19 11v1a7 7 0 0 1-14 0v-1" />
-                            <path d="M12 18v3" />
-                            <path d="M8 21h8" />
-                        </svg>
-                                <svg class="voice-mic-icon pause" viewBox="0 0 24 24" aria-hidden="true">
-                                    <rect x="7" y="5" width="4" height="14" rx="1.2"></rect>
-                                    <rect x="13" y="5" width="4" height="14" rx="1.2"></rect>
-                                </svg>
-                    </button>
-                </div>
-            </div>
-        </dialog>
     {% endif %}
 
     {% block scripts %}{% endblock %}
@@ -2041,14 +1863,6 @@
             const chatLauncher = document.getElementById('chatLauncher');
             const chatDrawer = document.getElementById('chatDrawer');
             const chatBackdrop = document.getElementById('chatBackdrop');
-            const chatDrawerClose = document.getElementById('chatDrawerClose');
-            const voiceTranscript = document.getElementById('voiceTranscript');
-            const voiceMicButton = document.getElementById('voiceMicButton');
-            const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-            let longPressTimer = null;
-            let longPressTriggered = false;
-            let voiceRecognition = null;
-            let voiceListening = false;
 
             function applyTheme(theme) {
                 root.dataset.theme = theme;
@@ -2058,146 +1872,32 @@
                 }
             }
 
+            let chatFrameLoaded = false;
             function openDrawer() {
-                if (!chatDrawer) {
-                    return;
+                if (!chatDrawer) return;
+                // Lazy-load the iframe src on first open only
+                if (!chatFrameLoaded) {
+                    const frame = document.getElementById('chatFrame');
+                    if (frame) {
+                        frame.src = frame.dataset.src;
+                        chatFrameLoaded = true;
+                    }
                 }
                 chatDrawer.classList.add('open');
                 chatBackdrop?.classList.add('open');
                 chatDrawer.setAttribute('aria-hidden', 'false');
+                if (chatLauncher) chatLauncher.style.display = 'none';
             }
 
             function closeDrawer() {
-                if (!chatDrawer) {
-                    return;
-                }
+                if (!chatDrawer) return;
                 chatDrawer.classList.remove('open');
                 chatBackdrop?.classList.remove('open');
                 chatDrawer.setAttribute('aria-hidden', 'true');
-            }
-
-            function openVoiceAssistant() {
-                const voiceDialog = document.getElementById('voiceAssistantDialog');
-                if (voiceDialog) {
-                    if (!voiceDialog.open) {
-                        voiceDialog.showModal();
-                    }
-                    voiceTranscript?.scrollTo({ top: voiceTranscript.scrollHeight, behavior: 'smooth' });
-                }
-            }
-
-            function appendVoiceMessage(role, text, speak = false) {
-                if (!voiceTranscript) {
-                    return;
-                }
-
-                const bubble = document.createElement('div');
-                bubble.className = `voice-message ${role}`;
-                const title = document.createElement('strong');
-                title.textContent = role === 'user' ? 'You' : 'Assistant';
-                const body = document.createElement('span');
-                body.textContent = text;
-                const stamp = document.createElement('time');
-                stamp.setAttribute('datetime', '');
-                stamp.textContent = 'now';
-                bubble.append(title, body, stamp);
-                voiceTranscript.appendChild(bubble);
-                voiceTranscript.scrollTo({ top: voiceTranscript.scrollHeight, behavior: 'smooth' });
-
-                if (speak && window.speechSynthesis && window.SpeechSynthesisUtterance) {
-                    window.speechSynthesis.cancel();
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.rate = 1;
-                    utterance.pitch = 1;
-                    window.speechSynthesis.speak(utterance);
-                    updateVoiceMicState();
-                }
-            }
-
-            function updateVoiceMicState() {
-                if (!voiceMicButton) {
-                    return;
-                }
-
-                if (window.speechSynthesis?.speaking) {
-                    voiceMicButton.dataset.mode = window.speechSynthesis.paused ? 'paused' : 'speaking';
-                    voiceMicButton.setAttribute('aria-label', window.speechSynthesis.paused ? 'Resume assistant reply' : 'Pause assistant reply');
-                    voiceMicButton.setAttribute('aria-pressed', 'true');
-                    return;
-                }
-
-                voiceMicButton.dataset.mode = voiceListening ? 'listening' : 'idle';
-                voiceMicButton.setAttribute('aria-label', voiceListening ? 'Stop talking' : 'Talk to assistant');
-                voiceMicButton.setAttribute('aria-pressed', String(voiceListening));
-            }
-
-            function ensureVoiceRecognition() {
-                if (!SpeechRecognitionCtor) {
-                    return null;
-                }
-
-                if (!voiceRecognition) {
-                    voiceRecognition = new SpeechRecognitionCtor();
-                    voiceRecognition.lang = 'en-US';
-                    voiceRecognition.continuous = false;
-                    voiceRecognition.interimResults = false;
-                    voiceRecognition.onresult = (event) => {
-                        const spokenText = event.results[0][0].transcript.trim();
-                        if (spokenText) {
-                            appendVoiceMessage('user', spokenText);
-                            appendVoiceMessage('ai', 'Got it. I will keep this short and direct.', true);
-                        }
-                    };
-                    voiceRecognition.onend = () => {
-                        voiceListening = false;
-                        updateVoiceMicState();
-                    };
-                    voiceRecognition.onerror = () => {
-                        voiceListening = false;
-                        updateVoiceMicState();
-                    };
-                }
-
-                return voiceRecognition;
-            }
-
-            function toggleVoiceMic() {
-                if (window.speechSynthesis?.speaking) {
-                    if (window.speechSynthesis.paused) {
-                        window.speechSynthesis.resume();
-                    } else {
-                        window.speechSynthesis.pause();
-                    }
-                    updateVoiceMicState();
-                    return;
-                }
-
-                const recognition = ensureVoiceRecognition();
-                if (!recognition) {
-                    appendVoiceMessage('ai', 'Microphone access is not available in this browser.');
-                    return;
-                }
-
-                if (voiceListening) {
-                    recognition.stop();
-                    voiceListening = false;
-                    updateVoiceMicState();
-                    return;
-                }
-
-                try {
-                    recognition.start();
-                    voiceListening = true;
-                    updateVoiceMicState();
-                } catch (error) {
-                    voiceListening = false;
-                    updateVoiceMicState();
-                }
+                if (chatLauncher) chatLauncher.style.display = '';
             }
 
             applyTheme(storedTheme);
-
-            updateVoiceMicState();
 
             if (avatarButton && accountMenu) {
                 avatarButton.addEventListener('click', (event) => {
@@ -2293,8 +1993,6 @@
                 });
             }
 
-            voiceMicButton?.addEventListener('click', toggleVoiceMic);
-
             if (chatLauncher && chatDrawer && chatBackdrop) {
                 const toggleDrawer = () => {
                     if (chatDrawer.classList.contains('open')) {
@@ -2305,33 +2003,19 @@
                 };
 
                 chatLauncher.addEventListener('click', () => {
-                    if (longPressTriggered) {
-                        longPressTriggered = false;
-                        return;
-                    }
                     toggleDrawer();
                 });
 
-                chatLauncher.addEventListener('pointerdown', () => {
-                    longPressTriggered = false;
-                    longPressTimer = window.setTimeout(() => {
-                        longPressTriggered = true;
-                        openVoiceAssistant();
-                    }, 550);
-                });
-
-                chatLauncher.addEventListener('pointerup', () => {
-                    window.clearTimeout(longPressTimer);
-                });
-
-                chatLauncher.addEventListener('pointerleave', () => {
-                    window.clearTimeout(longPressTimer);
-                });
-
                 chatBackdrop.addEventListener('click', closeDrawer);
-                chatDrawerClose.addEventListener('click', closeDrawer);
                 window.addEventListener('keydown', (event) => {
                     if (event.key === 'Escape') {
+                        closeDrawer();
+                    }
+                });
+
+                // Handle close message from iframe (embedded chat close button)
+                window.addEventListener('message', (event) => {
+                    if (event.data === 'close-chat-drawer') {
                         closeDrawer();
                     }
                 });
