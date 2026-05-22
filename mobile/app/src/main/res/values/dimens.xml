@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="page_margin">20dp</dimen>
-    <dimen name="card_radius">22dp</dimen>
-    <dimen name="control_radius">16dp</dimen>
-    <dimen name="stack_sm">8dp</dimen>
-    <dimen name="stack_md">16dp</dimen>
-    <dimen name="stack_lg">24dp</dimen>
-</resources>
