@@ -33,11 +33,24 @@ def _query_is_patient_specific(text: str) -> bool:
 def _build_context_block(session, selected_patient, previous_summaries):
     patient_block = "No patient selected."
     if selected_patient:
+        diseases = selected_patient.disease_entries.all()
+        medications = selected_patient.medication_entries.all()
+        sensitivities = selected_patient.sensitivity_entries.all()
+
+        disease_list = "\n".join([f"- {d.name} (Notes: {d.notes or 'None'}, Source: {d.get_source_display()})" for d in diseases]) or "None"
+        med_list = "\n".join([f"- {m.name} {m.dosage} (Instructions: {m.instructions or 'None'}, Notes: {m.notes or 'None'}, Source: {m.get_source_display()})" for m in medications]) or "None"
+        sens_list = "\n".join([f"- {s.name} ({s.get_kind_display()}, Severity: {s.severity or 'Not specified'}, Notes: {s.notes or 'None'}, Source: {s.get_source_display()})" for s in sensitivities]) or "None"
+
         patient_block = (
-            f"Patient: {selected_patient.name}\n"
-            f"Summary: {selected_patient.ai_summary or 'No summary yet'}\n"
-            f"Allergies: {selected_patient.allergies}\n"
-            f"Disease history: {', '.join(selected_patient.history_diseases)}\n"
+            f"Patient Name: {selected_patient.name}\n"
+            f"Age: {selected_patient.age}\n"
+            f"Gender: {selected_patient.get_gender_display()}\n"
+            f"Current Scenario: {selected_patient.current_scenario_description or 'None'}\n"
+            f"Doctor Guidelines: {selected_patient.doctor_guidelines or 'None'}\n"
+            f"Current AI Summary: {selected_patient.ai_summary or 'No summary yet'}\n"
+            f"Diseases:\n{disease_list}\n"
+            f"Active Medications:\n{med_list}\n"
+            f"Sensitivities & Allergies:\n{sens_list}\n"
         )
 
     prev_summary_block = "\n".join([f"- {s}" for s in previous_summaries]) or "No previous summaries."
@@ -53,6 +66,8 @@ def _build_context_block(session, selected_patient, previous_summaries):
         "- If user asks to create/update/delete task/routine/schedule, include one action proposal in this exact tag format:\n"
         "<ACTION_JSON>{...valid json...}</ACTION_JSON>\n"
         "- Action JSON schema keys: operation(create|update|delete), item_type(task|routine|schedule), title, description, notes, status, priority, due_at, recurrence_mode, recurrence_weekdays, recurrence_dates, reminder_enabled, reminder_minutes_before, item_id(optional).\n"
+        "- If user asks you to generate, write, update, or rewrite the patient summary, include an action proposal in this format:\n"
+        "<ACTION_JSON>{\"operation\": \"update\", \"item_type\": \"summary\", \"title\": \"Update Patient Summary\", \"summary_text\": \"...detailed, practical patient summary...\"}</ACTION_JSON>\n"
         "- Do not execute actions yourself; only propose.\n\n"
         f"CURRENT SESSION SOURCE: {session.source}\n"
         f"PATIENT CONTEXT:\n{patient_block}\n"
@@ -116,6 +131,12 @@ def generate_session_summary(session, selected_patient):
 def apply_action_proposal(patient, action_payload):
     operation = (action_payload.get("operation") or "create").lower()
     item_type = action_payload.get("item_type") or CareItem.ItemType.TASK
+
+    if item_type == "summary":
+        summary_text = action_payload.get("summary_text") or action_payload.get("description") or action_payload.get("notes") or ""
+        patient.ai_summary = summary_text.strip()
+        patient.save(update_fields=["ai_summary", "updated_at"])
+        return "update"
 
     if operation == "delete":
         item_id = action_payload.get("item_id")

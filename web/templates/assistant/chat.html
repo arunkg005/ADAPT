@@ -46,9 +46,16 @@
     <h3 style="margin-top:0;">Session #{{ current_session.id }}</h3>
     <div style="max-height:380px; overflow:auto; border:1px solid var(--border); border-radius:10px; padding:10px;">
         {% for m in messages_list %}
-            <div class="panel" style="margin-bottom:8px; background:{% if m.role == 'assistant' %}var(--accent){% else %}var(--panel){% endif %};">
-                <strong>{{ m.get_role_display }}:</strong>
-                <div style="white-space: pre-wrap; margin-top:6px;">{{ m.content }}</div>
+            <div class="panel" style="margin-bottom:8px; background:{% if m.role == 'assistant' %}color-mix(in srgb, var(--primary) 8%, transparent){% else %}var(--surface-strong){% endif %}; padding: 12px 16px; border-radius: 14px; box-shadow: none; border: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                    <strong style="color: var(--primary);">{{ m.get_role_display }}</strong>
+                    {% if m.role == 'assistant' %}
+                        <button type="button" class="tts-speak-btn" data-message-id="{{ m.id }}" style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border-radius: 50%; background: var(--surface-strong); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s ease; color: var(--ink);" title="Read reply aloud">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">volume_up</span>
+                        </button>
+                    {% endif %}
+                </div>
+                <div id="msg-content-{{ m.id }}" style="white-space: pre-wrap; margin-top:6px; font-size: 0.95rem; line-height: 1.5; color: var(--ink);">{{ m.content }}</div>
             </div>
         {% empty %}
             <p>No messages in this session yet.</p>
@@ -60,10 +67,14 @@
 <div class="panel">
     <h3 style="margin-top:0;">AI Action Proposals (Needs Permission)</h3>
     {% for p in proposals %}
-        <div class="metric" style="margin-bottom:10px;">
-            <p style="margin:0;"><strong>{{ p.item_type|title }}</strong> - {{ p.operation|title }} - {{ p.title }}</p>
-            <pre style="white-space: pre-wrap; margin:8px 0;">{{ p.payload }}</pre>
-            <form method="post" class="row-actions">
+        <div class="metric" style="margin-bottom:10px; padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-strong);">
+            <p style="margin:0; font-size: 0.95rem;"><strong>{{ p.item_type|title }}</strong> - {{ p.operation|title }} - {{ p.title }}</p>
+            {% if p.item_type == 'summary' %}
+                <div style="white-space: pre-wrap; margin:12px 0; padding:14px; background:var(--field-bg); border-left:4px solid var(--accent); border-radius:8px; font-size:0.92rem; line-height:1.5; color: var(--ink);">{{ p.payload.summary_text }}</div>
+            {% else %}
+                <pre style="white-space: pre-wrap; margin:8px 0; background: var(--field-bg); padding: 10px; border-radius: 8px; font-size: 0.85rem; color: var(--ink);">{{ p.payload }}</pre>
+            {% endif %}
+            <form method="post" class="row-actions" style="margin-top: 10px;">
                 {% csrf_token %}
                 <input type="hidden" name="proposal_id" value="{{ p.id }}">
                 <button class="btn primary" type="submit" name="action" value="approve_action">Approve and Apply</button>
@@ -88,8 +99,12 @@
         <input type="hidden" name="selected_patient" value="{% if selected_patient %}{{ selected_patient.id }}{% endif %}">
         <label for="message">Ask Assistant</label>
         <textarea id="message" name="message" rows="5" placeholder="Ask anything or ask AI to create/manage task/routine/schedule..."></textarea>
-        <div class="row-actions" style="margin-top:12px;">
+        <div class="row-actions" style="margin-top:12px; display: flex; align-items: center; gap: 10px;">
             <button class="btn primary" type="submit" name="action" value="send">Send</button>
+            <button type="button" id="voice-dictate-btn" class="btn" style="display: none; align-items: center; justify-content: center; gap: 6px; padding: 0 16px; height: 42px; border-radius: 21px; background: var(--field-bg); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s ease; font-weight: 600; color: var(--ink);" title="Start Voice Dictation">
+                <span class="material-symbols-outlined" style="font-size: 20px;">mic</span>
+                <span id="voice-dictate-label">Voice Dictate</span>
+            </button>
         </div>
     </form>
 </div>
@@ -98,13 +113,47 @@
 <div class="panel">
     <h3 style="margin-top:0;">Previous Session Summaries Used as Context</h3>
     {% for s in previous_summaries %}
-        <div class="metric" style="white-space: pre-wrap; margin-bottom:10px;">{{ s }}</div>
+        <div class="metric" style="white-space: pre-wrap; margin-bottom:10px; padding: 12px; background: var(--field-bg); border-radius: 10px; font-size: 0.9rem; line-height: 1.4; color: var(--ink);">{{ s }}</div>
     {% endfor %}
 </div>
 {% endif %}
 {% endblock %}
 
 {% block scripts %}
+<style>
+    @keyframes mic-pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4);
+            background-color: color-mix(in srgb, var(--success) 10%, transparent);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(22, 163, 74, 0);
+            background-color: color-mix(in srgb, var(--success) 25%, transparent);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+            background-color: color-mix(in srgb, var(--success) 10%, transparent);
+        }
+    }
+    .mic-listening {
+        animation: mic-pulse 1.5s infinite !important;
+        color: var(--success) !important;
+        border-color: var(--success) !important;
+        background: color-mix(in srgb, var(--success) 15%, transparent) !important;
+    }
+    
+    .tts-playing {
+        color: var(--accent) !important;
+        background-color: color-mix(in srgb, var(--accent) 15%, transparent) !important;
+        border-color: var(--accent) !important;
+        animation: tts-pulse 1.5s infinite;
+    }
+    
+    @keyframes tts-pulse {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; }
+    }
+</style>
 <script>
     window.addEventListener('beforeunload', function () {
         const sessionId = "{% if current_session %}{{ current_session.id }}{% endif %}";
@@ -116,5 +165,130 @@
         data.append('session', sessionId);
         navigator.sendBeacon('{% url "assistant:close_session" %}', data);
     });
+
+    // --- Voice Dictation (Speech-to-Text) ---
+    const voiceBtn = document.getElementById('voice-dictate-btn');
+    const voiceLabel = document.getElementById('voice-dictate-label');
+    const messageInput = document.getElementById('message');
+
+    if (voiceBtn && messageInput) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            voiceBtn.style.display = 'inline-flex'; // Only show if browser supports STT
+            
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            let isListening = false;
+
+            recognition.onstart = function() {
+                isListening = true;
+                voiceBtn.classList.add('mic-listening');
+                voiceBtn.querySelector('.material-symbols-outlined').textContent = 'mic_active';
+                voiceLabel.textContent = 'Listening...';
+                messageInput.placeholder = 'Listening... Speak clearly into your mic.';
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error', event.error);
+                stopRecognition();
+                if (event.error === 'not-allowed') {
+                    alert('Microphone access was denied. Please enable microphone permissions in your browser settings.');
+                }
+            };
+
+            recognition.onend = function() {
+                stopRecognition();
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                if (transcript) {
+                    const currentVal = messageInput.value.trim();
+                    messageInput.value = currentVal ? currentVal + ' ' + transcript : transcript;
+                    messageInput.focus();
+                }
+            };
+
+            function stopRecognition() {
+                isListening = false;
+                voiceBtn.classList.remove('mic-listening');
+                voiceBtn.querySelector('.material-symbols-outlined').textContent = 'mic';
+                voiceLabel.textContent = 'Voice Dictate';
+                messageInput.placeholder = 'Ask anything or ask AI to create/manage task/routine/schedule...';
+            }
+
+            voiceBtn.addEventListener('click', function() {
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            });
+        }
+    }
+
+    // --- Voice Read-Aloud (Text-to-Speech) ---
+    const ttsButtons = document.querySelectorAll('.tts-speak-btn');
+    let currentUtterance = null;
+    let activeTtsBtn = null;
+
+    if (ttsButtons.length > 0 && window.speechSynthesis) {
+        ttsButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const messageId = this.getAttribute('data-message-id');
+                const contentDiv = document.getElementById(`msg-content-${messageId}`);
+                if (!contentDiv) return;
+
+                let textToSpeak = contentDiv.innerText || contentDiv.textContent;
+                
+                // If it is already speaking this specific message, stop it
+                if (window.speechSynthesis.speaking && activeTtsBtn === this) {
+                    window.speechSynthesis.cancel();
+                    resetActiveTts();
+                    return;
+                }
+
+                // If speaking something else, cancel it first
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                    resetActiveTts();
+                }
+
+                // Setup utterance
+                currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
+                activeTtsBtn = this;
+                
+                this.classList.add('tts-playing');
+                this.querySelector('.material-symbols-outlined').textContent = 'stop';
+
+                currentUtterance.onend = function() {
+                    resetActiveTts();
+                };
+
+                currentUtterance.onerror = function() {
+                    resetActiveTts();
+                };
+
+                window.speechSynthesis.speak(currentUtterance);
+            });
+        });
+
+        function resetActiveTts() {
+            if (activeTtsBtn) {
+                activeTtsBtn.classList.remove('tts-playing');
+                activeTtsBtn.querySelector('.material-symbols-outlined').textContent = 'volume_up';
+                activeTtsBtn = null;
+            }
+            currentUtterance = null;
+        }
+
+        // Stop speaking if user leaves
+        window.addEventListener('beforeunload', function() {
+            window.speechSynthesis.cancel();
+        });
+    }
 </script>
 {% endblock %}
