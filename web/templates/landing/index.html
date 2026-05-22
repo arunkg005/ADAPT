@@ -4,63 +4,108 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ADAPT Care Platform</title>
+  <title>ADAPT Care Platform | Caregiver Workspace</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
   <style>
+    :root {
+      --background: hsl(210 40% 98%);
+      --foreground: hsl(220 50% 12%);
+      --primary: hsl(220 50% 12%);
+      --primary-soft: hsl(222 35% 20%);
+      --primary-foreground: hsl(210 40% 98%);
+      --accent: hsl(22 95% 55%);
+      --accent-soft: hsl(22 95% 94%);
+      --success: hsl(150 60% 35%);
+      --success-soft: hsl(150 60% 94%);
+      --destructive: hsl(0 72% 50%);
+      --destructive-soft: hsl(0 72% 94%);
+      --border: hsl(214 25% 90%);
+      --card-bg: rgba(255, 255, 255, 0.72);
+      --gradient-hero: linear-gradient(135deg, hsl(32 100% 97%) 0%, hsl(218 50% 95%) 50%, hsl(210 40% 98%) 100%);
+      --gradient-primary: linear-gradient(135deg, hsl(220 50% 12%) 0%, hsl(222 35% 20%) 100%);
+      --shadow: 0 12px 34px rgba(15, 23, 42, 0.05);
+      --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+      --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      --background: #f5f7fa;
-      --foreground: #1a2233;
-      --primary: #1a2233;
-      --primary-foreground: #f8fafc;
-      --accent: #ff9f43;
-      --success: #22c55e;
-      --muted: #e5e7eb;
-      --card: #fff;
-      --border: #e5e7eb;
-      --gradient-hero: linear-gradient(135deg, #fff7ed 0%, #e3eafc 50%, #f5f7fa 100%);
-      --gradient-primary: linear-gradient(135deg, #1a2233 0%, #2c3654 100%);
-      font-family: 'Inter', Arial, sans-serif;
+      font-family: var(--font-body);
       background: var(--background);
       color: var(--foreground);
       margin: 0;
       padding: 0;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
     }
 
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 1.5rem;
+      position: relative;
     }
 
+    /* Glassmorphism Cards */
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: var(--shadow);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+      border-color: rgba(255, 255, 255, 0.85);
+    }
+
+    /* Gradients & Backgrounds */
     .gradient-hero-bg {
       background: var(--gradient-hero);
+      position: relative;
     }
 
     .hero-section {
-      min-height: 85vh;
+      min-height: 90vh;
       display: flex;
       align-items: center;
       position: relative;
       overflow: hidden;
+      padding: 4rem 0;
     }
 
     .hero-bg-accent {
       position: absolute;
-      top: 80px; right: 40px;
-      width: 18rem; height: 18rem;
+      top: 10%; right: -5%;
+      width: 24rem; height: 24rem;
       border-radius: 50%;
-      background: rgba(255, 159, 67, 0.1);
-      filter: blur(48px);
+      background: hsla(22, 95%, 55%, 0.08);
+      filter: blur(64px);
+      pointer-events: none;
       z-index: 0;
     }
 
     .hero-bg-primary {
       position: absolute;
-      bottom: 40px; left: 40px;
-      width: 24rem; height: 24rem;
+      bottom: 5%; left: -5%;
+      width: 32rem; height: 32rem;
       border-radius: 50%;
-      background: rgba(26, 34, 51, 0.05);
-      filter: blur(48px);
+      background: hsla(220, 50%, 12%, 0.05);
+      filter: blur(64px);
+      pointer-events: none;
       z-index: 0;
     }
 
@@ -75,27 +120,29 @@
 
     @media (min-width: 1024px) {
       .hero-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1.1fr 0.9fr;
       }
     }
 
     .hero-content {
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1.5rem;
     }
 
     .hero-badge {
+      align-self: flex-start;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
       padding: 0.5rem 1rem;
       border-radius: 9999px;
-      background: rgba(255, 159, 67, 0.1);
+      background: var(--accent-soft);
       border: 1px solid rgba(255, 159, 67, 0.2);
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
-      font-size: 0.95rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
       color: var(--accent);
     }
 
@@ -107,16 +154,23 @@
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.6; }
     }
 
     .hero-title {
-      font-size: 2.5rem;
-      font-weight: bold;
-      font-family: 'Space Grotesk', Arial, sans-serif;
-      line-height: 1.1;
+      font-size: 2.8rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+      line-height: 1.15;
       margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    @media (min-width: 768px) {
+      .hero-title {
+        font-size: 3.6rem;
+      }
     }
 
     .text-gradient-primary {
@@ -128,66 +182,815 @@
 
     .hero-desc {
       font-size: 1.15rem;
-      color: #6b7280;
+      color: hsl(215 15% 40%);
       max-width: 32rem;
       line-height: 1.6;
+      margin: 0;
     }
 
     .hero-actions {
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
+      margin-top: 0.5rem;
     }
 
+    /* Buttons */
     .btn {
-      display: inline-block;
-      padding: 0.75rem 2rem;
-      border-radius: 0.75rem;
-      font-size: 1.1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      border-radius: 0.85rem;
+      font-size: 1rem;
       font-weight: 600;
-      border: none;
+      border: 1px solid var(--border);
       cursor: pointer;
       text-decoration: none;
-      transition: 0.2s;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .btn-hero {
+    .btn-primary {
       background: var(--gradient-primary);
       color: var(--primary-foreground);
+      border-color: transparent;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
     }
 
-    .btn-hero:hover {
-      opacity: 0.9;
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--foreground);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(15, 23, 42, 0.04);
+      border-color: var(--foreground);
     }
 
     .hero-chips {
       display: flex;
       gap: 0.75rem;
       flex-wrap: wrap;
-      padding-top: 0.5rem;
+      padding-top: 1rem;
     }
 
     .chip {
       padding: 0.5rem 1.25rem;
       border-radius: 9999px;
       border: 1px solid var(--border);
-      background: rgba(255,255,255,0.6);
-      color: #6b7280;
-      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.6);
+      color: hsl(215 15% 45%);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    /* Hero Right Widgets */
+    .hero-widgets-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .widget-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .widget-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 0.5rem;
+    }
+
+    .widget-title {
+      font-size: 1.15rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      margin: 0 0 1rem;
+    }
+
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .step-number {
+      width: 1.75rem; height: 1.75rem;
+      border-radius: 6px;
+      background: var(--gradient-primary);
+      color: var(--primary-foreground);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .step-text {
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    /* Live Context Widget */
+    .progress-bar-shell {
+      margin-bottom: 0.75rem;
+    }
+
+    .progress-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: hsl(215 15% 45%);
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+
+    .progress-bar-track {
+      height: 0.5rem;
+      border-radius: 999px;
+      background: hsl(214 25% 90%);
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--gradient-primary);
+      transition: width 1s ease-out;
+    }
+
+    .progress-bar-fill.accent {
+      background: var(--accent);
+    }
+
+    .center-align {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .widget-shield-icon {
+      width: 3rem; height: 3rem;
+      border-radius: 0.75rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .widget-shield-icon .material-symbols-outlined {
+      font-size: 1.75rem;
+    }
+
+    .shield-heading {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .shield-sub {
+      font-size: 0.75rem;
+      color: hsl(215 15% 45%);
+      margin: 0.25rem 0 0;
+    }
+
+    /* Core Sections */
+    .section-spacing {
+      padding: 6rem 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .section-eyebrow {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0;
+    }
+
+    .section-title {
+      font-size: 2.25rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+
+    .section-desc {
+      font-size: 1.1rem;
+      color: hsl(215 15% 45%);
+      max-width: 36rem;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      height: 100%;
+    }
+
+    .feature-icon-wrapper {
+      width: 3.25rem; height: 3.25rem;
+      border-radius: 12px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon-wrapper {
+      background: rgba(255, 159, 67, 0.2);
+    }
+
+    .feature-card-title {
+      font-size: 1.25rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .feature-card-desc {
+      font-size: 0.95rem;
+      color: hsl(215 15% 45%);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Problem / Approach Section */
+    .bg-white-gradient {
+      background: linear-gradient(180deg, hsl(210 40% 98%) 0%, #ffffff 50%, hsl(210 40% 98%) 100%);
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+      .comparison-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .comparison-card {
+      padding: 2.25rem;
+    }
+
+    .comparison-card.border-accent {
+      border-color: rgba(255, 159, 67, 0.3);
+    }
+
+    .comparison-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .comparison-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .comp-icon {
+      width: 1.75rem; height: 1.75rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.12rem;
+    }
+
+    .comp-icon.err {
+      background: var(--destructive-soft);
+      color: var(--destructive);
+    }
+
+    .comp-icon.ok {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .comp-item-text {
+      font-size: 0.98rem;
+      color: hsl(215 15% 40%);
+      line-height: 1.6;
+    }
+
+    /* Interactive Infographics & Dashboard Mockup */
+    .mockup-wrapper {
+      margin-top: 2rem;
+    }
+
+    .mockup-window {
+      background: hsl(220 30% 96%);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      aspect-ratio: 16/10;
+      max-height: 620px;
+      width: 100%;
+    }
+
+    .mockup-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .mockup-dots {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .mockup-dot {
+      width: 0.65rem; height: 0.65rem;
+      border-radius: 50%;
+      background: hsl(214 25% 85%);
+    }
+
+    .mockup-dot.red { background: hsl(0, 72%, 60%); }
+    .mockup-dot.yellow { background: hsl(40, 95%, 60%); }
+    .mockup-dot.green { background: hsl(150, 60%, 55%); }
+
+    .mockup-address {
+      background: hsl(214 25% 94%);
+      border-radius: 8px;
+      font-size: 0.75rem;
+      color: hsl(215 15% 45%);
+      padding: 0.35rem 3rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
+
+    .mockup-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 200px minmax(0, 1fr);
+      min-height: 0;
+      background: hsl(210 40% 98%);
+    }
+
+    @media (max-width: 640px) {
+      .mockup-body {
+        grid-template-columns: 60px minmax(0, 1fr);
+      }
+      .mockup-sidebar span {
+        display: none;
+      }
+      .mockup-sidebar .material-symbols-outlined {
+        font-size: 1.5rem !important;
+        margin: 0 auto;
+      }
+    }
+
+    .mockup-sidebar {
+      background: #ffffff;
+      border-right: 1px solid var(--border);
+      padding: 1rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      overflow-y: auto;
+    }
+
+    .mockup-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0.85rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: hsl(215 15% 40%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .mockup-nav-item .material-symbols-outlined {
+      font-size: 1.2rem;
+      color: hsl(215 15% 50%);
+    }
+
+    .mockup-nav-item:hover {
+      background: hsl(214 25% 96%);
+      color: var(--foreground);
+    }
+
+    .mockup-nav-item.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .mockup-nav-item.active .material-symbols-outlined {
+      color: var(--accent);
+    }
+
+    .mockup-content {
+      padding: 1.5rem;
+      overflow-y: auto;
+      height: 100%;
+      position: relative;
+    }
+
+    .mockup-pane {
+      display: none;
+      flex-direction: column;
+      gap: 1.25rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .mockup-pane.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pane-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+    }
+
+    .pane-title {
+      font-size: 1.1rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      margin: 0;
+    }
+
+    /* Miniature UI Elements inside Mockup */
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .mini-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.85rem;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.02);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .mini-card strong {
+      font-size: 0.88rem;
+    }
+
+    .mini-card span {
+      font-size: 0.75rem;
+      color: hsl(215 15% 45%);
+    }
+
+    .mini-pill {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 99px;
+      background: hsl(214 25% 90%);
+      color: hsl(215 15% 45%);
+      align-self: flex-start;
+    }
+
+    .mini-pill.active {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .mini-table th, .mini-table td {
+      padding: 0.65rem 0.85rem;
+      font-size: 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mini-table th {
+      background: hsl(214 25% 96%);
+      font-weight: 600;
+      color: hsl(215 15% 45%);
+    }
+
+    .mini-btn {
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .mini-btn.primary {
+      background: var(--gradient-primary);
+      color: var(--primary-foreground);
+      border: none;
+    }
+
+    /* Mock AI Chat Panel */
+    .mini-chat-window {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      height: 280px;
+    }
+
+    .mini-chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .mini-msg {
+      max-width: 80%;
+      padding: 0.65rem 0.85rem;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      line-height: 1.4;
+    }
+
+    .mini-msg.ai {
+      background: hsl(214 25% 94%);
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+
+    .mini-msg.user {
+      background: var(--accent-soft);
+      color: var(--foreground);
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+
+    .mini-chat-input-box {
+      border-top: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .mini-chat-prompts {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem 0;
+      flex-wrap: wrap;
+    }
+
+    .mini-chat-prompt-pill {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(255,159,67,0.2);
+      border-radius: 99px;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mini-chat-prompt-pill:hover {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    /* Infographic Flow */
+    .infographic-container {
+      margin-top: 4rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .infographic-title {
+      font-size: 1.25rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: var(--primary-soft);
+    }
+
+    .flow-line {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      width: 100%;
+      position: relative;
+    }
+
+    @media (min-width: 1024px) {
+      .flow-line {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .flow-line::after {
+        content: "";
+        position: absolute;
+        top: 2rem;
+        left: 10%;
+        right: 10%;
+        height: 2px;
+        background: dashed var(--border);
+        z-index: 0;
+      }
+    }
+
+    .flow-node {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      position: relative;
+      z-index: 1;
+      transition: all 0.3s;
+      cursor: default;
+    }
+
+    .flow-node:hover {
+      border-color: var(--accent);
+      box-shadow: 0 10px 25px rgba(255, 159, 67, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .flow-node-icon {
+      width: 3.5rem; height: 3.5rem;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flow-node-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .flow-node-desc {
+      font-size: 0.78rem;
+      color: hsl(215 15% 45%);
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    /* About Section styling */
+    .bg-dark-accent {
+      background: var(--gradient-primary);
+      color: var(--primary-foreground);
+    }
+
+    .bg-dark-accent .section-title {
+      color: var(--primary-foreground);
+    }
+
+    .bg-dark-accent .section-desc {
+      color: hsl(214 25% 80%);
+    }
+
+    .about-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .about-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .about-card-title {
+      font-size: 1.25rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .about-card-desc {
+      font-size: 0.95rem;
+      color: hsl(214 25% 80%);
+      line-height: 1.6;
+      margin: 0;
     }
 
     .footer {
       padding: 3rem 0;
       text-align: center;
-      background: var(--primary);
+      background: hsl(220 50% 8%);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
       color: var(--primary-foreground);
     }
 
+    .footer-title {
+      font-size: 1.15rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+
+    .footer-desc {
+      font-size: 0.88rem;
+      color: hsl(214 25% 70%);
+      margin: 0;
+    }
   </style>
 </head>
 
 <body>
 
+  <!-- HERO SECTION -->
   <section class="hero-section gradient-hero-bg">
     <div class="hero-bg-accent"></div>
     <div class="hero-bg-primary"></div>
@@ -195,7 +998,7 @@
     <div class="container">
       <div class="hero-grid">
 
-        <!-- LEFT CONTENT -->
+        <!-- LEFT COLUMN: VALUE PROP -->
         <div class="hero-content">
           <div class="hero-badge">
             <span class="badge-dot"></span>
@@ -208,20 +1011,21 @@
           </h1>
 
           <p class="hero-desc">
-            ADAPT connects the caregiver web console and Android assist experience,
-            so routines, reminders, and outcomes stay in one coordinated loop.
+            ADAPT provides a unified, responsive caregiver workspace that manages routines, schedules, and patient tracking in one coordinated loop on any device.
           </p>
 
           <div class="hero-actions">
             {% if request.user.is_authenticated %}
-            <a href="{% url 'dashboard:home' %}" class="btn btn-hero">
+            <a href="{% url 'dashboard:home' %}" class="btn btn-primary">
               Go to Dashboard
+              <span class="material-symbols-outlined" style="font-size: 1.1rem;">arrow_forward</span>
             </a>
             {% else %}
-            <a href="{% url 'login' %}" class="btn btn-hero">
+            <a href="{% url 'login' %}" class="btn btn-primary">
               Log In
+              <span class="material-symbols-outlined" style="font-size: 1.1rem;">arrow_forward</span>
             </a>
-            <a href="{% url 'register' %}" class="btn" style="border: 1px solid var(--border); color: var(--foreground); background: transparent;">
+            <a href="{% url 'register' %}" class="btn btn-secondary">
               Sign Up
             </a>
             {% endif %}
@@ -229,22 +1033,488 @@
 
           <div class="hero-chips">
             <span class="chip">Caregiver-first operations</span>
-            <span class="chip">Android assist integration</span>
+            <span class="chip">Cross-device consistency</span>
             <span class="chip">Handover continuity</span>
           </div>
         </div>
 
-        <!-- RIGHT SIDE (kept minimal for clarity, your UI preserved above) -->
-        <div></div>
+        <!-- RIGHT COLUMN: HERO WIDGETS -->
+        <div class="hero-widgets-container">
+          <div class="glass-card">
+            <p class="widget-eyebrow">How it runs</p>
+            <h3 class="widget-title">Plan, Track, Review</h3>
+            <div class="flow-steps">
+              <div class="flow-step">
+                <span class="step-number">1</span>
+                <span class="step-text">Care routines planned in the Task Lab</span>
+              </div>
+              <div class="flow-step">
+                <span class="step-number">2</span>
+                <span class="step-text">Interactive schedules active for patients</span>
+              </div>
+              <div class="flow-step">
+                <span class="step-number">3</span>
+                <span class="step-text">Clinical outcomes synced back instantly</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="widget-row">
+            <div class="glass-card">
+              <p class="widget-eyebrow">Live Context</p>
+              <h3 class="widget-title" style="margin-bottom: 0.75rem;">Today's status</h3>
+              
+              <div class="progress-bar-shell">
+                <div class="progress-bar-label">
+                  <span>Completed tasks</span>
+                  <span>75%</span>
+                </div>
+                <div class="progress-bar-track">
+                  <div class="progress-bar-fill" style="width: 75%;"></div>
+                </div>
+              </div>
+
+              <div class="progress-bar-shell" style="margin-bottom: 0;">
+                <div class="progress-bar-label">
+                  <span>AI updates synced</span>
+                  <span>50%</span>
+                </div>
+                <div class="progress-bar-track">
+                  <div class="progress-bar-fill accent" style="width: 50%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card center-align">
+              <div class="widget-shield-icon">
+                <span class="material-symbols-outlined">shield</span>
+              </div>
+              <p class="shield-heading">HIPAA Ready</p>
+              <p class="shield-sub">Role-based security</p>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>
   </section>
 
+  <!-- CAPABILITIES / FEATURES SECTION -->
+  <section class="section-spacing bg-white-gradient" id="features">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Platform Capabilities</p>
+        <h2 class="section-title">Everything caregivers need, unified</h2>
+        <p class="section-desc">From planning schedules to reviewing patient analytics—one responsive platform optimized for seamless care delivery.</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Task Lab -->
+        <div class="glass-card feature-card">
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">assignment</span>
+          </div>
+          <h3 class="feature-card-title">Task Lab</h3>
+          <p class="feature-card-desc">Create and publish clinical care routines from verified templates or custom-tailored schedules. Assign, activate, and manage care items instantly.</p>
+        </div>
+
+        <!-- Alert Management -->
+        <div class="glass-card feature-card">
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">warning</span>
+          </div>
+          <h3 class="feature-card-title">Alert Management</h3>
+          <p class="feature-card-desc">Stay ahead of patient escalations with real-time status updates, overdue notifications, and complete audit tracking indicators on critical care tasks.</p>
+        </div>
+
+        <!-- Analysis Dashboard -->
+        <div class="glass-card feature-card">
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">bar_chart</span>
+          </div>
+          <h3 class="feature-card-title">Analysis Dashboard</h3>
+          <p class="feature-card-desc">Review critical patient metrics, telemetry reports, and compliance trends in fully configurable time windows to make informed treatment decisions.</p>
+        </div>
+
+        <!-- Gemini AI Assistant -->
+        <div class="glass-card feature-card">
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">insights</span>
+          </div>
+          <h3 class="feature-card-title">AI Assistant</h3>
+          <p class="feature-card-desc">Leverage context-aware chat assistance. Ask questions regarding patient history, generate clinical summaries, and propose care modifications on the fly.</p>
+        </div>
+
+        <!-- Responsive Operations -->
+        <div class="glass-card feature-card">
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">devices</span>
+          </div>
+          <h3 class="feature-card-title">Responsive Design</h3>
+          <p class="feature-card-desc">Access the workspace on any screen size. Smoothly transition from desktop administration to on-the-go mobile client monitoring with the exact same codebase.</p>
+        </div>
+
+        <!-- Handover Continuity -->
+        <div class="glass-card feature-card">
+          <div class="feature-icon-wrapper">
+            <span class="material-symbols-outlined">sync</span>
+          </div>
+          <h3 class="feature-card-title">Handover Continuity</h3>
+          <p class="feature-card-desc">Bridge shift transitions smoothly. View past caregiver notes, scheduled task histories, and AI analyses to maintain uninterrupted patient care quality.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM / APPROACH SECTION -->
+  <section class="section-spacing" id="comparison">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">The Challenge & The Solution</p>
+        <h2 class="section-title">Coordinated Care Operations</h2>
+        <p class="section-desc">How ADAPT bridges care coordination gaps to prevent errors and reduce caregiver cognitive load.</p>
+      </div>
+
+      <div class="comparison-grid">
+        <!-- Problem Card -->
+        <div class="glass-card comparison-card border-accent" style="border-left: 4px solid var(--destructive);">
+          <h3 class="widget-title" style="color: var(--destructive); display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined">cancel</span>
+            Problems in traditional tracking
+          </h3>
+          <ul class="comparison-list">
+            <li class="comparison-item">
+              <div class="comp-icon err">✕</div>
+              <span class="comp-item-text">Care guidelines get split across paper charts, messaging apps, and separate note tools.</span>
+            </li>
+            <li class="comparison-item">
+              <div class="comp-icon err">✕</div>
+              <span class="comp-item-text">Patient task progress is hard to audit or cross-reference during caregiver handover windows.</span>
+            </li>
+            <li class="comparison-item">
+              <div class="comp-icon err">✕</div>
+              <span class="comp-item-text">Missed clinical guidelines or medications are often discovered only after a critical incident occurs.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Our Approach Card -->
+        <div class="glass-card comparison-card" style="border-left: 4px solid var(--success);">
+          <h3 class="widget-title" style="color: var(--success); display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined">check_circle</span>
+            The ADAPT Approach
+          </h3>
+          <ul class="comparison-list">
+            <li class="comparison-item">
+              <div class="comp-icon ok">✓</div>
+              <span class="comp-item-text">Create, assign, and customize care routines from a single, centralized web workspace.</span>
+            </li>
+            <li class="comparison-item">
+              <div class="comp-icon ok">✓</div>
+              <span class="comp-item-text">Optimize delivery with a responsive design, rendering patient schedules beautifully on smartphones.</span>
+            </li>
+            <li class="comparison-item">
+              <div class="comp-icon ok">✓</div>
+              <span class="comp-item-text">Feed outcomes directly into unified charts and automatic AI summaries for prompt care decisions.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE INFOGRAPHICS & DYNAMIC WEB PREVIEW -->
+  <section class="section-spacing bg-white-gradient" id="interactive-showcase">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Interactive Preview</p>
+        <h2 class="section-title">Experience the caretaker dashboard</h2>
+        <p class="section-desc">Click through the sidebar tabs in the responsive mock interface below to see how ADAPT displays patient tracking details in real time.</p>
+      </div>
+
+      <!-- INTERACTIVE DASHBOARD WRAPPER -->
+      <div class="mockup-wrapper">
+        <div class="mockup-window">
+          <!-- Mockup Header -->
+          <div class="mockup-header">
+            <div class="mockup-dots">
+              <span class="mockup-dot red"></span>
+              <span class="mockup-dot yellow"></span>
+              <span class="mockup-dot green"></span>
+            </div>
+            <div class="mockup-address">https://adapt-platform.org/workspace/</div>
+            <div style="width: 2rem;"></div> <!-- Spacing alignment -->
+          </div>
+
+          <!-- Mockup body -->
+          <div class="mockup-body">
+            <!-- Sidebar -->
+            <div class="mockup-sidebar">
+              <button class="mockup-nav-item active" id="tab-patients-btn" onclick="switchMockTab('patients')">
+                <span class="material-symbols-outlined">groups</span>
+                <span>Patient List</span>
+              </button>
+              <button class="mockup-nav-item" id="tab-tasks-btn" onclick="switchMockTab('tasks')">
+                <span class="material-symbols-outlined">assignment</span>
+                <span>Task Lab</span>
+              </button>
+              <button class="mockup-nav-item" id="tab-routines-btn" onclick="switchMockTab('routines')">
+                <span class="material-symbols-outlined">wb_sunny</span>
+                <span>Routines</span>
+              </button>
+              <button class="mockup-nav-item" id="tab-ai-btn" onclick="switchMockTab('ai')">
+                <span class="material-symbols-outlined">insights</span>
+                <span>Gemini AI</span>
+              </button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="mockup-content">
+              
+              <!-- Tab 1: Patient List -->
+              <div class="mockup-pane active" id="pane-patients">
+                <div class="pane-header">
+                  <h4 class="pane-title">Active Patients</h4>
+                  <span class="mini-pill active">4 Profiles Active</span>
+                </div>
+                <div class="mini-grid">
+                  <div class="mini-card" style="border-left: 3px solid var(--accent);">
+                    <strong>Liam Ross</strong>
+                    <span>Age 68 • Diabetes M.</span>
+                    <span class="mini-pill active" style="margin-top: 0.25rem;">2 Due Today</span>
+                  </div>
+                  <div class="mini-card" style="border-left: 3px solid var(--success);">
+                    <strong>Sarah Jenkins</strong>
+                    <span>Age 72 • Hypertension</span>
+                    <span class="mini-pill" style="margin-top: 0.25rem;">0 Pending</span>
+                  </div>
+                  <div class="mini-card" style="border-left: 3px solid var(--destructive);">
+                    <strong>Aria Thorne</strong>
+                    <span>Age 64 • Post-Op Recovery</span>
+                    <span class="mini-pill" style="background: var(--destructive-soft); color: var(--destructive); margin-top: 0.25rem;">1 Overdue</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 2: Task Lab -->
+              <div class="mockup-pane" id="pane-tasks">
+                <div class="pane-header">
+                  <h4 class="pane-title">Care Task Progress</h4>
+                  <button class="mini-btn primary" onclick="alert('Demo: Task created successfully!')">+ Add Task</button>
+                </div>
+                
+                <table class="mini-table">
+                  <thead>
+                    <tr>
+                      <th>Task</th>
+                      <th>Time</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Insulin Dosage (Liam Ross)</td>
+                      <td>08:00 AM</td>
+                      <td><span class="mini-pill active">Completed</span></td>
+                    </tr>
+                    <tr>
+                      <td>Check Blood Pressure (Sarah Jenkins)</td>
+                      <td>12:30 PM</td>
+                      <td><span class="mini-pill active">Completed</span></td>
+                    </tr>
+                    <tr>
+                      <td>Physical Therapy Assist (Aria Thorne)</td>
+                      <td>04:00 PM</td>
+                      <td><span class="mini-pill" style="background: hsl(40, 95%, 90%); color: hsl(40, 95%, 45%);">Pending</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Tab 3: Routines -->
+              <div class="mockup-pane" id="pane-routines">
+                <div class="pane-header">
+                  <h4 class="pane-title">Saved Routines</h4>
+                  <span class="mini-pill">Morning / Evening Sets</span>
+                </div>
+                <div class="mini-grid" style="grid-template-columns: 1fr;">
+                  <div class="mini-card" style="flex-direction: row; justify-content: space-between; align-items: center; padding: 0.75rem 1rem;">
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
+                      <span class="material-symbols-outlined" style="color: var(--accent);">wb_sunny</span>
+                      <div>
+                        <strong style="display: block;">Post-Op Mobility Set</strong>
+                        <span style="font-size: 0.7rem;">3 Exercises • Guided intervals</span>
+                      </div>
+                    </div>
+                    <button class="mini-btn" onclick="alert('Demo: Routine loaded!')">Assign</button>
+                  </div>
+
+                  <div class="mini-card" style="flex-direction: row; justify-content: space-between; align-items: center; padding: 0.75rem 1rem;">
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
+                      <span class="material-symbols-outlined" style="color: var(--primary);">nights_stay</span>
+                      <div>
+                        <strong style="display: block;">Sleep Prep & Vitals Log</strong>
+                        <span style="font-size: 0.7rem;">Blood oxygen reading + Bed positioning</span>
+                      </div>
+                    </div>
+                    <button class="mini-btn" onclick="alert('Demo: Routine loaded!')">Assign</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 4: Gemini AI -->
+              <div class="mockup-pane" id="pane-ai">
+                <div class="pane-header">
+                  <h4 class="pane-title">Gemini Assistant</h4>
+                  <span class="mini-pill active" style="background: var(--accent-soft); color: var(--accent);">Online</span>
+                </div>
+                <div class="mini-chat-window">
+                  <div class="mini-chat-messages" id="mock-chat-box">
+                    <div class="mini-msg ai">
+                      <strong>Gemini:</strong>
+                      Ready to analyze patient progress. What would you like to review?
+                    </div>
+                  </div>
+                  <div class="mini-chat-prompts">
+                    <div class="mini-chat-prompt-pill" onclick="sendMockMessage('Summarize Liam\'s compliance', 'Liam Ross has completed 85% of his scheduled routines over the last 7 days. His insulin administration timings are consistent, showing stable morning glucose levels.')">Compliance summary</div>
+                    <div class="mini-chat-prompt-pill" onclick="sendMockMessage('Check medication logs', 'Sarah Jenkins has logged 100% of her antihypertensive medications. No dose adjustments are flagged at this time.')">Medication checks</div>
+                  </div>
+                  <div class="mini-chat-input-box">
+                    <span style="font-size: 0.75rem; color: hsl(215 15% 55%);">Select a query pill above to chat with Gemini.</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FLOW INFOGRAPHIC -->
+      <div class="infographic-container">
+        <h3 class="infographic-title">Centralized Data & AI Optimization Flow</h3>
+        
+        <div class="flow-line">
+          <!-- Step 1 -->
+          <div class="flow-node">
+            <div class="flow-node-icon">
+              <span class="material-symbols-outlined">schedule</span>
+            </div>
+            <h4 class="flow-node-title">1. Schedule Planned</h4>
+            <p class="flow-node-desc">Caretakers layout care tasks & medication timings in the dashboard.</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="flow-node">
+            <div class="flow-node-icon">
+              <span class="material-symbols-outlined">touch_app</span>
+            </div>
+            <h4 class="flow-node-title">2. Care Logged</h4>
+            <p class="flow-node-desc">Caregivers log outcomes or mark tasks complete on their devices.</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="flow-node">
+            <div class="flow-node-icon">
+              <span class="material-symbols-outlined">psychology</span>
+            </div>
+            <h4 class="flow-node-title">3. AI Analysis</h4>
+            <p class="flow-node-desc">Gemini processes compliance history using context-aware algorithms.</p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="flow-node">
+            <div class="flow-node-icon">
+              <span class="material-symbols-outlined">auto_graph</span>
+            </div>
+            <h4 class="flow-node-title">4. Optimized Plan</h4>
+            <p class="flow-node-desc">Caretakers receive suggestions to adapt routines to patient outcomes.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ABOUT SECTION -->
+  <section class="section-spacing bg-dark-accent" id="about">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow" style="color: var(--accent);">About ADAPT</p>
+        <h2 class="section-title">Cognitive Assistance for Clinical Care</h2>
+        <p class="section-desc">ADAPT (Advanced Digital Assistant for Patient Tracking) is designed to streamline clinical communication pipelines and safeguard patient wellbeing.</p>
+      </div>
+
+      <div class="about-cards">
+        <div class="about-card">
+          <h3 class="about-card-title">Centralized Management</h3>
+          <p class="about-card-desc">By housing medical scenario details, guidelines, active tasks, and disease parameters in a single database, ADAPT eliminates data silos, helping caretakers coordinate efficiently.</p>
+        </div>
+
+        <div class="about-card">
+          <h3 class="about-card-title">Cognitive AI Partners</h3>
+          <p class="about-card-desc">Our integration with Gemini AI functions as a clinical sidekick. It helps scan task logs to identify gaps, highlight critical allergy sensitivities, and generate handover reports.</p>
+        </div>
+
+        <div class="about-card">
+          <h3 class="about-card-title">Designed for Caregivers</h3>
+          <p class="about-card-desc">With user-centric interface layouts, clear font scaling, and optimized mobile viewport styling, ADAPT keeps caregivers focused on their patients rather than administrative struggles.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
   <footer class="footer">
-    <p><strong>ADAPT Care Platform</strong></p>
-    <p style="opacity:0.7;">Cognitive assistance for caregiver workflows</p>
+    <div class="container">
+      <h3 class="footer-title">ADAPT Care Platform</h3>
+      <p class="footer-desc">A unified web workspace for caregiver planning, analysis, and clinical tracking.</p>
+    </div>
   </footer>
+
+  <script>
+    // JS for Mock Dashboard Tabs switching
+    function switchMockTab(tabId) {
+      // Deactivate all buttons
+      document.querySelectorAll('.mockup-nav-item').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      // Deactivate all content panes
+      document.querySelectorAll('.mockup-pane').forEach(pane => {
+        pane.classList.remove('active');
+      });
+
+      // Activate selected button & pane
+      document.getElementById('tab-' + tabId + '-btn').classList.add('active');
+      document.getElementById('pane-' + tabId).classList.add('active');
+    }
+
+    // JS for mock AI Assistant prompt interaction
+    function sendMockMessage(userText, botText) {
+      const chatBox = document.getElementById('mock-chat-box');
+      
+      // Clear previous interactive messages to keep clean
+      chatBox.innerHTML = '';
+      
+      // Append user bubble
+      const userBubble = document.createElement('div');
+      userBubble.className = 'mini-msg user';
+      userBubble.innerHTML = '<strong>You:</strong> ' + userText;
+      chatBox.appendChild(userBubble);
+      
+      // Auto scroll
+      chatBox.scrollTop = chatBox.scrollHeight;
+      
+      // Delay and append AI bubble
+      setTimeout(() => {
+        const aiBubble = document.createElement('div');
+        aiBubble.className = 'mini-msg ai';
+        aiBubble.innerHTML = '<strong>Gemini:</strong> ' + botText;
+        chatBox.appendChild(aiBubble);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 550);
+    }
+  </script>
 
 </body>
 </html>
