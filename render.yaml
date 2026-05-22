@@ -6,7 +6,7 @@ services:
     rootDir: backend
     plan: free
     buildCommand: "chmod +x build.sh && ./build.sh"
-    startCommand: "gunicorn adapt.wsgi:application --config gunicorn.conf.py"
+    startCommand: "python manage.py migrate --noinput && gunicorn adapt.wsgi:application --config gunicorn.conf.py"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
