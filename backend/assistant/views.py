@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 from dashboard.views import _caretaker_context, _get_or_create_caretaker_profile
 from patients.models import Patient
@@ -15,6 +16,7 @@ from .services import apply_action_proposal, generate_assistant_reply, generate_
 
 IDLE_TIMEOUT_MINUTES = 20
 
+@login_required
 def index(request, patient_id=None):
 	patient_id = patient_id or request.GET.get("patient")
 	session_id = request.GET.get("session")
@@ -68,7 +70,7 @@ def index(request, patient_id=None):
 			"allergies": patient.allergies,
 		} for patient in patient_options
 	]
-	caretaker_profile = _get_or_create_caretaker_profile()
+	caretaker_profile = _get_or_create_caretaker_profile(request.user)
 	messages_list = list(current_session.messages.all()) if current_session else []
 	proposals = current_session.action_proposals.filter(status=ChatActionProposal.Status.PENDING) if current_session else []
 	previous_summaries = []
