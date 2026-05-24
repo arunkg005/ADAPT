@@ -3,6 +3,68 @@
 {% block title %}{{ meta.label }} — {{ patient.name }} | ADAPT{% endblock %}
 
 {% block content %}
+<style>
+    /* Phase 3 Mobile UX: Table to Cards */
+    @media (max-width: 768px) {
+        .patient-table thead {
+            display: none;
+        }
+        .patient-table, .patient-table tbody, .patient-table tr, .patient-table td {
+            display: block;
+            width: 100%;
+        }
+        .patient-table tr {
+            margin-bottom: 16px;
+            background: var(--surface-strong);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        .patient-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border);
+            text-align: right;
+        }
+        .patient-table td:last-child {
+            border-bottom: 0;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+        .patient-table td::before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            margin-right: 16px;
+            text-align: left;
+        }
+        .table-actions {
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .table-toolbar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .table-toolbar-actions {
+            width: 100%;
+            align-items: stretch;
+            flex-direction: column;
+        }
+        .table-toolbar-actions .btn {
+            text-align: center;
+            justify-content: center;
+        }
+    }
+</style>
 <section class="panel">
     <div class="page-toolbar table-toolbar">
         <div class="table-heading-wrap">
@@ -60,31 +122,35 @@
             <tbody>
                 {% for item in items %}
                     <tr>
-                        <td>
-                            <strong>{{ item.title }}</strong>
-                            <div class="muted" style="margin-top:4px;">{{ item.description|default:'-' }}</div>
+                        <td data-label="Title">
+                            <div style="text-align: right;">
+                                <strong>{{ item.title }}</strong>
+                                <div class="muted" style="margin-top:4px;">{{ item.description|default:'-' }}</div>
+                            </div>
                         </td>
-                        <td><span class="pill">{{ item.get_status_display }}</span></td>
-                        <td><span class="pill">{{ item.get_priority_display }}</span></td>
-                        <td>{{ item.due_at|default:'-' }}</td>
-                        <td>
-                            {{ item.get_recurrence_mode_display }}
-                            {% if item.recurrence_weekdays %}
-                                <div class="muted">Days: {{ item.recurrence_weekdays }}</div>
-                            {% endif %}
-                            {% if item.recurrence_dates %}
-                                <div class="muted">Dates: {{ item.recurrence_dates }}</div>
-                            {% endif %}
+                        <td data-label="Status"><span class="pill">{{ item.get_status_display }}</span></td>
+                        <td data-label="Priority"><span class="pill">{{ item.get_priority_display }}</span></td>
+                        <td data-label="Due">{{ item.due_at|default:'-' }}</td>
+                        <td data-label="Recurrence">
+                            <div style="text-align: right;">
+                                {{ item.get_recurrence_mode_display }}
+                                {% if item.recurrence_weekdays %}
+                                    <div class="muted">Days: {{ item.recurrence_weekdays }}</div>
+                                {% endif %}
+                                {% if item.recurrence_dates %}
+                                    <div class="muted">Dates: {{ item.recurrence_dates }}</div>
+                                {% endif %}
+                            </div>
                         </td>
-                        <td>
+                        <td data-label="Reminder">
                             {% if item.reminder_enabled %}
                                 <span class="pill">{{ item.reminder_minutes_before }} min</span>
                             {% else %}
                                 <span class="muted">Off</span>
                             {% endif %}
                         </td>
-                        <td>
-                            <div class="table-actions">
+                        <td data-label="Actions">
+                            <div class="table-actions" style="display:flex; gap:8px;">
                                 <a class="btn btn-action" href="{% url 'tasks:item_edit' patient.id item_type item.id %}">Edit</a>
                                 <a class="btn btn-action" href="{% url 'tasks:item_delete' patient.id item_type item.id %}">Delete</a>
                             </div>

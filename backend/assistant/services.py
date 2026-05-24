@@ -3,12 +3,44 @@ import os
 import re
 from datetime import datetime
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 from tasks.models import CareItem
 
 PLACEHOLDER_KEY = "replace-with-your-gemini-api-key"
 ACTION_PATTERN = re.compile(r"<ACTION_JSON>(.*?)</ACTION_JSON>", re.DOTALL)
+
+# ---------------------------------------------------------------------------
+# Module-level client — reads GEMINI_API_KEY from the environment automatically.
+# A single Client instance is reused across all requests (thread-safe).
+# ---------------------------------------------------------------------------
+_api_key = os.getenv("GEMINI_API_KEY", "").strip()
+client = genai.Client(api_key=_api_key) if (_api_key and _api_key != PLACEHOLDER_KEY) else None
+
+# ---------------------------------------------------------------------------
+# Emergency keywords that immediately bypass the LLM pipeline.
+# ---------------------------------------------------------------------------
+_EMERGENCY_KEYWORDS = (
+    "unresponsive",
+    "choking",
+    "seizure",
+    "unconscious",
+    "bleeding",
+    "heart attack",
+    "stroke",
+)
+
+_EMERGENCY_RESPONSE = (
+    "🚨 EMERGENCY DETECTED 🚨\n\n"
+    "This situation requires IMMEDIATE emergency services. Please follow these steps right now:\n"
+    "1. Call your local emergency number (911 / 112 / 999) immediately.\n"
+    "2. Do NOT leave the patient alone.\n"
+    "3. Stay on the line with the dispatcher — they will guide you.\n"
+    "4. Unlock the front door so responders can enter.\n"
+    "5. Do not administer food, water, or medication unless directed by the dispatcher.\n\n"
+    "This AI assistant cannot replace emergency services. Call for help NOW."
+)
 
 
 def _query_is_patient_specific(text: str) -> bool:
@@ -77,19 +109,37 @@ def _build_context_block(session, selected_patient, previous_summaries):
     )
 
 
-def _call_model(prompt):
-    api_key = os.getenv("GEMINI_API_KEY", "").strip()
-    if not api_key or api_key == PLACEHOLDER_KEY:
+def _call_model(prompt: str) -> str:
+    """Send *prompt* to the Gemini model and return the text response.
+
+    Uses the module-level ``client`` (google-genai SDK).  Falls back to a
+    static message when the API key is absent or is still the placeholder.
+    Temperature is fixed at 0.1 to keep responses strictly factual.
+    """
+    if client is None:
         return "AI is in fallback mode because Gemini API key is missing."
 
-    genai.configure(api_key=api_key)
     model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-    model = genai.GenerativeModel(model_name=model_name)
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model=model_name,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            temperature=0.1,
+        ),
+    )
     return (getattr(response, "text", "") or "").strip()
 
 
 def generate_assistant_reply(session, selected_patient, user_text, previous_summaries):
+    # ------------------------------------------------------------------
+    # EMERGENCY BYPASS BLOCK — evaluated before any other logic.
+    # If the user message contains a life-threatening keyword the LLM
+    # pipeline is skipped entirely and a hardcoded directive is returned.
+    # ------------------------------------------------------------------
+    _text_lower = (user_text or "").lower()
+    if any(kw in _text_lower for kw in _EMERGENCY_KEYWORDS):
+        return _EMERGENCY_RESPONSE, None
+
     context = _build_context_block(session, selected_patient, previous_summaries)
     prompt = f"{context}\n\nLATEST USER QUESTION:\n{user_text}\n"
 

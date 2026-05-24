@@ -1,71 +1,577 @@
 {% extends "base.html" %}
 
-{% block title %}Patient Dashboard | ADAPT{% endblock %}
+{% block title %}{{ selected_patient.name }} | Patient Dashboard | ADAPT{% endblock %}
+{% block meta_description %}Patient dashboard for {{ selected_patient.name }} — task progress, routines, schedule, and clinical data.{% endblock %}
 
 {% block head %}
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          surface: 'var(--surface)',
-          'surface-container-lowest': 'var(--surface-strong)',
-          'surface-container-low': 'var(--surface-soft)',
-          'surface-container': 'var(--field-bg)',
-          'on-surface': 'var(--ink)',
-          'on-surface-variant': 'var(--muted)',
-          primary: 'var(--primary)',
-          'on-primary': 'var(--primary-foreground)',
-          'primary-container': 'color-mix(in srgb, var(--primary) 10%, transparent)',
-          secondary: 'var(--accent)',
-          'secondary-container': 'color-mix(in srgb, var(--accent) 15%, transparent)',
-          outline: 'var(--border)',
-          'outline-variant': 'var(--border)',
-        },
-        boxShadow: {
-          'level-1': 'var(--shadow)',
-          'level-2': 'var(--shadow)'
-        }
-      }
-    }
-  }
-</script>
 <style>
-    .patient-shell-tabs .compact-list {
-        padding-left: 1.25rem;
+    /* ================================================================
+       Patient Dashboard — Phase 2 Component Styles
+       No Tailwind. Uses Phase 1 design system tokens exclusively.
+       ================================================================ */
+
+    /* ---- Status badge system ---- */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1.4;
+        white-space: nowrap;
+        letter-spacing: 0.02em;
+    }
+
+    .badge-success {
+        background: var(--success-soft);
+        color: var(--success);
+        border: 1px solid color-mix(in srgb, var(--success) 22%, transparent);
+    }
+
+    .badge-warning {
+        background: var(--warning-soft);
+        color: color-mix(in srgb, var(--warning) 80%, var(--ink));
+        border: 1px solid color-mix(in srgb, var(--warning) 28%, transparent);
+    }
+
+    .badge-danger {
+        background: var(--destructive-soft);
+        color: var(--destructive);
+        border: 1px solid color-mix(in srgb, var(--destructive) 22%, transparent);
+    }
+
+    .badge-info {
+        background: var(--info-soft);
+        color: var(--info);
+        border: 1px solid color-mix(in srgb, var(--info) 20%, transparent);
+    }
+
+    .badge-neutral {
+        background: var(--surface-soft);
+        color: var(--muted);
+        border: 1px solid var(--border);
+    }
+
+    /* ---- Summary metric cards ---- */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .summary-card {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 16px 18px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        background: var(--surface-strong);
+        transition: transform var(--duration-fast) var(--ease-out),
+                    box-shadow var(--duration-base) ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .summary-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        border-radius: var(--radius-full);
+    }
+
+    .summary-card.today::before  { background: var(--info); }
+    .summary-card.done::before   { background: var(--success); }
+    .summary-card.pending::before{ background: var(--warning); }
+    .summary-card.overdue::before{ background: var(--destructive); }
+
+    .summary-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .summary-card .sc-label {
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted-light);
+    }
+
+    .summary-card .sc-value {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        color: var(--ink);
+    }
+
+    .summary-card.overdue .sc-value { color: var(--destructive); }
+    .summary-card.pending  .sc-value { color: color-mix(in srgb, var(--warning) 80%, var(--ink)); }
+    .summary-card.done     .sc-value { color: var(--success); }
+
+    .summary-card .sc-sub {
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin: 0;
+    }
+
+    /* ---- Patient header avatar ---- */
+    .patient-avatar-lg {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-md);
+        background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 65%, var(--accent)));
+        color: var(--primary-foreground);
+        font-size: 1.3rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+    }
+
+    /* ---- Button hierarchy ---- */
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 18px;
+        border-radius: var(--radius-md);
+        border: 1px solid transparent;
+        background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 78%, var(--accent) 22%));
+        color: var(--primary-foreground);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform var(--duration-fast) var(--ease-out),
+                    box-shadow var(--duration-fast) ease,
+                    filter var(--duration-fast) ease;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.22);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+        filter: brightness(0.92);
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.14);
+    }
+
+    .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 16px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: var(--surface-strong);
+        color: var(--ink);
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background var(--duration-fast) ease,
+                    border-color var(--duration-fast) ease,
+                    transform var(--duration-fast) var(--ease-out),
+                    box-shadow var(--duration-fast) ease;
+    }
+
+    .btn-secondary:hover {
+        background: var(--surface-soft);
+        border-color: var(--border-strong);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-xs);
+    }
+
+    .btn-secondary:active {
+        transform: translateY(0);
+        background: var(--surface-hover);
+    }
+
+    /* ---- Info card ---- */
+    .info-card {
+        padding: 18px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        background: var(--surface-strong);
+    }
+
+    .info-card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .info-card-header p {
+        margin: 0;
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+    }
+
+    /* ---- Basic info list ---- */
+    .patient-info-list {
+        display: flex;
+        flex-direction: column;
         gap: 10px;
+        padding-left: 0;
+        list-style: none;
+        margin: 0;
     }
 
-    .patient-shell-tabs .compact-list > * {
-        line-height: 1.5;
+    .patient-info-list li {
+        font-size: 0.92rem;
+        line-height: 1.55;
         overflow-wrap: anywhere;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
     }
 
-    .patient-basic-info-card .patient-basic-info-list {
-        padding-left: 1.25rem;
-        gap: 10px;
+    .patient-info-list li strong {
+        color: var(--ink-secondary);
+        flex-shrink: 0;
     }
 
-    .patient-basic-info-card .patient-basic-info-list li {
-        line-height: 1.5;
-        overflow-wrap: anywhere;
+    /* ---- Action promo cards (Track progress, Task lab) ---- */
+    .action-promo {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        background: var(--surface-strong);
+        flex-wrap: wrap;
+        transition: border-color var(--duration-fast) ease;
+    }
+
+    .action-promo:hover {
+        border-color: var(--border-strong);
+    }
+
+    .action-promo-copy strong {
+        display: block;
+        font-size: 0.98rem;
+    }
+
+    .action-promo-copy p {
+        margin: 4px 0 0;
+        font-size: 0.85rem;
+        color: var(--muted);
+    }
+
+    /* ---- Routine item cards ---- */
+    .routine-item-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 14px 16px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        background: var(--surface-strong);
+        transition: transform var(--duration-fast) var(--ease-out),
+                    border-color var(--duration-fast) ease,
+                    box-shadow var(--duration-base) ease;
+    }
+
+    .routine-item-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--border-strong);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .routine-item-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-sm);
+        background: var(--accent-soft);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .routine-item-copy {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .routine-item-copy h4 {
+        margin: 0 0 2px;
+        font-size: 0.92rem;
+        color: var(--primary);
+    }
+
+    .routine-item-copy p {
+        margin: 0;
+        font-size: 0.78rem;
+        color: var(--muted);
+    }
+
+    /* ---- Schedule timeline ---- */
+    .schedule-timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding-left: 14px;
+        border-left: 2px solid var(--border);
+    }
+
+    .schedule-event {
+        padding: 14px 16px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        background: var(--surface-strong);
+        border-left: 4px solid var(--primary);
+    }
+
+    .schedule-event h3 {
+        margin: 0 0 4px;
+        font-size: 0.92rem;
+        color: var(--primary);
+    }
+
+    .schedule-event span {
+        font-size: 0.78rem;
+        color: var(--muted);
+    }
+
+    /* ---- Progress bar ---- */
+    .progress-track {
+        width: 100%;
+        height: 8px;
+        border-radius: var(--radius-full);
+        background: var(--surface-soft);
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: var(--radius-full);
+        background: linear-gradient(90deg, var(--primary), color-mix(in srgb, var(--primary) 70%, var(--accent)));
+        transition: width 0.8s var(--ease-out);
+    }
+
+    /* ---- Analysis mini-cards ---- */
+    .analysis-mini-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .analysis-mini-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 14px 10px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        background: var(--surface-strong);
+        text-align: center;
+    }
+
+    .analysis-mini-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .analysis-mini-icon.green {
+        background: var(--success-soft);
+        color: var(--success);
+    }
+
+    .analysis-mini-icon.orange {
+        background: var(--accent-soft);
+        color: var(--accent);
+    }
+
+    .analysis-mini-icon.blue {
+        background: var(--info-soft);
+        color: var(--info);
+    }
+
+    .analysis-mini-card strong {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: var(--ink);
+    }
+
+    .analysis-mini-label {
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+    }
+
+    /* ---- AI summary card ---- */
+    .ai-summary-card {
+        padding: 18px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        background: var(--surface-strong);
+    }
+
+    .ai-summary-card .ai-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 12px;
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+    }
+
+    .ai-summary-card .ai-label .ai-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--success);
+        animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    .ai-summary-body {
+        font-size: 0.9rem;
+        color: var(--ink-secondary);
+        line-height: 1.65;
+        white-space: pre-wrap;
+    }
+
+    /* ---- Empty states ---- */
+    .empty-routine, .empty-schedule {
+        padding: 32px 20px;
+        text-align: center;
+        border-radius: var(--radius-lg);
+        border: 1px dashed var(--border);
+        background: var(--surface-soft);
+        color: var(--muted);
+        font-size: 0.88rem;
+    }
+
+    /* ---- Disease pill ---- */
+    .disease-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 12px;
+        border-radius: var(--radius-full);
+        background: var(--info-soft);
+        border: 1px solid color-mix(in srgb, var(--info) 20%, transparent);
+        color: var(--info);
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    /* ---- Completion percent hero ---- */
+    .completion-hero {
+        padding: 20px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        background: var(--surface-strong);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .completion-hero::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 120px;
+        height: 120px;
+        border-radius: 0 0 0 100%;
+        background: color-mix(in srgb, var(--primary) 7%, transparent);
+        pointer-events: none;
+    }
+
+    .completion-percent {
+        font-size: 3rem;
+        font-weight: 800;
+        letter-spacing: -0.06em;
+        color: var(--primary);
+        line-height: 1;
+    }
+
+    .completion-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-top: 4px;
+    }
+
+    /* ---- Section spacing helpers ---- */
+    .tab-panel {
+        display: grid;
+        gap: 14px;
+    }
+
+    @media (max-width: 960px) {
+        .summary-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .analysis-mini-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 600px) {
+        .summary-grid {
+            grid-template-columns: 1fr 1fr;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
+{# ── Patient header panel ── #}
 <section class="panel patient-shell-header">
     <div class="patient-page-header">
         <div class="patient-title-block">
-            <div>
-                <p class="section-label">Patient dashboard</p>
-                <h2>{{ selected_patient.name }}</h2>
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div class="patient-avatar-lg" aria-hidden="true">{{ selected_patient.name|first|upper }}</div>
+                <div>
+                    <p class="section-label">Patient dashboard</p>
+                    <h2 style="margin: 2px 0 0; font-size: 1.55rem; letter-spacing: -0.03em;">{{ selected_patient.name }}</h2>
+                </div>
             </div>
-            <div class="patient-basic-row">
-                <span class="pill">Age {{ selected_patient.age }}</span>
-                <span class="pill">{{ selected_patient.gender }}</span>
-                <span class="pill">{{ selected_patient.diseases|length }} conditions</span>
+
+            <div class="patient-basic-row" style="margin-top: 12px;">
+                <span class="badge badge-neutral">Age {{ selected_patient.age }}</span>
+                <span class="badge badge-neutral">{{ selected_patient.gender }}</span>
+                <span class="badge badge-info">{{ selected_patient.diseases|length }} condition{{ selected_patient.diseases|length|pluralize }}</span>
             </div>
 
             <div class="patient-switcher">
@@ -88,51 +594,64 @@
         </div>
 
         <div class="row-actions patient-header-actions">
-            <a class="btn" href="{% url 'dashboard:home' %}">Back</a>
-            <a class="btn primary" href="{% url 'dashboard:patient_settings' selected_patient.id %}">Edit</a>
+            <a class="btn-secondary" href="{% url 'dashboard:home' %}">
+                <span class="material-symbols-outlined" style="font-size: 1rem;">arrow_back</span>
+                Back
+            </a>
+            <a class="btn-primary" href="{% url 'dashboard:patient_settings' selected_patient.id %}">
+                <span class="material-symbols-outlined" style="font-size: 1rem;">edit</span>
+                Edit
+            </a>
         </div>
     </div>
 </section>
 
+{# ── Tab navigation panel ── #}
 <section class="panel patient-shell-tabs">
     <div class="tabs" aria-label="Patient dashboard sections">
         <button type="button" class="tab-btn active" data-tab="profile">Profile</button>
-        <button type="button" class="tab-btn" data-tab="task">Task</button>
-        <button type="button" class="tab-btn" data-tab="routine">Routine</button>
+        <button type="button" class="tab-btn" data-tab="task">Tasks</button>
+        <button type="button" class="tab-btn" data-tab="routine">Routines</button>
         <button type="button" class="tab-btn" data-tab="schedule">Schedule</button>
-        <button type="button" class="tab-btn" data-tab="clinical">Diseases and medication preference</button>
+        <button type="button" class="tab-btn" data-tab="clinical">Clinical</button>
         <button type="button" class="tab-btn" data-tab="analysis">Analysis</button>
     </div>
 
+    {# ── Tab: Profile ── #}
     <section class="tab-content active" id="tab-profile">
         <div class="tab-panel">
-            <div class="grid summary-grid">
-                <div class="summary-card">
-                    <span class="section-label">Today</span>
-                    <strong>{{ selected_patient.task_progress.total_today }}</strong>
-                    <span class="muted">Tasks assigned</span>
+            {# Stat summary cards #}
+            <div class="summary-grid">
+                <div class="summary-card today">
+                    <span class="sc-label">Today</span>
+                    <span class="sc-value">{{ selected_patient.task_progress.total_today }}</span>
+                    <p class="sc-sub">Tasks assigned</p>
                 </div>
-                <div class="summary-card">
-                    <span class="section-label">Complete</span>
-                    <strong>{{ selected_patient.task_progress.completed_today }}</strong>
-                    <span class="muted">Finished today</span>
+                <div class="summary-card done">
+                    <span class="sc-label">Complete</span>
+                    <span class="sc-value">{{ selected_patient.task_progress.completed_today }}</span>
+                    <p class="sc-sub">Finished today</p>
                 </div>
-                <div class="summary-card">
-                    <span class="section-label">Pending</span>
-                    <strong>{{ selected_patient.task_progress.pending_today }}</strong>
-                    <span class="muted">Waiting attention</span>
+                <div class="summary-card pending">
+                    <span class="sc-label">Pending</span>
+                    <span class="sc-value">{{ selected_patient.task_progress.pending_today }}</span>
+                    <p class="sc-sub">Waiting attention</p>
                 </div>
-                <div class="summary-card">
-                    <span class="section-label">Overdue</span>
-                    <strong>{{ selected_patient.task_progress.overdue }}</strong>
-                    <span class="muted">Needs follow-up</span>
+                <div class="summary-card overdue">
+                    <span class="sc-label">Overdue</span>
+                    <span class="sc-value">{{ selected_patient.task_progress.overdue }}</span>
+                    <p class="sc-sub">Needs follow-up</p>
                 </div>
             </div>
 
-            <div class="subtle-card patient-basic-info-card">
-                <p class="section-label">Basic info</p>
-                <ul class="compact-list patient-basic-info-list">
-                    <li><strong>Allergies:</strong> {{ selected_patient.allergies }}</li>
+            {# Basic info card #}
+            <div class="info-card">
+                <div class="info-card-header">
+                    <span class="material-symbols-outlined" style="font-size: 1rem; color: var(--muted);">person</span>
+                    <p>Basic info</p>
+                </div>
+                <ul class="patient-info-list patient-basic-info-list">
+                    <li><strong>Allergies:</strong> {{ selected_patient.allergies|default:"None recorded" }}</li>
                     <li><strong>Current scenario:</strong> {{ selected_patient.current_scenario }}</li>
                     <li><strong>Doctor guidelines:</strong> {{ selected_patient.doctor_guidelines|default:"Not provided" }}</li>
                 </ul>
@@ -140,196 +659,186 @@
         </div>
     </section>
 
+    {# ── Tab: Tasks ── #}
     <section class="tab-content" id="tab-task">
         <div class="tab-panel">
-            <div class="subtle-card">
-                <div class="row-actions mb-12">
-                    <div>
-                        <strong>Track progress</strong>
-                        <p class="muted mb-0">Open the progress window for a focused progress view.</p>
-                    </div>
-                    <a class="btn primary" href="{% url 'dashboard:progress' %}?patient_id={{ selected_patient.id }}">Open progress window</a>
+            <div class="action-promo">
+                <div class="action-promo-copy">
+                    <strong>Track progress</strong>
+                    <p>Open the progress window for a focused progress view.</p>
                 </div>
+                <a class="btn-primary" href="{% url 'dashboard:progress' %}?patient_id={{ selected_patient.id }}">
+                    <span class="material-symbols-outlined" style="font-size: 1rem;">insights</span>
+                    Open progress window
+                </a>
             </div>
-            <div class="subtle-card">
-                <div class="row-actions mb-12">
-                    <div>
-                        <strong>Patient tasks</strong>
-                        <p class="muted mb-0">Open the Task lab window for a focused task mangement.</p>
-                    </div>
-                    <a class="btn primary" href="{% url 'dashboard:task_lab' %}?patient_id={{ selected_patient.id }}">Open Task Lab</a>
+            <div class="action-promo">
+                <div class="action-promo-copy">
+                    <strong>Patient tasks</strong>
+                    <p>Open the Task lab for focused task management.</p>
                 </div>
-                <div class="compact-list">{% for item in selected_patient.tasks %}<div>{{ item }}</div>{% endfor %}</div>
+                <a class="btn-primary" href="{% url 'dashboard:task_lab' %}?patient_id={{ selected_patient.id }}">
+                    <span class="material-symbols-outlined" style="font-size: 1rem;">assignment</span>
+                    Open Task Lab
+                </a>
             </div>
+            {% if selected_patient.tasks %}
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <span class="material-symbols-outlined" style="font-size: 1rem; color: var(--muted);">task_alt</span>
+                        <p>Recent tasks</p>
+                    </div>
+                    <div class="compact-list">
+                        {% for item in selected_patient.tasks %}<div style="padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--ink-secondary);">{{ item.title }} ({{ item.display_status }})</div>{% endfor %}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </section>
 
+    {# ── Tab: Routine ── #}
     <section class="tab-content" id="tab-routine">
         <div class="tab-panel">
-            <div class="p-5 flex flex-col gap-6 bg-transparent">
-              <header class="space-y-1">
-                <h2 class="text-2xl font-bold text-on-surface">Routines</h2>
-                <p class="text-on-surface-variant text-sm">Manage and assign daily routines</p>
-              </header>
-
-              <section class="space-y-4">
-                <div class="flex items-center justify-between">
-                  <h3 class="text-lg font-bold text-on-surface">Saved Routines</h3>
-                  <a href="{% url 'dashboard:schedule_routine' %}?patient_id={{ selected_patient.id }}" class="bg-primary text-on-primary px-4 py-2 rounded-full flex items-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
-                    <span class="material-symbols-outlined text-[18px]">add</span>
-                    <span class="font-bold text-xs">Create Routine</span>
-                  </a>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Saved Routines</h3>
+                    <p style="margin: 2px 0 0; font-size: 0.85rem; color: var(--muted);">Manage and assign daily routines</p>
                 </div>
-
-                <div class="grid grid-cols-1 gap-4">
-                  {% for item in selected_patient.routine %}
-                  <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant flex justify-between items-center group transition-all hover:shadow-level-2">
-                    <div class="flex items-center gap-4">
-                      <div class="bg-secondary-container p-3 rounded-full text-secondary">
-                        <span class="material-symbols-outlined">wb_sunny</span>
-                      </div>
-                      <div>
-                        <h4 class="font-bold text-primary">{{ item }}</h4>
-                        <p class="text-xs text-on-surface-variant">Routine Item</p>
-                      </div>
-                    </div>
-                    <button class="w-10 h-10 rounded-full hover:bg-surface-container transition-colors flex items-center justify-center text-outline border-none bg-transparent" type="button">
-                      <span class="material-symbols-outlined text-[20px]">edit</span>
-                    </button>
-                  </div>
-                  {% empty %}
-                  <div class="text-center p-8 bg-surface-container-low rounded-2xl border border-dashed border-outline-variant">
-                     <p class="text-on-surface-variant text-sm">No routines configured yet.</p>
-                  </div>
-                  {% endfor %}
-                </div>
-              </section>
+                <a href="{% url 'dashboard:schedule_routine' %}?patient_id={{ selected_patient.id %}" class="btn-primary">
+                    <span class="material-symbols-outlined" style="font-size: 1rem;">add</span>
+                    Create Routine
+                </a>
             </div>
+
+            {% for item in selected_patient.routine %}
+                <div class="routine-item-card">
+                    <div class="routine-item-icon">
+                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">wb_sunny</span>
+                    </div>
+                    <div class="routine-item-copy">
+                        <h4>{{ item.title }}</h4>
+                        <p>{{ item.notes|default:"Routine item" }}</p>
+                    </div>
+                    <a class="btn-secondary" href="{% url 'tasks:item_edit' selected_patient.id 'routine' item.id %}" style="padding: 7px 10px; border-radius: 50%; width: 36px; height: 36px; justify-content: center;" aria-label="Edit routine">
+                        <span class="material-symbols-outlined" style="font-size: 1rem;">edit</span>
+                    </a>
+                </div>
+            {% empty %}
+                <div class="empty-routine">No routines configured yet. Create one to assign care steps to this patient.</div>
+            {% endfor %}
         </div>
     </section>
 
+    {# ── Tab: Schedule ── #}
     <section class="tab-content" id="tab-schedule">
         <div class="tab-panel">
-            <div class="p-5 flex flex-col gap-6 bg-transparent">
-              <section>
-                <div class="flex items-center justify-between mb-4">
-                  <h1 class="text-2xl font-black text-primary">Schedule</h1>
-                  <div class="flex items-center gap-1 text-primary">
-                    <span class="text-xs font-bold uppercase tracking-wider">Today</span>
-                  </div>
-                </div>
-                
-                <div class="space-y-6 relative ml-2">
-                  <div class="absolute left-[3.75rem] top-0 bottom-0 w-[1px] bg-outline-variant"></div>
-                  
-                  {% for item in selected_patient.schedule %}
-                  <div class="flex gap-4 relative">
-                    <div class="w-14 shrink-0 flex flex-col items-center pt-1">
-                      <span class="text-[10px] font-black uppercase tracking-tighter text-on-surface-variant">
-                        --:--
-                      </span>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                <h2 style="margin: 0; font-size: 1.15rem; letter-spacing: -0.02em;">Today's Schedule</h2>
+                <span class="badge badge-info">Today</span>
+            </div>
+
+            <div class="schedule-timeline">
+                {% for item in selected_patient.schedule %}
+                    <div class="schedule-event">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                            <h3>{{ item.title }}</h3>
+                            <a href="{% url 'tasks:item_edit' selected_patient.id 'schedule' item.id %}" class="material-symbols-outlined" style="font-size: 1.1rem; color: var(--primary); text-decoration: none;">edit</a>
+                        </div>
+                        <span>{{ item.notes|default:"No notes" }}</span>
                     </div>
-                    
-                    <div class="flex-1 bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border-l-4 border-l-primary">
-                      <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-sm font-bold text-primary">{{ item }}</h3>
-                        <span class="material-symbols-outlined text-primary">event</span>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <span class="text-xs font-medium text-on-surface-variant">{{ selected_patient.name }}</span>
-                      </div>
-                    </div>
-                  </div>
-                  {% empty %}
-                  <div class="text-center p-8 bg-surface-container-low rounded-2xl border border-dashed border-outline-variant">
-                     <p class="text-on-surface-variant text-sm">No scheduled items found.</p>
-                  </div>
-                  {% endfor %}
-                </div>
-              </section>
+                {% empty %}
+                    <div class="empty-schedule">No scheduled items for today.</div>
+                {% endfor %}
             </div>
         </div>
     </section>
 
+    {# ── Tab: Clinical ── #}
     <section class="tab-content" id="tab-clinical">
         <div class="tab-panel">
-            <div class="subtle-card">
-                <p class="section-label">Diseases</p>
-                <div class="chip-row">
+            <div class="info-card">
+                <div class="info-card-header">
+                    <span class="material-symbols-outlined" style="font-size: 1rem; color: var(--muted);">medical_information</span>
+                    <p>Diseases</p>
+                </div>
+                <div class="chip-row" style="margin-top: 4px;">
                     {% for item in selected_patient.diseases %}
-                        <span class="pill">{{ item }}</span>
+                        <span class="disease-pill">{{ item }}</span>
+                    {% empty %}
+                        <span class="muted">No conditions recorded.</span>
                     {% endfor %}
                 </div>
             </div>
 
-            <div class="subtle-card">
-                <p class="section-label">Medication preference</p>
-                <div class="compact-list">
-                    <div><strong>Medications:</strong> {{ selected_patient.medications|join:", " }}</div>
-                    <div><strong>Reminder:</strong> {% if selected_patient.reminder_preference.enabled %}Enabled{% else %}Disabled{% endif %}</div>
-                    <div><strong>Reminder lead time:</strong> {{ selected_patient.reminder_preference.minutes_before }} min before</div>
+            <div class="info-card">
+                <div class="info-card-header">
+                    <span class="material-symbols-outlined" style="font-size: 1rem; color: var(--muted);">medication</span>
+                    <p>Medication preference</p>
                 </div>
-                <div class="row-actions mt-12">
-                    <a class="btn" href="{% url 'patients:medication_management' selected_patient.id %}">Manage medications</a>
-                    <a class="btn" href="{% url 'patients:disease_management' selected_patient.id %}">Manage diseases</a>
+                <ul class="patient-info-list" style="margin-bottom: 16px;">
+                    <li><strong>Medications:</strong> {{ selected_patient.medications|join:", " }}</li>
+                    <li><strong>Reminder:</strong>
+                        {% if selected_patient.reminder_preference.enabled %}
+                            <span class="badge badge-success">Enabled</span>
+                        {% else %}
+                            <span class="badge badge-neutral">Disabled</span>
+                        {% endif %}
+                    </li>
+                    <li><strong>Lead time:</strong> {{ selected_patient.reminder_preference.minutes_before }} min before</li>
+                </ul>
+                <div class="row-actions">
+                    <a class="btn-secondary" href="{% url 'patients:medication_management' selected_patient.id %}">Manage medications</a>
+                    <a class="btn-secondary" href="{% url 'patients:disease_management' selected_patient.id %}">Manage diseases</a>
                 </div>
             </div>
         </div>
     </section>
 
+    {# ── Tab: Analysis ── #}
     <section class="tab-content" id="tab-analysis">
         <div class="tab-panel">
-            <div class="p-5 flex flex-col gap-6 bg-transparent">
-              <header class="flex flex-col gap-3">
-                <h1 class="text-2xl font-black text-primary">Progress</h1>
-              </header>
+            {# Completion hero #}
+            <div class="completion-hero">
+                <p style="margin: 0 0 10px; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);">Today's Summary</p>
+                <div class="completion-percent">{{ selected_patient.task_progress.completion_percent }}%</div>
+                <p class="completion-label">Overall completion</p>
+                <div class="progress-track" style="margin-top: 14px;">
+                    <div class="progress-fill" style="width: {{ selected_patient.task_progress.completion_percent }}%;"></div>
+                </div>
+            </div>
 
-              <section class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-primary-container rounded-bl-full pointer-events-none"></div>
-                <h2 class="text-sm font-bold text-on-surface mb-4">Today's Summary</h2>
-                <div class="flex justify-between items-end mb-4">
-                  <div class="flex flex-col">
-                    <span class="text-4xl font-black text-primary">{{ selected_patient.task_progress.completion_percent }}%</span>
-                    <span class="text-xs font-bold text-on-surface-variant mt-1">Overall Completion</span>
-                  </div>
+            {# Stat mini-cards #}
+            <div class="analysis-mini-grid">
+                <div class="analysis-mini-card">
+                    <div class="analysis-mini-icon green">
+                        <span class="material-symbols-outlined" style="font-size: 1rem;">check_circle</span>
+                    </div>
+                    <strong>{{ selected_patient.task_progress.completed_today }}</strong>
+                    <span class="analysis-mini-label">Completed</span>
                 </div>
-                <div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
-                  <div class="bg-primary h-full rounded-full" style="width: {{ selected_patient.task_progress.completion_percent }}%;"></div>
+                <div class="analysis-mini-card">
+                    <div class="analysis-mini-icon orange">
+                        <span class="material-symbols-outlined" style="font-size: 1rem;">pending</span>
+                    </div>
+                    <strong>{{ selected_patient.task_progress.pending_today }}</strong>
+                    <span class="analysis-mini-label">Pending</span>
                 </div>
-              </section>
+                <div class="analysis-mini-card">
+                    <div class="analysis-mini-icon blue">
+                        <span class="material-symbols-outlined" style="font-size: 1rem;">assignment</span>
+                    </div>
+                    <strong>{{ selected_patient.task_progress.total_today }}</strong>
+                    <span class="analysis-mini-label">Assigned</span>
+                </div>
+            </div>
 
-              <div class="grid grid-cols-3 gap-3 mb-4">
-                <div class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant shadow-level-1 flex flex-col items-center gap-1 text-center">
-                  <div class="w-8 h-8 rounded-full flex items-center justify-center text-green-600 bg-green-50 mb-1" style="color: var(--success); background: color-mix(in srgb, var(--success) 15%, transparent);">
-                    <span class="material-symbols-outlined text-[18px]">check_circle</span>
-                  </div>
-                  <span class="text-xl font-black text-on-surface">{{ selected_patient.task_progress.completed_today }}</span>
-                  <span class="text-[9px] font-black uppercase tracking-tighter text-outline">Completed</span>
+            {# AI summary #}
+            <div class="ai-summary-card">
+                <div class="ai-label">
+                    <span class="ai-dot"></span>
+                    AI Analysis
                 </div>
-                
-                <div class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant shadow-level-1 flex flex-col items-center gap-1 text-center">
-                  <div class="w-8 h-8 rounded-full flex items-center justify-center text-secondary bg-secondary-container mb-1">
-                    <span class="material-symbols-outlined text-[18px]">pending</span>
-                  </div>
-                  <span class="text-xl font-black text-on-surface">{{ selected_patient.task_progress.pending_today }}</span>
-                  <span class="text-[9px] font-black uppercase tracking-tighter text-outline">Pending</span>
-                </div>
-                
-                <div class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant shadow-level-1 flex flex-col items-center gap-1 text-center">
-                  <div class="w-8 h-8 rounded-full flex items-center justify-center text-primary bg-primary-container mb-1">
-                    <span class="material-symbols-outlined text-[18px]">assignment</span>
-                  </div>
-                  <span class="text-xl font-black text-on-surface">{{ selected_patient.task_progress.total_today }}</span>
-                  <span class="text-[9px] font-black uppercase tracking-tighter text-outline">Assigned</span>
-                </div>
-              </div>
-
-              <section class="bg-surface-container-lowest rounded-2xl p-5 shadow-level-1 border border-outline-variant">
-                <p class="text-sm font-bold text-on-surface mb-2">AI Analysis</p>
-                <div class="text-sm text-on-surface-variant leading-relaxed" style="white-space: pre-wrap;">
-                  {{ selected_patient.ai_summary|default:"AI summary not generated yet." }}
-                </div>
-              </section>
+                <div class="ai-summary-body">{{ selected_patient.ai_summary|default:"AI summary not generated yet. Open the assistant to request an analysis for this patient." }}</div>
             </div>
         </div>
     </section>

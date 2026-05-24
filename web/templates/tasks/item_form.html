@@ -23,60 +23,60 @@
             <div class="field-card field-card--full">
                 <label for="id_title">Title</label>
                 {{ form.title }}
-                <div class="form-error">{{ form.title.errors }}</div>
+                {% if form.title.errors %}{{ form.title.errors }}{% endif %}
             </div>
             <div class="field-card field-card--full">
                 <label for="id_description">Description</label>
                 {{ form.description }}
-                <div class="form-error">{{ form.description.errors }}</div>
+                {% if form.description.errors %}{{ form.description.errors }}{% endif %}
             </div>
             <div class="field-card field-card--full">
                 <label for="id_notes">Steps / Notes</label>
                 {{ form.notes }}
-                <div class="form-error">{{ form.notes.errors }}</div>
+                {% if form.notes.errors %}{{ form.notes.errors }}{% endif %}
             </div>
             <div class="field-card">
                 <label for="id_status">Status</label>
                 {{ form.status }}
-                <div class="form-error">{{ form.status.errors }}</div>
+                {% if form.status.errors %}{{ form.status.errors }}{% endif %}
             </div>
             <div class="field-card">
                 <label for="id_priority">Priority</label>
                 {{ form.priority }}
                 {% if form.priority.help_text %}<p class="muted form-note">{{ form.priority.help_text }}</p>{% endif %}
-                <div class="form-error">{{ form.priority.errors }}</div>
+                {% if form.priority.errors %}{{ form.priority.errors }}{% endif %}
             </div>
             <div class="field-card">
                 <label for="id_due_at">Due At</label>
                 {{ form.due_at }}
-                <div class="form-error">{{ form.due_at.errors }}</div>
+                {% if form.due_at.errors %}{{ form.due_at.errors }}{% endif %}
             </div>
             <div class="field-card">
                 <label for="id_recurrence_mode">Recurrence</label>
                 {{ form.recurrence_mode }}
-                <div class="form-error">{{ form.recurrence_mode.errors }}</div>
+                {% if form.recurrence_mode.errors %}{{ form.recurrence_mode.errors }}{% endif %}
             </div>
             <div class="field-card field-card--full">
                 <label>Recurrence Days</label>
                 <div class="chip-row" style="margin-top:4px;">{{ form.recurrence_weekday_choices }}</div>
-                <div class="form-error">{{ form.recurrence_weekday_choices.errors }}</div>
+                {% if form.recurrence_weekday_choices.errors %}{{ form.recurrence_weekday_choices.errors }}{% endif %}
             </div>
             <div class="field-card field-card--full">
                 <label for="id_recurrence_dates">Recurrence Dates / Day Numbers</label>
                 {{ form.recurrence_dates }}
-                <div class="form-error">{{ form.recurrence_dates.errors }}</div>
+                {% if form.recurrence_dates.errors %}{{ form.recurrence_dates.errors }}{% endif %}
             </div>
             <div class="field-card">
                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
                     {{ form.reminder_enabled }}
                     <span>Enable reminder</span>
                 </label>
-                <div class="form-error">{{ form.reminder_enabled.errors }}</div>
+                {% if form.reminder_enabled.errors %}{{ form.reminder_enabled.errors }}{% endif %}
             </div>
             <div class="field-card">
                 <label for="id_reminder_minutes_before">Reminder minutes before</label>
                 {{ form.reminder_minutes_before }}
-                <div class="form-error">{{ form.reminder_minutes_before.errors }}</div>
+                {% if form.reminder_minutes_before.errors %}{{ form.reminder_minutes_before.errors }}{% endif %}
             </div>
         </div>
         <div class="form-actions" style="margin-top:14px;">

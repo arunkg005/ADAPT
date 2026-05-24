@@ -9,15 +9,15 @@
 
     <form method="post">
         {% csrf_token %}
-        <div class="grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+        <div class="field-grid">
             {% for field in form %}
-                <div class="metric" style="{% if field.field.widget.input_type == 'textarea' or field.name == 'history_diseases_csv' %}grid-column: 1 / span 2;{% endif %}">
+                <div class="field-card {% if field.field.widget.input_type == 'textarea' or field.name == 'history_diseases_csv' %}field-card--full{% endif %}">
                     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                     {{ field }}
                     {% if field.help_text %}
-                        <div style="color:var(--muted); margin-top:4px; font-size:13px;">{{ field.help_text }}</div>
+                        <p class="muted form-note">{{ field.help_text }}</p>
                     {% endif %}
-                    <div style="color:var(--destructive);">{{ field.errors }}</div>
+                    {% if field.errors %}{{ field.errors }}{% endif %}
                 </div>
             {% endfor %}
         </div>
@@ -28,14 +28,17 @@
         </div>
     </form>
 
-    <hr style="border:none; border-top:1px solid var(--border); margin:18px 0;">
-    <h3 style="margin-top:0; color:#991b1b;">Danger Zone</h3>
-    <p style="color:#7f1d1d;">Deleting a patient permanently removes profile data, documents, tasks, and related history.</p>
-    <form method="post" onsubmit="return confirm('Delete this patient and all related records permanently?');">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="delete">
-        <button class="btn" type="submit" style="background:#fee2e2; border-color:#fecaca; color:#991b1b;">Delete Patient</button>
-    </form>
+    <hr style="border:none; border-top:1px solid var(--border); margin:24px 0;">
+    
+    <div style="background: var(--destructive-soft); border: 1px solid color-mix(in srgb, var(--destructive) 30%, var(--border)); padding: 20px; border-radius: var(--radius-lg);">
+        <h3 style="margin-top:0; color:var(--destructive); margin-bottom: 8px;">Danger Zone</h3>
+        <p style="color: color-mix(in srgb, var(--destructive) 80%, var(--ink)); margin-top: 0;">Deleting a patient permanently removes profile data, documents, tasks, and related history.</p>
+        <form method="post" onsubmit="return confirm('Delete this patient and all related records permanently?');" style="margin-top: 16px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete">
+            <button class="btn danger" type="submit">Delete Patient</button>
+        </form>
+    </div>
 
     <div class="row-actions">
         <a class="btn" href="{% url 'dashboard:patient_dashboard' patient.id %}">Back to Patient Dashboard</a>

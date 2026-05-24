@@ -1,17 +1,72 @@
 {% extends "base.html" %}
-{% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4">{{ heading|default:"Select a patient" }}</h2>
-    <div class="patient-list">
-    {% for patient in patients %}
-        <a href="?patient_id={{ patient.id }}" class="patient-card">
-            <div class="patient-card__header">
-                <strong>{{ patient.name }}</strong>
-                <span>{{ patient.age }} yrs, {{ patient.gender }}</span>
-            </div>
-        </a>
-    {% endfor %}
-    </div>
-</div>
-{% endblock %}
 
+{% block content %}
+<style>
+    .patient-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 120px;
+        transition: transform var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+        text-decoration: none;
+        color: var(--ink);
+    }
+    .patient-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+    }
+    .patient-card__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.1rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 12px;
+    }
+    .patient-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+    @media (max-width: 768px) {
+        .patient-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="panel">
+    <div class="page-toolbar table-toolbar">
+        <div class="table-heading-wrap">
+            <p class="section-label">Routine Builder</p>
+            <h2 class="panel-title">{{ heading|default:"Select a patient" }}</h2>
+        </div>
+        <div class="table-toolbar-actions">
+            <a class="btn" href="{% url 'dashboard:index' %}">Cancel</a>
+        </div>
+    </div>
+</section>
+
+{% if patients %}
+    <section class="patient-grid">
+        {% for patient in patients %}
+            <a href="?patient_id={{ patient.id }}" class="patient-card">
+                <div class="patient-card__header">
+                    <strong>{{ patient.name }}</strong>
+                    <span class="muted" style="font-size: 0.9rem;">{{ patient.age }} yrs</span>
+                </div>
+                <div class="muted">{{ patient.get_gender_display|default:patient.gender }}</div>
+            </a>
+        {% endfor %}
+    </section>
+{% else %}
+    <section class="panel">
+        <p style="margin:0;">No patients available.</p>
+    </section>
+{% endif %}
+{% endblock %}

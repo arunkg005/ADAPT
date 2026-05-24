@@ -177,9 +177,9 @@ def _serialize_patient(patient):
 			for medication in medication_entries
 		],
 		"medications": [f"{m.name} {('- ' + m.dosage) if m.dosage else ''}".strip() for m in medication_entries] or ["No medications listed"],
-		"tasks": [f"{item.title} ({item.get_status_display()})" for item in task_items] or ["Task list is empty."],
-		"routine": [f"{item.title} ({item.notes or 'No notes'})" for item in routine_items] or ["Routine tasks are not configured yet."],
-		"schedule": [f"{item.title} ({item.notes or 'No notes'})" for item in schedule_items] or ["Scheduled tasks are not configured yet."],
+		"tasks": [{"id": item.id, "title": item.title, "display_status": item.get_status_display(), "notes": item.notes} for item in task_items] or [],
+		"routine": [{"id": item.id, "title": item.title, "notes": item.notes} for item in routine_items] or [],
+		"schedule": [{"id": item.id, "title": item.title, "notes": item.notes} for item in schedule_items] or [],
 		"reminder_preference": {
 			"enabled": patient.routine_reminder_enabled,
 			"minutes_before": patient.routine_reminder_minutes_before,

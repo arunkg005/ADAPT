@@ -13,7 +13,9 @@
                 <div class="metric" style="{% if field.field.widget.input_type == 'textarea' %}grid-column: 1 / span 2;{% endif %}">
                     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                     {{ field }}
-                    <div style="color:#b91c1c;">{{ field.errors }}</div>
+                    {% if field.errors %}
+                        <div class="form-error">{{ field.errors }}</div>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>
@@ -29,7 +31,7 @@
     <form method="post" onsubmit="return confirm('Delete caretaker profile settings and reset to default values?');">
         {% csrf_token %}
         <input type="hidden" name="action" value="delete">
-        <button class="btn" type="submit" style="background:#fee2e2; border-color:#fecaca; color:#991b1b;">Delete Profile Settings</button>
+        <button class="btn btn-action" type="submit" style="background:var(--destructive-soft); border-color:var(--destructive); color:var(--destructive); width:100%; display:flex; justify-content:center;">Delete Profile Settings</button>
     </form>
 </div>
 {% endblock %}

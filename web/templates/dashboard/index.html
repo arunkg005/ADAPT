@@ -1,17 +1,307 @@
 {% extends "base.html" %}
 
-{% block title %}Caretaker Dashboard | ADAPT{% endblock %}
+{% block title %}Patient Overview | ADAPT{% endblock %}
+{% block meta_description %}Manage and review all registered patients in your ADAPT caregiver workspace.{% endblock %}
+
+{% block head %}
+<style>
+    /* ================================================================
+       Dashboard Index — Phase 2 Component Styles
+       ================================================================ */
+
+    /* ---- Stat summary strip ---- */
+    .dash-stat-strip {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .dash-stat-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 18px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        background: var(--surface-strong);
+        transition: box-shadow var(--duration-base) ease, transform var(--duration-fast) var(--ease-out);
+    }
+
+    .dash-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .dash-stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .dash-stat-icon.blue {
+        background: var(--info-soft);
+        color: var(--info);
+    }
+
+    .dash-stat-icon.green {
+        background: var(--success-soft);
+        color: var(--success);
+    }
+
+    .dash-stat-icon.orange {
+        background: var(--accent-soft);
+        color: var(--accent);
+    }
+
+    .dash-stat-copy strong {
+        display: block;
+        font-size: 1.55rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        color: var(--ink);
+    }
+
+    .dash-stat-copy span {
+        font-size: 0.82rem;
+        color: var(--muted);
+        font-weight: 500;
+    }
+
+    /* ---- Toolbar improvements ---- */
+    .dash-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .dash-toolbar-left h3 {
+        margin: 0;
+        font-size: 1.15rem;
+        letter-spacing: -0.02em;
+    }
+
+    .dash-toolbar-left .dash-sub {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 0.84rem;
+    }
+
+    /* ---- Patient avatar in table ---- */
+    .patient-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 65%, var(--accent)));
+        color: var(--primary-foreground);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .patient-name-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* ---- Semantic disease pills ---- */
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: var(--radius-full);
+        background: var(--info-soft);
+        border: 1px solid color-mix(in srgb, var(--info) 20%, transparent);
+        color: var(--info);
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    /* ---- Button variants ---- */
+    .btn-primary-sm {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: var(--radius-md);
+        border: 1px solid transparent;
+        background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 78%, var(--accent) 22%));
+        color: var(--primary-foreground);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform var(--duration-fast) var(--ease-out),
+                    box-shadow var(--duration-fast) ease,
+                    filter var(--duration-fast) ease;
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.14);
+    }
+
+    .btn-primary-sm:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2);
+    }
+
+    .btn-primary-sm:active {
+        transform: translateY(0);
+        filter: brightness(0.94);
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+    }
+
+    .btn-ghost-sm {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--ink);
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background var(--duration-fast) ease,
+                    border-color var(--duration-fast) ease,
+                    transform var(--duration-fast) var(--ease-out);
+    }
+
+    .btn-ghost-sm:hover {
+        background: var(--surface-soft);
+        border-color: var(--border-strong);
+        transform: translateY(-1px);
+    }
+
+    .btn-ghost-sm:active {
+        transform: translateY(0);
+        background: var(--surface-hover);
+    }
+
+    /* ---- Table refinements ---- */
+    .table th {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        padding: 10px 12px;
+    }
+
+    .table td {
+        padding: 12px 12px;
+        vertical-align: middle;
+    }
+
+    .table tbody tr {
+        transition: background var(--duration-fast) ease;
+    }
+
+    .table tbody tr:hover {
+        background: color-mix(in srgb, var(--primary) 4%, transparent);
+    }
+
+    /* ---- Enhanced empty state ---- */
+    .empty-state-enhanced {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 48px 24px;
+        border-radius: var(--radius-lg);
+        border: 1px dashed var(--border);
+        background: var(--surface-soft);
+        text-align: center;
+        color: var(--muted);
+    }
+
+    .empty-state-enhanced .empty-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: var(--radius-md);
+        background: var(--surface-hover);
+        color: var(--muted-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-state-enhanced strong {
+        display: block;
+        color: var(--ink);
+        font-size: 1rem;
+    }
+
+    .empty-state-enhanced p {
+        margin: 0;
+        font-size: 0.88rem;
+        max-width: 32ch;
+        line-height: 1.5;
+    }
+
+    @media (max-width: 720px) {
+        .dash-stat-strip {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <section class="panel">
-    <div class="page-toolbar table-toolbar">
-        <div class="table-heading-wrap">
-            <h3 class="panel-title">Patient list</h3>
-            <span class="patient-count-subscript">{{ patients|length }} patients</span>
+    <!-- Summary stat strip -->
+    <div class="dash-stat-strip">
+        <div class="dash-stat-card">
+            <div class="dash-stat-icon blue">
+                <span class="material-symbols-outlined" style="font-size: 1.25rem;">groups</span>
+            </div>
+            <div class="dash-stat-copy">
+                <strong>{{ patients|length }}</strong>
+                <span>Registered patients</span>
+            </div>
         </div>
-        <div class="table-toolbar-actions">
-            <a class="btn primary" href="{% url 'patients:add_patient' %}">Add Patient</a>
+        <div class="dash-stat-card">
+            <div class="dash-stat-icon green">
+                <span class="material-symbols-outlined" style="font-size: 1.25rem;">check_circle</span>
+            </div>
+            <div class="dash-stat-copy">
+                <strong>{{ patients|length }}</strong>
+                <span>Active profiles</span>
+            </div>
         </div>
+        <div class="dash-stat-card">
+            <div class="dash-stat-icon orange">
+                <span class="material-symbols-outlined" style="font-size: 1.25rem;">assignment</span>
+            </div>
+            <div class="dash-stat-copy">
+                <strong>—</strong>
+                <span>Tasks due today</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="dash-toolbar">
+        <div class="dash-toolbar-left">
+            <h3>Patient list</h3>
+            <p class="dash-sub">{{ patients|length }} patient{{ patients|length|pluralize }} registered</p>
+        </div>
+        <a class="btn-primary-sm" href="{% url 'patients:add_patient' %}">
+            <span class="material-symbols-outlined" style="font-size: 1rem;">add</span>
+            Add Patient
+        </a>
     </div>
 
     {% if patients %}
@@ -19,20 +309,23 @@
             <table class="table patient-table" aria-label="Patient list">
                 <thead>
                     <tr>
-                        <th>Sr No.</th>
-                        <th>Name</th>
+                        <th>#</th>
+                        <th>Patient</th>
                         <th>Age</th>
                         <th>Gender</th>
-                        <th>Disease</th>
-                        <th>Action</th>
+                        <th>Conditions</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for patient in patients %}
                         <tr data-patient-card data-search-text="{{ patient.name }} {{ patient.age }} {{ patient.gender }} {% if patient.diseases %}{% for disease in patient.diseases %}{{ disease }} {% endfor %}{% endif %}" data-search-href="{% url 'dashboard:patient_dashboard' patient.id %}">
-                            <td>{{ forloop.counter }}</td>
+                            <td style="color: var(--muted); font-size: 0.82rem; font-weight: 600;">{{ forloop.counter }}</td>
                             <td>
-                                <strong>{{ patient.name }}</strong>
+                                <div class="patient-name-cell">
+                                    <div class="patient-avatar" aria-hidden="true">{{ patient.name|first|upper }}</div>
+                                    <strong>{{ patient.name }}</strong>
+                                </div>
                             </td>
                             <td>{{ patient.age }}</td>
                             <td>{{ patient.gender }}</td>
@@ -43,14 +336,19 @@
                                             <span class="pill">{{ disease }}</span>
                                         {% endfor %}
                                     {% else %}
-                                        <span class="muted">General care</span>
+                                        <span class="muted" style="font-size: 0.85rem;">General care</span>
                                     {% endif %}
                                 </div>
                             </td>
                             <td>
                                 <div class="table-actions">
-                                    <a class="btn btn-action" href="{% url 'dashboard:patient_dashboard' patient.id %}">Open dashboard</a>
-                                    <a class="btn btn-action" href="{% url 'dashboard:patient_settings' patient.id %}">Edit</a>
+                                    <a class="btn-primary-sm" href="{% url 'dashboard:patient_dashboard' patient.id %}">
+                                        Open dashboard
+                                    </a>
+                                    <a class="btn-ghost-sm" href="{% url 'dashboard:patient_settings' patient.id %}">
+                                        <span class="material-symbols-outlined" style="font-size: 0.95rem;">edit</span>
+                                        Edit
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -59,7 +357,19 @@
             </table>
         </div>
     {% else %}
-        <div class="empty-state">No patients yet. Add the first profile to begin.</div>
+        <div class="empty-state-enhanced">
+            <div class="empty-icon">
+                <span class="material-symbols-outlined" style="font-size: 1.4rem;">person_add</span>
+            </div>
+            <div>
+                <strong>No patients yet</strong>
+                <p>Add the first patient profile to begin managing care routines and schedules.</p>
+            </div>
+            <a class="btn-primary-sm" href="{% url 'patients:add_patient' %}">
+                <span class="material-symbols-outlined" style="font-size: 1rem;">add</span>
+                Add first patient
+            </a>
+        </div>
     {% endif %}
 </section>
 {% endblock %}

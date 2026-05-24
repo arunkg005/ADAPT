@@ -1,244 +1,296 @@
 {% extends "base.html" %}
-{% block content %}
 
+{% block title %}Schedule Window | ADAPT{% endblock %}
+{% block meta_description %}Manage and review the scheduling timeline for the selected patient.{% endblock %}
+
+{% block head %}
 <style>
-.calendar-shell { border:1px solid var(--border); border-radius:20px; overflow:hidden; background:var(--surface-strong); }
+    .schedule-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 20px;
+        align-items: start;
+    }
 
-/* HEADER */
-.calendar-header { display:flex; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border);}
-.calendar-header-left, .calendar-header-right { display:flex; gap:10px; align-items:center; }
+    @media (max-width: 900px) {
+        .schedule-shell {
+            grid-template-columns: 1fr;
+        }
+    }
 
-/* MONTH */
-.calendar-month { display:grid; grid-template-columns:repeat(7,1fr); }
-.calendar-day-box { height:110px; border:1px solid var(--border); padding:6px; cursor:pointer; position:relative;}
-.event-bar { height:5px; background:var(--primary); border-radius:4px; margin-top:3px; }
+    .panel {
+        background: var(--surface-strong);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+    }
 
-/* WEEK/DAY */
-.calendar-time { display:grid; grid-template-columns:60px 1fr; position:relative;}
-.time-label { height:60px; font-size:12px; color:var(--muted); }
-.time-slot { height:60px; border-bottom:1px solid var(--border); position:relative; cursor:pointer;}
+    .schedule-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 16px;
+    }
 
-/* EVENTS */
-.event { position:absolute; left:10%; width:80%; background:var(--primary); color:#fff; border-radius:6px; padding:4px; cursor:pointer; }
+    .schedule-header h1 {
+        margin: 0 0 4px;
+        font-size: 1.8rem;
+        letter-spacing: -0.02em;
+    }
 
-/* POPUP */
-.popup { position:fixed; top:30%; left:50%; transform:translateX(-50%);
-background:var(--surface); border:1px solid var(--border); padding:16px; border-radius:14px; display:none; z-index:999; }
+    .schedule-header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+    }
 
-/* FORM */
-.form-box { position:fixed; bottom:20px; right:20px; background:var(--surface);
-padding:14px; border:1px solid var(--border); border-radius:12px; display:none; }
+    .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .timeline-item {
+        display: flex;
+        gap: 16px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 16px;
+        transition: transform var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+    }
+
+    .timeline-item:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .timeline-time {
+        min-width: 80px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--primary);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        border-right: 2px solid var(--border);
+        padding-right: 16px;
+    }
+
+    .timeline-time small {
+        font-size: 0.75rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .timeline-content {
+        flex: 1;
+    }
+
+    .timeline-content h3 {
+        margin: 0 0 6px;
+        font-size: 1.1rem;
+        color: var(--ink);
+    }
+
+    .timeline-content p {
+        margin: 0;
+        color: var(--ink-secondary);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .sidebar-widget {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+
+    .sidebar-widget h3 {
+        margin: 0 0 12px;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--ink);
+    }
+
+    .next-step-item {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+    }
+
+    .next-step-item:first-of-type {
+        border-top: none;
+        padding-top: 0;
+        margin-top: 0;
+    }
+
+    .next-step-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: var(--radius-full);
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .badge.urgent {
+        background: var(--destructive-soft);
+        color: var(--destructive);
+    }
+
+    .badge.routine {
+        background: var(--info-soft);
+        color: var(--info);
+    }
+
+    .badge.medical {
+        background: var(--primary-soft);
+        color: var(--primary);
+    }
+
+    .next-step-time {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--muted);
+    }
+
+    .next-step-item h4 {
+        margin: 0 0 4px;
+        font-size: 0.95rem;
+    }
+
+    .next-step-item p {
+        margin: 0 0 10px;
+        font-size: 0.85rem;
+        color: var(--ink-secondary);
+    }
+
+    .patient-selector {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
 </style>
+{% endblock %}
 
-<div class="calendar-shell">
+{% block content %}
+<div class="schedule-shell">
+    <div class="schedule-main">
+        <section class="panel">
+            <div class="schedule-header">
+                <div>
+                    <h1>{{ selected_patient.name|default:"Schedule Window" }}</h1>
+                    <p>{{ schedule_month_label }} &mdash; {{ schedule_range_label }}</p>
+                </div>
+                {% if selected_patient %}
+                <div style="text-align: right;">
+                    <span class="pill" style="background: var(--surface-soft); border: 1px solid var(--border); color: var(--ink); padding: 6px 12px; border-radius: var(--radius-full); font-weight: 600; font-size: 0.85rem;">
+                        {{ schedule_metrics.total }} Total Items
+                    </span>
+                </div>
+                {% endif %}
+            </div>
 
-<!-- HEADER -->
-<div class="calendar-header">
-    <div class="calendar-header-left">
-        <button onclick="today()">Today</button>
-        <button onclick="prev()">‹</button>
-        <button onclick="next()">›</button>
-        <h3 id="title"></h3>
+            {% if not selected_patient %}
+                <div class="empty-state" style="text-align: center; padding: 40px 20px;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: var(--muted); margin-bottom: 16px;">calendar_today</span>
+                    <h2 style="margin: 0 0 8px;">Select a Patient</h2>
+                    <p style="color: var(--muted); margin: 0;">Choose a patient from the sidebar to view their schedule.</p>
+                </div>
+            {% else %}
+                <div class="timeline">
+                    {% for event in schedule_events %}
+                        <div class="timeline-item">
+                            <div class="timeline-time">
+                                <span>{{ event.time }}</span>
+                                <small>{{ event.day }}, {{ event.date }}</small>
+                            </div>
+                            <div class="timeline-content">
+                                <h3>{{ event.title }}</h3>
+                                <p>{{ event.description }}</p>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="empty-state" style="text-align: center; padding: 40px 20px; border: 1px dashed var(--border); border-radius: var(--radius-lg); background: var(--surface-soft);">
+                            <p style="color: var(--muted); margin: 0;">No schedule events found for this time period.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
     </div>
 
-    <div class="calendar-header-right">
-        <input type="date" onchange="jump(this.value)">
-        <select id="view" onchange="changeView()">
-            <option value="month">Month</option>
-            <option value="week">Week</option>
-            <option value="day">Day</option>
-        </select>
-        <button onclick="openForm()">+</button>
-    </div>
+    <aside class="schedule-sidebar">
+        {% if selected_patient %}
+            <div class="sidebar-widget">
+                <h3><span class="material-symbols-outlined" style="font-size: 1.2rem; color: var(--primary);">bolt</span> Next Steps</h3>
+                <div class="next-steps-list">
+                    {% for step in schedule_next_steps %}
+                        <div class="next-step-item">
+                            <div class="next-step-meta">
+                                <span class="badge {{ step.kind }}">{{ step.label }}</span>
+                                <span class="next-step-time">{{ step.time }}</span>
+                            </div>
+                            <h4>{{ step.title }}</h4>
+                            <p>{{ step.description }}</p>
+                            {% if step.button %}
+                                <a href="{% url 'dashboard:task_lab' %}?patient_id={{ selected_patient.id }}" class="btn primary" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 8px;">{{ step.button }}</a>
+                            {% endif %}
+                            {% if step.progress %}
+                                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-top: 8px;">
+                                    <span>Progress</span>
+                                    <span>{{ step.progress }}</span>
+                                </div>
+                                <div style="height: 6px; background: var(--surface-soft); border-radius: 4px; overflow: hidden; margin-top: 4px;">
+                                    <div style="height: 100%; width: {{ step.progress_value }}%; background: var(--primary);"></div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <p style="color: var(--muted); font-size: 0.85rem; margin: 0;">No upcoming steps.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <h3><span class="material-symbols-outlined" style="font-size: 1.2rem; color: var(--warning);">note_alt</span> {{ schedule_note_title }}</h3>
+                <p style="font-size: 0.9rem; color: var(--ink-secondary); margin: 0 0 12px; line-height: 1.5;">{{ schedule_note_body }}</p>
+                <div style="padding: 12px; background: var(--info-soft); border-radius: var(--radius-md); font-size: 0.85rem; color: color-mix(in srgb, var(--info) 80%, var(--ink)); font-weight: 500; border: 1px solid color-mix(in srgb, var(--info) 20%, transparent);">
+                    {{ schedule_note_followup }}
+                </div>
+            </div>
+        {% endif %}
+        
+        <div class="sidebar-widget">
+            <h3><span class="material-symbols-outlined" style="font-size: 1.2rem;">group</span> Switch Patient</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+                {% for p in patients %}
+                    <a href="{% url 'dashboard:schedule' %}?patient_id={{ p.id }}" class="btn {% if selected_patient.id == p.id %}primary{% endif %}" style="justify-content: flex-start;">
+                        {{ p.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </aside>
 </div>
-
-<div id="viewContainer"></div>
-</div>
-
-<!-- POPUP -->
-<div id="popup" class="popup"></div>
-
-<!-- FORM -->
-<div id="form" class="form-box">
-    <input id="f_title" placeholder="title"><br>
-    <input id="f_time" placeholder="hour"><br>
-    <button onclick="save()">save</button>
-</div>
-
-<script>
-let view="month";
-let current=new Date();
-let events=[];
-
-/* ---------- RENDER ---------- */
-function render(){
-    if(view==="month") renderMonth();
-    if(view==="week") renderWeek();
-    if(view==="day") renderDay();
-}
-
-/* ---------- HEADER ---------- */
-function updateTitle(){
-    if(view==="month"){
-        title.innerText=current.toLocaleString('default',{month:'long',year:'numeric'});
-    }
-    if(view==="day"){
-        title.innerText=current.toDateString();
-    }
-    if(view==="week"){
-        let start=new Date(current);
-        start.setDate(current.getDate()-current.getDay());
-        let end=new Date(start); end.setDate(start.getDate()+6);
-
-        title.innerText=`${start.getDate()}–${end.getDate()} ${end.toLocaleString('default',{month:'short'})} ${end.getFullYear()}`;
-    }
-}
-
-/* ---------- MONTH ---------- */
-function renderMonth(){
-    updateTitle();
-    let c=document.getElementById("viewContainer");
-    c.innerHTML='<div class="calendar-month"></div>';
-    let grid=c.firstChild;
-
-    let first=new Date(current.getFullYear(),current.getMonth(),1).getDay();
-    let days=new Date(current.getFullYear(),current.getMonth()+1,0).getDate();
-
-    for(let i=0;i<first;i++){
-        grid.appendChild(document.createElement("div"));
-    }
-
-    for(let d=1;d<=days;d++){
-        let box=document.createElement("div");
-        box.className="calendar-day-box";
-        box.innerHTML=`<strong>${d}</strong>`;
-
-        box.onclick=()=>openForm(null,d);
-
-        events.forEach(e=>{
-            if(sameDay(e.date,new Date(current.getFullYear(),current.getMonth(),d))){
-                let bar=document.createElement("div");
-                bar.className="event-bar";
-                bar.onclick=(x)=>{x.stopPropagation();show(e);}
-                box.appendChild(bar);
-            }
-        });
-
-        grid.appendChild(box);
-    }
-}
-
-/* ---------- WEEK ---------- */
-function renderWeek(){
-    updateTitle();
-    let c=document.getElementById("viewContainer");
-    c.innerHTML='<div class="calendar-time"></div>';
-    let grid=c.firstChild;
-
-    let start=new Date(current);
-    start.setDate(current.getDate()-current.getDay());
-
-    for(let h=0;h<24;h++){
-        let label=document.createElement("div");
-        label.className="time-label";
-        label.innerText=h+":00";
-
-        let slot=document.createElement("div");
-        slot.className="time-slot";
-        slot.onclick=()=>openForm(h,start);
-
-        grid.appendChild(label);
-        grid.appendChild(slot);
-    }
-
-    events.forEach(e=>{
-        if(inWeek(e.date,start)){
-            let ev=document.createElement("div");
-            ev.className="event";
-            ev.style.top=(e.time*60)+"px";
-            ev.innerText=e.title;
-            ev.onclick=(x)=>{x.stopPropagation();show(e);}
-            grid.appendChild(ev);
-        }
-    });
-}
-
-/* ---------- DAY ---------- */
-function renderDay(){
-    updateTitle();
-    let c=document.getElementById("viewContainer");
-    c.innerHTML='<div class="calendar-time"></div>';
-    let grid=c.firstChild;
-
-    for(let h=0;h<24;h++){
-        let label=document.createElement("div");
-        label.className="time-label";
-        label.innerText=h+":00";
-
-        let slot=document.createElement("div");
-        slot.className="time-slot";
-        slot.onclick=()=>openForm(h,current);
-
-        grid.appendChild(label);
-        grid.appendChild(slot);
-    }
-
-    events.forEach(e=>{
-        if(sameDay(e.date,current)){
-            let ev=document.createElement("div");
-            ev.className="event";
-            ev.style.top=(e.time*60)+"px";
-            ev.innerText=e.title;
-            ev.onclick=(x)=>{x.stopPropagation();show(e);}
-            grid.appendChild(ev);
-        }
-    });
-}
-
-/* ---------- FORM ---------- */
-function openForm(hour=null,date=current){
-    form.style.display="block";
-    f_time.value=hour??"";
-    form.dataset.date=date;
-}
-
-function save(){
-    events.push({
-        title:f_title.value,
-        time:parseInt(f_time.value)||0,
-        date:new Date(form.dataset.date)
-    });
-    form.style.display="none";
-    render();
-}
-
-/* ---------- POPUP ---------- */
-function show(e){
-    popup.style.display="block";
-    popup.innerHTML=`
-        <h3>${e.title}</h3>
-        <p>${e.date.toDateString()}</p>
-        <p>${e.time}:00</p>
-        <button>Edit</button>
-    `;
-}
-
-/* ---------- NAV ---------- */
-function today(){ current=new Date(); render(); }
-function prev(){ current.setDate(current.getDate()-1); render(); }
-function next(){ current.setDate(current.getDate()+1); render(); }
-function changeView(){ view=viewSelect(); render(); }
-function viewSelect(){ return document.getElementById("view").value; }
-function jump(v){ current=new Date(v); render(); }
-
-/* ---------- HELPERS ---------- */
-function sameDay(a,b){ return new Date(a).toDateString()===new Date(b).toDateString(); }
-function inWeek(d,start){
-    let end=new Date(start); end.setDate(start.getDate()+6);
-    return d>=start && d<=end;
-}
-
-render();
-</script>
-
 {% endblock %}

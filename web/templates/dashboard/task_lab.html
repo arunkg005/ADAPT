@@ -4,6 +4,11 @@
 
 {% block head %}
 <style>
+    /* ================================================================
+       Task Lab — Phase 2 Component Styles
+       ================================================================ */
+
+    /* ---- Layout ---- */
     .task-lab-page {
         display: flex;
         flex-direction: column;
@@ -19,9 +24,9 @@
 
     .task-lab-panel {
         border: 1px solid var(--border);
-        border-radius: 24px;
-        background: var(--surface);
-        box-shadow: var(--shadow);
+        border-radius: var(--radius-xl);
+        background: var(--surface-strong);
+        box-shadow: var(--shadow-sm);
     }
 
     .task-lab-panel-inner {
@@ -47,38 +52,53 @@
     .task-lab-title-row {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 5px;
     }
 
     .task-lab-title-row h1 {
         margin: 0;
-        font-size: 1.4rem;
-        letter-spacing: -0.02em;
+        font-size: 1.3rem;
+        letter-spacing: -0.025em;
+        color: var(--ink);
     }
 
     .task-lab-title-row p {
         margin: 0;
         color: var(--muted);
-        font-size: 0.92rem;
+        font-size: 0.88rem;
         line-height: 1.4;
     }
 
+    /* ---- Sidebar patient search ---- */
     .task-lab-search {
         width: 100%;
-        padding: 12px 14px;
-        border-radius: 14px;
+        padding: 11px 14px;
+        border-radius: var(--radius-md);
         border: 1px solid var(--border);
-        background: var(--surface-strong);
+        background: var(--field-bg);
         color: var(--ink);
         outline: none;
+        font-size: 0.9rem;
+        transition: border-color var(--duration-fast) ease,
+                    box-shadow var(--duration-fast) ease,
+                    background var(--duration-fast) ease;
     }
 
+    .task-lab-search:focus {
+        border-color: var(--ring);
+        background: var(--surface-strong);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 22%, transparent);
+    }
+
+    /* ---- Patient list in sidebar ---- */
     .task-lab-patient-list {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
         overflow: auto;
         padding-right: 2px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
     }
 
     .task-lab-patient-card {
@@ -87,55 +107,68 @@
         justify-content: space-between;
         gap: 12px;
         width: 100%;
-        padding: 14px 14px;
-        border-radius: 18px;
+        padding: 13px 14px;
+        border-radius: var(--radius-lg);
         border: 1px solid var(--border);
         background: var(--surface-strong);
         color: var(--ink);
-        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        text-decoration: none;
+        transition: transform var(--duration-fast) var(--ease-out),
+                    border-color var(--duration-fast) ease,
+                    background var(--duration-fast) ease,
+                    box-shadow var(--duration-base) ease;
         text-align: left;
     }
 
     .task-lab-patient-card:hover {
         transform: translateY(-1px);
-        border-color: var(--primary);
+        border-color: var(--border-strong);
+        box-shadow: var(--shadow-xs);
+    }
+
+    .task-lab-patient-card:active {
+        transform: translateY(0);
+        background: var(--surface-soft);
     }
 
     .task-lab-patient-card.active {
-        background: var(--surface-strong);
+        background: color-mix(in srgb, var(--primary) 8%, var(--surface-strong));
         border-color: var(--primary);
-        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
     }
 
     .task-lab-patient-copy {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 3px;
         min-width: 0;
     }
 
     .task-lab-patient-copy strong {
-        font-size: 0.98rem;
-        line-height: 1.2;
+        font-size: 0.92rem;
+        line-height: 1.25;
+        color: var(--ink);
     }
 
     .task-lab-patient-copy span {
         color: var(--muted);
-        font-size: 0.82rem;
+        font-size: 0.8rem;
         line-height: 1.3;
     }
 
     .task-lab-patient-badge {
         flex: none;
-        padding: 6px 10px;
-        border-radius: 999px;
+        padding: 4px 9px;
+        border-radius: var(--radius-full);
         background: var(--surface-soft);
+        border: 1px solid var(--border);
         color: var(--muted);
-        font-size: 0.76rem;
+        font-size: 0.72rem;
         font-weight: 700;
         white-space: nowrap;
     }
 
+    /* ---- Main workspace ---- */
     .task-lab-workspace {
         display: flex;
         flex-direction: column;
@@ -158,75 +191,144 @@
         min-width: 0;
     }
 
+    /* ---- Patient avatar ---- */
     .task-lab-avatar {
-        width: 64px;
-        height: 64px;
-        border-radius: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: var(--radius-md);
         display: flex;
         align-items: center;
         justify-content: center;
         background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 72%, var(--accent)));
         color: var(--primary-foreground);
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         font-weight: 800;
         letter-spacing: 0.04em;
-        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.16);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
         flex: none;
     }
 
     .task-lab-hero-copy {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 7px;
         min-width: 0;
     }
 
     .task-lab-hero-copy h1 {
         margin: 0;
-        font-size: 1.9rem;
-        line-height: 1.05;
-        letter-spacing: -0.03em;
+        font-size: 1.8rem;
+        line-height: 1.08;
+        letter-spacing: -0.035em;
+        color: var(--ink);
     }
 
     .task-lab-hero-copy p {
         margin: 0;
         color: var(--muted);
-        font-size: 0.92rem;
+        font-size: 0.88rem;
+        line-height: 1.45;
     }
 
+    /* ---- Chip row ---- */
     .task-lab-chip-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 7px;
     }
 
     .task-lab-chip {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 7px 11px;
-        border-radius: 999px;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: var(--radius-full);
         background: var(--surface-soft);
+        border: 1px solid var(--border);
         color: var(--muted);
-        font-size: 0.78rem;
+        font-size: 0.76rem;
         font-weight: 700;
         white-space: nowrap;
     }
 
     .task-lab-chip.positive {
-        background: var(--surface-strong);
+        background: var(--success-soft);
         color: var(--success);
-        border: 1px solid var(--success);
+        border-color: color-mix(in srgb, var(--success) 22%, transparent);
     }
 
+    /* ============================================================
+       STATUS BADGE SYSTEM
+       Semantic colors for task statuses
+       ============================================================ */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: var(--radius-full);
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+    }
+
+    /* Done / Completed */
+    .status-badge-done {
+        background: var(--success-soft);
+        color: var(--success);
+        border: 1px solid color-mix(in srgb, var(--success) 22%, transparent);
+    }
+
+    /* Pending */
+    .status-badge-pending {
+        background: var(--warning-soft);
+        color: color-mix(in srgb, var(--warning) 78%, var(--ink));
+        border: 1px solid color-mix(in srgb, var(--warning) 28%, transparent);
+    }
+
+    /* Overdue */
+    .status-badge-overdue {
+        background: var(--destructive-soft);
+        color: var(--destructive);
+        border: 1px solid color-mix(in srgb, var(--destructive) 22%, transparent);
+    }
+
+    /* In Progress */
+    .status-badge-inprogress {
+        background: var(--info-soft);
+        color: var(--info);
+        border: 1px solid color-mix(in srgb, var(--info) 20%, transparent);
+    }
+
+    /* Priority badges */
+    .priority-badge-high {
+        background: var(--destructive-soft);
+        color: var(--destructive);
+        border: 1px solid color-mix(in srgb, var(--destructive) 18%, transparent);
+    }
+
+    .priority-badge-medium {
+        background: var(--warning-soft);
+        color: color-mix(in srgb, var(--warning) 80%, var(--ink));
+        border: 1px solid color-mix(in srgb, var(--warning) 24%, transparent);
+    }
+
+    .priority-badge-low {
+        background: var(--success-soft);
+        color: var(--success);
+        border: 1px solid color-mix(in srgb, var(--success) 20%, transparent);
+    }
+
+    /* ---- Task history / card views ---- */
     .task-lab-history-card,
     .task-lab-drawer,
     .task-lab-empty-card,
     .task-lab-card {
         border: 1px solid var(--border);
-        border-radius: 24px;
-        background: var(--surface);
-        box-shadow: var(--shadow);
+        border-radius: var(--radius-xl);
+        background: var(--surface-strong);
+        box-shadow: var(--shadow-sm);
     }
 
     .task-lab-card-inner {
@@ -239,64 +341,72 @@
         justify-content: space-between;
         gap: 12px;
         flex-wrap: wrap;
-        margin-bottom: 14px;
+        margin-bottom: 16px;
     }
 
     .task-lab-section-title {
         margin: 0;
-        font-size: 1.2rem;
-        letter-spacing: -0.02em;
+        font-size: 1.15rem;
+        letter-spacing: -0.025em;
+        color: var(--ink);
     }
 
     .task-lab-subtitle {
         margin: 4px 0 0;
         color: var(--muted);
-        font-size: 0.88rem;
-        line-height: 1.4;
+        font-size: 0.86rem;
+        line-height: 1.45;
     }
 
+    /* ---- Individual task cards ---- */
     .task-lab-task-list {
         display: grid;
-        gap: 12px;
+        gap: 10px;
     }
 
     .task-lab-task-card {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 14px;
-        padding: 14px;
-        border-radius: 18px;
+        padding: 16px;
+        border-radius: var(--radius-lg);
         border: 1px solid var(--border);
         background: var(--surface-strong);
+        transition: border-color var(--duration-fast) ease,
+                    transform var(--duration-fast) var(--ease-out),
+                    box-shadow var(--duration-base) ease;
+    }
+
+    .task-lab-task-card:hover {
+        border-color: var(--border-strong);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-xs);
     }
 
     .task-lab-task-card h3 {
-        margin: 0 0 6px;
-        font-size: 1rem;
-        line-height: 1.25;
+        margin: 0 0 5px;
+        font-size: 0.98rem;
+        line-height: 1.3;
+        color: var(--ink);
     }
 
     .task-lab-task-card p {
         margin: 0;
         color: var(--muted);
-        font-size: 0.86rem;
-        line-height: 1.45;
+        font-size: 0.84rem;
+        line-height: 1.5;
     }
 
     .task-lab-task-meta {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 7px;
         margin-top: 10px;
     }
 
-    .task-lab-task-meta .task-lab-chip {
-        padding: 5px 9px;
-        font-size: 0.74rem;
-    }
-
+    /* ---- Empty states ---- */
     .task-lab-empty-card {
-        padding: 30px 20px;
+        padding: 32px 20px;
         text-align: center;
         color: var(--muted);
     }
@@ -304,16 +414,23 @@
     .task-lab-empty-card strong {
         display: block;
         margin-bottom: 6px;
+        font-size: 0.95rem;
         color: var(--ink);
     }
 
+    .task-lab-empty-card span {
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+    /* ---- Form drawer ---- */
     .task-lab-drawer {
         display: none;
     }
 
     .task-lab-drawer.open {
         display: block;
-        animation: taskLabFadeIn 0.18s ease;
+        animation: taskLabFadeIn var(--duration-base) var(--ease-out);
     }
 
     .task-lab-builder-grid {
@@ -361,29 +478,33 @@
         padding: 18px;
     }
 
+    /* ---- Task preview box ---- */
     .task-lab-preview-box {
         border: 1px solid var(--border);
-        border-radius: 14px;
+        border-radius: var(--radius-md);
         padding: 16px;
-        background: var(--surface-strong);
+        background: var(--field-bg);
     }
 
     .task-lab-preview-title {
         display: block;
-        font-size: 1.05rem;
-        margin-bottom: 4px;
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: var(--ink);
     }
 
     .task-lab-preview-chip {
-        margin-bottom: 16px;
+        margin-bottom: 14px;
     }
 
     .task-lab-preview-steps {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
         color: var(--muted);
-        font-size: 0.88rem;
+        font-size: 0.86rem;
+        line-height: 1.45;
     }
 
     .task-lab-builder-side-card {
@@ -396,7 +517,7 @@
     .task-lab-divider {
         height: 1px;
         background: var(--border);
-        margin: 8px 0 0;
+        margin: 6px 0 0;
     }
 
     .task-lab-timeline-shell {
@@ -432,18 +553,20 @@
         right: 18px;
     }
 
-    .task-lab-hidden-fields {
-        display: none;
-    }
-
+    /* ---- Step items in builder ---- */
     .task-lab-step-item {
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        padding: 12px;
-        border-radius: 14px;
+        gap: 5px;
+        padding: 12px 14px;
+        border-radius: var(--radius-md);
         border: 1px solid var(--border);
-        background: var(--surface-strong);
+        background: var(--field-bg);
+        transition: border-color var(--duration-fast) ease;
+    }
+
+    .task-lab-step-item:hover {
+        border-color: var(--border-strong);
     }
 
     .task-lab-step-item-row {
@@ -456,25 +579,29 @@
     .task-lab-step-title {
         color: var(--ink);
         font-weight: 700;
+        font-size: 0.9rem;
     }
 
     .task-lab-step-detail {
         color: var(--muted);
-        font-size: 0.83rem;
+        font-size: 0.81rem;
         line-height: 1.4;
     }
 
     .task-lab-step-remove {
         border: none;
         background: transparent;
-        color: var(--muted);
+        color: var(--muted-light);
         cursor: pointer;
-        padding: 2px;
+        padding: 3px;
         line-height: 1;
+        border-radius: var(--radius-sm);
+        transition: color var(--duration-fast) ease, background var(--duration-fast) ease;
     }
 
     .task-lab-step-remove:hover {
         color: var(--destructive);
+        background: var(--destructive-soft);
     }
 
     .task-lab-edit-icon {
@@ -483,20 +610,128 @@
         cursor: pointer;
     }
 
+    /* ---- Medicine menu ---- */
+    .task-lab-switch-menu {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        min-width: 220px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--surface-strong);
+        box-shadow: var(--shadow);
+        z-index: 30;
+        overflow: hidden;
+    }
+
+    .task-lab-switch-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        width: 100%;
+        padding: 10px 14px;
+        border: none;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+        text-align: left;
+        font-size: 0.88rem;
+        transition: background var(--duration-fast) ease;
+    }
+
+    .task-lab-switch-item:hover {
+        background: var(--surface-soft);
+    }
+
     .task-lab-med-menu-trigger.active {
         border-color: var(--primary);
         color: var(--primary);
+        background: color-mix(in srgb, var(--primary) 8%, var(--surface-strong));
     }
 
-    @keyframes taskLabFadeIn {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
+    /* ---- Duration control ---- */
+    .task-lab-duration-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
+    .duration-label {
+        font-size: 0.82rem;
+        color: var(--muted);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .duration-unit {
+        font-size: 0.82rem;
+        color: var(--muted);
+    }
+
+    .task-lab-duration-control input[type="number"] {
+        width: 64px;
+        padding: 8px 10px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        background: var(--field-bg);
+        color: var(--ink);
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-align: center;
+        outline: none;
+        transition: border-color var(--duration-fast) ease,
+                    box-shadow var(--duration-fast) ease;
+    }
+
+    .task-lab-duration-control input[type="number"]:focus {
+        border-color: var(--ring);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 22%, transparent);
+    }
+
+    /* ---- Hidden fields ---- */
+    .task-lab-hidden-fields {
+        display: none;
+    }
+
+    /* ---- Sync note info card ---- */
+    .task-lab-sync-note {
+        margin-top: 14px;
+        padding: 14px 16px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: var(--info-soft);
+        color: color-mix(in srgb, var(--info) 80%, var(--ink));
+        font-size: 0.86rem;
+        line-height: 1.5;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .task-lab-sync-note strong {
+        display: block;
+        margin-bottom: 3px;
+        color: var(--info);
+    }
+
+    /* ---- Empty patient switch state ---- */
+    .task-lab-empty-switch {
+        padding: 20px;
+        border-radius: var(--radius-lg);
+        border: 1px dashed var(--border);
+        color: var(--muted);
+        background: var(--field-bg);
+        text-align: center;
+        font-size: 0.85rem;
+    }
+
+    /* ============================================================
+       FORM INPUTS — Modernized with design system tokens
+       ============================================================ */
     .task-lab-form-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
+        gap: 16px;
     }
 
     .task-lab-span-2 {
@@ -506,15 +741,15 @@
     .task-lab-input-group {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 7px;
     }
 
     .task-lab-input-group label {
-        font-size: 0.78rem;
+        font-size: 0.74rem;
         font-weight: 800;
         color: var(--muted);
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.09em;
     }
 
     .task-lab-input-group input[type="text"],
@@ -522,20 +757,31 @@
     .task-lab-input-group select,
     .task-lab-input-group textarea {
         width: 100%;
-        padding: 12px 14px;
-        border-radius: 14px;
+        padding: 11px 14px;
+        border-radius: var(--radius-md);
         border: 1px solid var(--border);
-        background: var(--surface-strong);
+        background: var(--field-bg);
         color: var(--ink);
-        font-size: 0.95rem;
+        font-size: 0.92rem;
+        font-family: var(--font-main);
         outline: none;
+        transition: border-color var(--duration-fast) ease,
+                    box-shadow var(--duration-fast) ease,
+                    background var(--duration-fast) ease;
     }
 
     .task-lab-input-group input:focus,
     .task-lab-input-group select:focus,
     .task-lab-input-group textarea:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 14%, transparent);
+        border-color: var(--ring);
+        background: var(--surface-strong);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 22%, transparent);
+    }
+
+    .task-lab-input-group input:hover:not(:focus),
+    .task-lab-input-group select:hover:not(:focus),
+    .task-lab-input-group textarea:hover:not(:focus) {
+        border-color: var(--border-strong);
     }
 
     .task-lab-input-group textarea {
@@ -544,8 +790,8 @@
     }
 
     .task-lab-input-group .helptext {
-        color: var(--muted);
-        font-size: 0.78rem;
+        color: var(--muted-light);
+        font-size: 0.76rem;
         line-height: 1.4;
     }
 
@@ -553,43 +799,41 @@
         margin: 0;
         padding-left: 16px;
         color: var(--destructive);
-        font-size: 0.82rem;
+        font-size: 0.8rem;
     }
 
-    .task-lab-sync-note {
-        margin-top: 14px;
-        padding: 14px;
-        border-radius: 16px;
-        border: 1px solid var(--border);
-        background: var(--surface-strong);
-        color: var(--muted);
-        font-size: 0.88rem;
-        line-height: 1.45;
-    }
-
-    .task-lab-sync-note strong {
-        display: block;
-        margin-bottom: 4px;
-        color: var(--ink);
-    }
-
-    .task-lab-empty-switch {
-        padding: 20px;
-        border-radius: 18px;
-        border: 1px dashed var(--border);
-        color: var(--muted);
-        background: var(--surface-strong);
-        text-align: center;
-    }
-
+    /* ---- Form action buttons ---- */
     .task-lab-form-actions {
         display: flex;
         justify-content: flex-end;
         gap: 10px;
         flex-wrap: wrap;
-        margin-top: 14px;
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid var(--border);
     }
 
+    /* Override base .btn for :active states */
+    .btn:active {
+        transform: translateY(0) !important;
+        filter: brightness(0.94);
+    }
+
+    .btn.primary:active {
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
+    }
+
+    .btn.danger:active {
+        filter: brightness(0.88);
+    }
+
+    /* ---- Animations ---- */
+    @keyframes taskLabFadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---- Responsive ---- */
     @media (max-width: 1180px) {
         .task-lab-shell {
             grid-template-columns: 1fr;
@@ -598,6 +842,12 @@
         .task-lab-sidebar {
             position: static;
             height: auto;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .task-lab-builder-grid {
+            grid-template-columns: 1fr;
         }
     }
 
@@ -691,11 +941,39 @@
                             {% for item in task_items %}
                                 <article class="task-lab-task-card">
                                     <div>
-                                        <h3>{{ item.title }}</h3>
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                            <h3>{{ item.title }}</h3>
+                                            <div style="display: flex; gap: 8px;">
+                                                <a href="{% url 'tasks:item_edit' selected_patient.id 'task' item.id %}" style="display: flex; align-items: center; gap: 4px; color: var(--primary); text-decoration: none; font-size: 0.85rem; font-weight: 600;"><span class="material-symbols-outlined" style="font-size: 1rem;">edit</span> Edit</a>
+                                                <a href="{% url 'tasks:item_delete' selected_patient.id 'task' item.id %}" style="display: flex; align-items: center; gap: 4px; color: var(--destructive); text-decoration: none; font-size: 0.85rem; font-weight: 600;"><span class="material-symbols-outlined" style="font-size: 1rem;">delete</span> Delete</a>
+                                            </div>
+                                        </div>
                                         <p>{{ item.description|default:item.notes|default:"No description provided." }}</p>
                                         <div class="task-lab-task-meta">
-                                            <span class="task-lab-chip">{{ item.get_status_display }}</span>
-                                            <span class="task-lab-chip">{{ item.get_priority_display }}</span>
+                                            {# Status badge — semantic color by value #}
+                                            {% with s=item.get_status_display %}
+                                            {% if s == 'Done' or s == 'Completed' %}
+                                                <span class="status-badge status-badge-done">✓ {{ s }}</span>
+                                            {% elif s == 'Overdue' %}
+                                                <span class="status-badge status-badge-overdue">! {{ s }}</span>
+                                            {% elif s == 'In Progress' or s == 'In progress' %}
+                                                <span class="status-badge status-badge-inprogress">→ {{ s }}</span>
+                                            {% else %}
+                                                <span class="status-badge status-badge-pending">○ {{ s }}</span>
+                                            {% endif %}
+                                            {% endwith %}
+
+                                            {# Priority badge — semantic color #}
+                                            {% with p=item.get_priority_display %}
+                                            {% if p == 'High' or p == 'Urgent' %}
+                                                <span class="status-badge priority-badge-high">{{ p }}</span>
+                                            {% elif p == 'Low' %}
+                                                <span class="status-badge priority-badge-low">{{ p }}</span>
+                                            {% else %}
+                                                <span class="status-badge priority-badge-medium">{{ p }}</span>
+                                            {% endif %}
+                                            {% endwith %}
+
                                             <span class="task-lab-chip">{{ item.get_recurrence_mode_display }}</span>
                                             {% if item.due_at %}
                                                 <span class="task-lab-chip">Due {{ item.due_at|date:"d M, Y h:i A" }}</span>

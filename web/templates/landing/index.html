@@ -4,47 +4,250 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="ADAPT Care Platform — A unified, caregiver-first workspace for care planning, patient tracking, and clinical AI assistance.">
   <title>ADAPT Care Platform | Caregiver Workspace</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
   <style>
+    /* ============================================================
+       ADAPT Landing — Design System & Tokens
+       ============================================================ */
     :root {
+      /* Colors */
       --background: hsl(210 40% 98%);
       --foreground: hsl(220 50% 12%);
-      --primary: hsl(220 50% 12%);
-      --primary-soft: hsl(222 35% 20%);
+      --foreground-secondary: hsl(220 20% 30%);
+      --muted: hsl(215 15% 45%);
+      --muted-light: hsl(215 12% 60%);
+
+      /* Brand */
+      --primary: hsl(221 62% 18%);
+      --primary-soft: hsl(221 45% 26%);
       --primary-foreground: hsl(210 40% 98%);
+
+      /* Accent */
       --accent: hsl(22 95% 55%);
-      --accent-soft: hsl(22 95% 94%);
+      --accent-soft: hsl(22 100% 95%);
+      --accent-border: rgba(255, 159, 67, 0.22);
+
+      /* Status */
       --success: hsl(150 60% 35%);
       --success-soft: hsl(150 60% 94%);
       --destructive: hsl(0 72% 50%);
       --destructive-soft: hsl(0 72% 94%);
+
+      /* Structural */
       --border: hsl(214 25% 90%);
-      --card-bg: rgba(255, 255, 255, 0.72);
-      --gradient-hero: linear-gradient(135deg, hsl(32 100% 97%) 0%, hsl(218 50% 95%) 50%, hsl(210 40% 98%) 100%);
-      --gradient-primary: linear-gradient(135deg, hsl(220 50% 12%) 0%, hsl(222 35% 20%) 100%);
+      --border-strong: hsl(214 25% 82%);
+      --card-bg: rgba(255, 255, 255, 0.76);
+      --field-bg: hsl(214 25% 95%);
+
+      /* Gradients */
+      --gradient-hero: linear-gradient(150deg, hsl(32 100% 97%) 0%, hsl(220 45% 96%) 50%, hsl(210 40% 98%) 100%);
+      --gradient-primary: linear-gradient(135deg, hsl(221 62% 18%) 0%, hsl(221 45% 26%) 100%);
+      --gradient-accent: linear-gradient(135deg, hsl(22 95% 55%) 0%, hsl(38 95% 55%) 100%);
+
+      /* Depth */
+      --shadow-xs: 0 1px 3px rgba(15, 23, 42, 0.04);
       --shadow: 0 12px 34px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 20px 48px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 32px 64px rgba(15, 23, 42, 0.10);
+
+      /* Typography */
       --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
       --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+      /* Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --radius-2xl: 24px;
+      --radius-full: 9999px;
+
+      /* Transitions */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration-fast: 150ms;
+      --duration-base: 220ms;
+      --duration-slow: 340ms;
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+    }
+
+    /* Skip-to-content for accessibility */
+    .skip-to-content {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      padding: 0.5rem 1rem;
+      background: var(--primary);
+      color: var(--primary-foreground);
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      font-weight: 600;
+      font-size: 0.9rem;
+      z-index: 200;
+      transition: top 0.2s ease;
+    }
+
+    .skip-to-content:focus {
+      top: 0;
     }
 
     body {
       font-family: var(--font-body);
       background: var(--background);
       color: var(--foreground);
-      margin: 0;
       padding: 0;
       overflow-x: hidden;
       scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ============================================================
+       TOP NAVIGATION BAR (Sticky)
+       ============================================================ */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 12px 0;
+      background: color-mix(in srgb, var(--background) 90%, transparent);
+      -webkit-backdrop-filter: blur(20px) saturate(1.6);
+      backdrop-filter: blur(20px) saturate(1.6);
+      border-bottom: 1px solid transparent;
+      transition: border-color var(--duration-base) ease,
+                  background var(--duration-base) ease,
+                  box-shadow var(--duration-base) ease;
+    }
+
+    .site-nav.scrolled {
+      border-bottom-color: var(--border);
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+      background: color-mix(in srgb, var(--background) 96%, transparent);
+    }
+
+    .site-nav__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .site-nav__brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .site-nav__logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--gradient-primary);
+      color: var(--primary-foreground);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+      flex-shrink: 0;
+    }
+
+    .site-nav__wordmark {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+      color: var(--foreground);
+    }
+
+    .site-nav__links {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      list-style: none;
+      padding: 0;
+    }
+
+    .site-nav__link {
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-full);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: background var(--duration-fast) ease, color var(--duration-fast) ease;
+    }
+
+    .site-nav__link:hover {
+      background: rgba(15, 23, 42, 0.04);
+      color: var(--foreground);
+    }
+
+    .site-nav__actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1.1rem;
+      border-radius: var(--radius-full);
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--duration-fast) ease;
+    }
+
+    .nav-btn-ghost {
+      background: transparent;
+      color: var(--foreground);
+    }
+
+    .nav-btn-ghost:hover {
+      background: rgba(15, 23, 42, 0.05);
+    }
+
+    .nav-btn-primary {
+      background: var(--gradient-primary);
+      color: var(--primary-foreground);
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
+    }
+
+    .nav-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.22);
+    }
+
+    .site-nav__hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px 8px;
+      cursor: pointer;
+      color: var(--foreground);
     }
 
     .container {
@@ -54,37 +257,44 @@
       position: relative;
     }
 
-    /* Glassmorphism Cards */
+    /* ============================================================
+       GLASSMORPHISM CARDS
+       ============================================================ */
     .glass-card {
       background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.65);
       box-shadow: var(--shadow);
-      border-radius: 1.25rem;
+      border-radius: var(--radius-xl);
       padding: 1.5rem;
-      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      transition: transform var(--duration-base) var(--ease-out),
+                  box-shadow var(--duration-base) ease,
+                  border-color var(--duration-base) ease;
     }
 
     .glass-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
-      border-color: rgba(255, 255, 255, 0.85);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(255, 255, 255, 0.9);
     }
 
-    /* Gradients & Backgrounds */
+
+    /* ============================================================
+       HERO SECTION
+       ============================================================ */
     .gradient-hero-bg {
       background: var(--gradient-hero);
       position: relative;
     }
 
     .hero-section {
-      min-height: 90vh;
+      min-height: calc(100vh - 68px);
       display: flex;
       align-items: center;
       position: relative;
       overflow: hidden;
-      padding: 4rem 0;
+      padding: 5rem 0 6rem;
     }
 
     .hero-bg-accent {
@@ -965,33 +1175,147 @@
       margin: 0;
     }
 
+    /* ============================================================
+       FOOTER
+       ============================================================ */
     .footer {
-      padding: 3rem 0;
-      text-align: center;
-      background: hsl(220 50% 8%);
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 4rem 0 3rem;
+      background: hsl(221 50% 8%);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
       color: var(--primary-foreground);
     }
 
+    .footer__inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      text-align: center;
+    }
+
+    .footer__brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .footer__logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
     .footer-title {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-family: var(--font-heading);
       font-weight: 700;
-      margin: 0 0 0.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .footer-divider {
+      width: 40px;
+      height: 1px;
+      background: rgba(255,255,255,0.12);
     }
 
     .footer-desc {
-      font-size: 0.88rem;
-      color: hsl(214 25% 70%);
-      margin: 0;
+      font-size: 0.875rem;
+      color: hsl(214 25% 65%);
+      max-width: 36rem;
+      line-height: 1.6;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+      padding: 0;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: hsl(214 25% 62%);
+      text-decoration: none;
+      transition: color var(--duration-fast) ease;
+    }
+
+    .footer-links a:hover {
+      color: hsl(214 25% 90%);
+    }
+
+    .footer-copyright {
+      font-size: 0.8rem;
+      color: hsl(214 25% 45%);
+    }
+
+    /* ============================================================
+       RESPONSIVE: Nav & Layout
+       ============================================================ */
+    @media (max-width: 768px) {
+      .site-nav__links {
+        display: none;
+      }
+
+      .site-nav__hamburger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .site-nav__actions .nav-btn-ghost {
+        display: none;
+      }
     }
   </style>
 </head>
 
 <body>
+  <a href="#main-content" class="skip-to-content">Skip to content</a>
+
+  <!-- STICKY TOP NAVIGATION -->
+  <nav class="site-nav" id="siteNav" role="navigation" aria-label="Main navigation">
+    <div class="site-nav__inner">
+      <a href="{% url 'home' %}" class="site-nav__brand" aria-label="ADAPT home">
+        <div class="site-nav__logo" aria-hidden="true">AD</div>
+        <span class="site-nav__wordmark">ADAPT</span>
+      </a>
+
+      <ul class="site-nav__links" role="list">
+        <li><a href="#features" class="site-nav__link">Features</a></li>
+        <li><a href="#comparison" class="site-nav__link">Why ADAPT</a></li>
+        <li><a href="#about" class="site-nav__link">About</a></li>
+      </ul>
+
+      <div class="site-nav__actions">
+        {% if request.user.is_authenticated %}
+          <a href="{% url 'dashboard:home' %}" class="nav-btn nav-btn-primary">
+            Dashboard
+            <span class="material-symbols-outlined" style="font-size: 1rem;">arrow_forward</span>
+          </a>
+        {% else %}
+          <a href="{% url 'login' %}" class="nav-btn nav-btn-ghost">Log In</a>
+          <a href="{% url 'register' %}" class="nav-btn nav-btn-primary">Get Started</a>
+        {% endif %}
+      </div>
+
+      <button class="site-nav__hamburger" id="navHamburger" aria-label="Open navigation menu" aria-expanded="false">
+        <span class="material-symbols-outlined" style="font-size: 1.2rem; display: block;">menu</span>
+      </button>
+    </div>
+  </nav>
 
   <!-- HERO SECTION -->
-  <section class="hero-section gradient-hero-bg">
+  <section class="hero-section gradient-hero-bg" id="main-content">
     <div class="hero-bg-accent"></div>
     <div class="hero-bg-primary"></div>
 
@@ -1465,14 +1789,41 @@
   </section>
 
   <!-- FOOTER -->
-  <footer class="footer">
+  <footer class="footer" id="footer" aria-label="Site footer">
     <div class="container">
-      <h3 class="footer-title">ADAPT Care Platform</h3>
-      <p class="footer-desc">A unified web workspace for caregiver planning, analysis, and clinical tracking.</p>
+      <div class="footer__inner">
+        <div class="footer__brand">
+          <div class="footer__logo" aria-hidden="true">AD</div>
+          <h3 class="footer-title">ADAPT Care Platform</h3>
+        </div>
+        <div class="footer-divider" aria-hidden="true"></div>
+        <p class="footer-desc">A unified web workspace for caregiver planning, AI-assisted analysis, and clinical patient tracking.</p>
+        <ul class="footer-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#about">About</a></li>
+          {% if not request.user.is_authenticated %}
+          <li><a href="{% url 'login' %}">Log In</a></li>
+          <li><a href="{% url 'register' %}">Sign Up</a></li>
+          {% else %}
+          <li><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+          {% endif %}
+        </ul>
+        <p class="footer-copyright">&copy; {% now "Y" %} ADAPT — Advanced Digital Assistant for Patient Tracking</p>
+      </div>
     </div>
   </footer>
 
   <script>
+    // Sticky nav scroll state
+    const siteNav = document.getElementById('siteNav');
+    if (siteNav) {
+      const onScroll = () => {
+        siteNav.classList.toggle('scrolled', window.scrollY > 20);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+
     // JS for Mock Dashboard Tabs switching
     function switchMockTab(tabId) {
       // Deactivate all buttons

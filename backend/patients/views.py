@@ -80,7 +80,7 @@ def add_patient(request):
 
 @login_required
 def disease_management(request, patient_id):
-	patient = get_object_or_404(Patient, id=patient_id)
+	patient = get_object_or_404(Patient, id=patient_id, user=request.user)
 	disease_form = PatientDiseaseForm(prefix="disease")
 	sensitivity_form = PatientSensitivityForm(prefix="sensitivity")
 
@@ -129,7 +129,7 @@ def disease_management(request, patient_id):
 
 @login_required
 def medication_management(request, patient_id):
-	patient = get_object_or_404(Patient, id=patient_id)
+	patient = get_object_or_404(Patient, id=patient_id, user=request.user)
 	medication_form = PatientMedicationForm(prefix="med")
 
 	if request.method == "POST":
@@ -163,7 +163,7 @@ def medication_management(request, patient_id):
 
 @login_required
 def disease_edit(request, patient_id, disease_id):
-	patient = get_object_or_404(Patient, id=patient_id)
+	patient = get_object_or_404(Patient, id=patient_id, user=request.user)
 	disease = get_object_or_404(PatientDisease, id=disease_id, patient=patient)
 
 	if request.method == "POST":
@@ -185,7 +185,7 @@ def disease_edit(request, patient_id, disease_id):
 
 @login_required
 def disease_delete(request, patient_id, disease_id):
-	patient = get_object_or_404(Patient, id=patient_id)
+	patient = get_object_or_404(Patient, id=patient_id, user=request.user)
 	disease = get_object_or_404(PatientDisease, id=disease_id, patient=patient)
 
 	if request.method == "POST":
@@ -203,7 +203,7 @@ def disease_delete(request, patient_id, disease_id):
 
 @login_required
 def sensitivity_edit(request, patient_id, sensitivity_id):
-	patient = get_object_or_404(Patient, id=patient_id)
+	patient = get_object_or_404(Patient, id=patient_id, user=request.user)
 	sensitivity = get_object_or_404(PatientSensitivity, id=sensitivity_id, patient=patient)
 
 	if request.method == "POST":
@@ -225,7 +225,7 @@ def sensitivity_edit(request, patient_id, sensitivity_id):
 
 @login_required
 def sensitivity_delete(request, patient_id, sensitivity_id):
-	patient = get_object_or_404(Patient, id=patient_id)
+	patient = get_object_or_404(Patient, id=patient_id, user=request.user)
 	sensitivity = get_object_or_404(PatientSensitivity, id=sensitivity_id, patient=patient)
 
 	if request.method == "POST":
@@ -243,7 +243,7 @@ def sensitivity_delete(request, patient_id, sensitivity_id):
 
 @login_required
 def medication_edit(request, patient_id, medication_id):
-	patient = get_object_or_404(Patient, id=patient_id)
+	patient = get_object_or_404(Patient, id=patient_id, user=request.user)
 	medication = get_object_or_404(PatientMedication, id=medication_id, patient=patient)
 
 	if request.method == "POST":
@@ -264,7 +264,7 @@ def medication_edit(request, patient_id, medication_id):
 
 @login_required
 def medication_delete(request, patient_id, medication_id):
-	patient = get_object_or_404(Patient, id=patient_id)
+	patient = get_object_or_404(Patient, id=patient_id, user=request.user)
 	medication = get_object_or_404(PatientMedication, id=medication_id, patient=patient)
 
 	if request.method == "POST":

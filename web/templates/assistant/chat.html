@@ -29,10 +29,10 @@
         max-width: 800px;
         margin: 20px auto;
         border: 1px solid var(--border);
-        border-radius: 20px;
+        border-radius: var(--radius-xl);
         overflow: hidden;
         background: var(--surface-strong);
-        box-shadow: var(--shadow);
+        box-shadow: var(--shadow-sm);
     }
 
     .chat-layout-wrapper.is-embedded {
@@ -61,7 +61,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        padding: 12px 16px;
+        padding: 14px 20px;
         background: var(--surface-strong);
         border-bottom: 1px solid var(--border);
         z-index: 10;
@@ -70,8 +70,9 @@
 
     .chat-header h3 {
         margin: 0;
-        font-size: 0.95rem;
-        font-weight: 700;
+        font-size: 1.05rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
         color: var(--ink);
     }
 
@@ -79,59 +80,64 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-full);
         border: 1px solid var(--border);
         background: var(--surface-strong);
         color: var(--ink);
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: background var(--duration-fast) ease, border-color var(--duration-fast) ease, transform var(--duration-fast) ease;
     }
 
     .btn-back:hover {
         background: var(--surface-soft);
-        border-color: var(--primary);
+        border-color: var(--border-strong);
+        transform: translateY(-1px);
     }
 
     .chat-header-select {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
     }
 
     .chat-header-select label {
-        font-size: 0.8rem;
-        font-weight: 600;
+        font-size: 0.78rem;
+        font-weight: 800;
         color: var(--muted);
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
     }
 
     .chat-patient-dropdown {
-        padding: 6px 12px;
-        border-radius: 10px;
+        padding: 8px 14px;
+        border-radius: var(--radius-md);
         border: 1px solid var(--border);
         background: var(--field-bg);
         color: var(--ink);
-        font-size: 0.88rem;
+        font-size: 0.9rem;
+        font-weight: 500;
         outline: none;
-        transition: border-color 0.2s;
+        transition: border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
         cursor: pointer;
     }
 
     .chat-patient-dropdown:focus {
         border-color: var(--ring);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 22%, transparent);
     }
 
     .chat-messages-container {
         flex: 1;
         overflow-y: auto;
-        padding: 16px;
+        padding: 24px;
         display: flex;
         flex-direction: column;
-        gap: 14px;
+        gap: 18px;
         scroll-behavior: smooth;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
     }
 
     .chat-messages-container::-webkit-scrollbar {
@@ -148,17 +154,22 @@
     }
 
     .chat-message-bubble {
-        max-width: 85%;
-        padding: 10px 14px;
-        border-radius: 16px;
-        line-height: 1.5;
-        font-size: 0.94rem;
+        max-width: 82%;
+        padding: 14px 18px;
+        border-radius: var(--radius-xl);
+        line-height: 1.55;
+        font-size: 0.96rem;
         position: relative;
         word-break: break-word;
         display: flex;
         flex-direction: column;
-        gap: 4px;
-        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
+        gap: 6px;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        transition: transform var(--duration-fast) ease;
+    }
+
+    .chat-message-bubble:hover {
+        transform: translateY(-1px);
     }
 
     .chat-message-bubble.user {
@@ -176,15 +187,38 @@
         border: 1px solid var(--border);
     }
 
+    .chat-message-bubble.emergency-bubble {
+        background: var(--destructive-soft) !important;
+        border: 2px solid var(--destructive) !important;
+        color: var(--ink) !important;
+        box-shadow: 0 4px 16px color-mix(in srgb, var(--destructive) 15%, transparent);
+    }
+
+    .emergency-bubble .chat-message-meta.assistant {
+        color: var(--destructive);
+    }
+
+    .emergency-alert-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 8px;
+        font-weight: 800;
+        color: var(--destructive);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
     .chat-message-meta {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 8px;
-        font-size: 0.72rem;
-        font-weight: 700;
-        opacity: 0.8;
-        letter-spacing: 0.04em;
+        font-size: 0.74rem;
+        font-weight: 800;
+        opacity: 0.85;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
     }
 
@@ -202,22 +236,24 @@
         background: none;
         border: none;
         cursor: pointer;
-        padding: 2px;
-        border-radius: 50%;
-        color: var(--muted);
+        padding: 4px;
+        border-radius: var(--radius-full);
+        color: inherit;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: background-color 0.2s, color 0.2s;
+        transition: background-color var(--duration-fast) ease, transform var(--duration-fast) ease;
+        opacity: 0.7;
     }
 
     .tts-speak-btn:hover {
-        background: var(--surface-soft);
-        color: var(--primary);
+        background: color-mix(in srgb, currentColor 10%, transparent);
+        opacity: 1;
+        transform: scale(1.05);
     }
 
     .chat-input-container {
-        padding: 12px 16px;
+        padding: 16px 24px;
         border-top: 1px solid var(--border);
         background: var(--surface-strong);
         flex-shrink: 0;
@@ -227,12 +263,12 @@
     .chat-input-pill {
         display: flex;
         align-items: flex-end;
-        gap: 8px;
+        gap: 10px;
         border: 1px solid var(--border);
-        border-radius: 20px;
-        padding: 4px 8px;
+        border-radius: var(--radius-xl);
+        padding: 8px 14px;
         background: var(--field-bg);
-        transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+        transition: border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease, background-color var(--duration-fast) ease;
     }
 
     .chat-input-pill:focus-within {
@@ -242,34 +278,40 @@
     }
 
     .chat-input-pill textarea {
-        flex: 1;
+        flex: 1 1 auto !important;
+        width: 100% !important;
+        min-width: 50px !important;
         border: 0;
         background: transparent;
         resize: none;
         height: 24px;
-        max-height: 120px;
+        max-height: 150px;
         padding: 6px 4px;
         outline: none;
         color: var(--ink);
         font-family: inherit;
-        font-size: 0.95rem;
-        line-height: 1.4;
+        font-size: 0.96rem;
+        line-height: 1.5;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
     }
 
     .chat-input-btn {
-        background: none;
+        background: transparent;
         border: none;
         cursor: pointer;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        max-width: 38px !important;
+        flex: 0 0 38px !important;
+        border-radius: var(--radius-md);
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--muted);
-        transition: background-color 0.2s, color 0.2s, transform 0.2s;
-        flex-shrink: 0;
-        margin-bottom: 2px;
+        transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease, transform var(--duration-fast) ease;
+        margin-bottom: 1px;
     }
 
     .chat-input-btn:hover {
@@ -277,16 +319,27 @@
         color: var(--ink);
     }
 
+    .chat-input-btn:active {
+        transform: scale(0.92);
+    }
+
     .chat-input-btn.primary-send {
-        background: var(--primary);
+        background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 78%, var(--accent) 22%));
         color: var(--primary-foreground);
+        border-radius: var(--radius-md);
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.14);
     }
 
     .chat-input-btn.primary-send:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        background: var(--primary);
-        filter: brightness(1.1);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+        filter: brightness(1.05);
+        color: var(--primary-foreground);
+    }
+
+    .chat-input-btn.primary-send:active {
+        transform: translateY(0) scale(0.95);
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
     }
 
     .empty-chat-state {
@@ -305,31 +358,32 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 8px 12px;
+        padding: 10px 14px;
         background: var(--field-bg);
         border: 1px solid var(--border);
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         margin-bottom: 12px;
         cursor: pointer;
-        font-size: 0.8rem;
-        font-weight: 600;
+        font-size: 0.82rem;
+        font-weight: 700;
         color: var(--muted);
         user-select: none;
-        transition: background 0.2s;
+        transition: background var(--duration-fast) ease, border-color var(--duration-fast) ease;
     }
 
     .summaries-toggle:hover {
         background: var(--surface-soft);
+        border-color: var(--border-strong);
     }
 
     .summaries-content {
         display: none;
         flex-direction: column;
-        gap: 8px;
-        margin-bottom: 16px;
-        padding: 10px;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 14px;
         border: 1px dashed var(--border);
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         background: var(--surface-soft);
     }
 
@@ -338,12 +392,12 @@
     }
 
     .summary-item {
-        padding: 8px 12px;
+        padding: 10px 14px;
         background: var(--surface-strong);
-        border-radius: 8px;
-        font-size: 0.84rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.86rem;
         color: var(--muted);
-        line-height: 1.4;
+        line-height: 1.5;
         border: 1px solid var(--border);
     }
 
@@ -351,48 +405,53 @@
     .proposals-section {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        margin-top: 16px;
-        padding-top: 16px;
+        gap: 14px;
+        margin-top: 20px;
+        padding-top: 20px;
         border-top: 1px dashed var(--border);
     }
 
     .proposals-title {
-        font-size: 0.8rem;
-        font-weight: 700;
+        font-size: 0.82rem;
+        font-weight: 800;
         color: var(--muted);
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
     }
 
     .proposal-card {
         border: 1px solid var(--border);
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
         background: var(--surface-soft);
-        padding: 12px;
+        padding: 16px;
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        gap: 10px;
+        box-shadow: var(--shadow-sm);
+        transition: border-color var(--duration-fast) ease;
+    }
+
+    .proposal-card:hover {
+        border-color: var(--border-strong);
     }
 
     .proposal-header {
-        font-weight: 700;
-        font-size: 0.85rem;
+        font-weight: 800;
+        font-size: 0.9rem;
         color: var(--primary);
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
     }
 
     .proposal-payload {
         white-space: pre-wrap;
-        padding: 10px;
+        padding: 12px 14px;
         background: var(--surface-strong);
         border-left: 3px solid var(--accent);
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
         font-size: 0.88rem;
-        line-height: 1.4;
+        line-height: 1.5;
         color: var(--ink);
     }
 
@@ -427,6 +486,30 @@
     @keyframes tts-pulse {
         0%, 100% { opacity: 0.8; }
         50% { opacity: 1; }
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 0;
+    }
+
+    .typing-indicator span {
+        width: 6px;
+        height: 6px;
+        background-color: var(--muted);
+        border-radius: 50%;
+        animation: typing-bounce 1.4s infinite ease-in-out both;
+    }
+
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes typing-bounce {
+        0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
+        40% { transform: scale(1); opacity: 1; }
     }
 </style>
 {% endblock %}
@@ -493,7 +576,7 @@
 
         <!-- Messages Bubble Flow -->
         {% for m in messages_list %}
-            <div class="chat-message-bubble {% if m.role == 'assistant' %}assistant{% else %}user{% endif %}">
+            <div class="chat-message-bubble {% if m.role == 'assistant' %}assistant{% else %}user{% endif %} {% if '🚨' in m.content %}emergency-bubble{% endif %}">
                 <div class="chat-message-meta {% if m.role == 'assistant' %}assistant{% else %}user{% endif %}">
                     <strong>{{ m.get_role_display }}</strong>
                     {% if m.role == 'assistant' %}
@@ -502,7 +585,7 @@
                         </button>
                     {% endif %}
                 </div>
-                <div id="msg-content-{{ m.id }}" style="white-space: pre-wrap;">{{ m.content }}</div>
+                <div id="msg-content-{{ m.id }}" style="white-space: pre-wrap;">{% if '🚨' in m.content %}<div class="emergency-alert-header"><span class="material-symbols-outlined" style="font-size: 18px;">error</span><span>Emergency Alert</span></div>{% endif %}{{ m.content }}</div>
             </div>
         {% empty %}
             <div class="empty-chat-state">
@@ -564,7 +647,7 @@
                 </button>
                 
                 <button type="submit" name="action" value="send" class="chat-input-btn primary-send" title="Send Message">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">send</span>
+                    <span class="material-symbols-outlined" style="font-size: 18px;">arrow_upward</span>
                 </button>
             </div>
         </form>
@@ -604,7 +687,11 @@
             if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
                 if (this.value.trim()) {
-                    this.closest('form').submit();
+                    // Trigger the custom submit logic
+                    const chatForm = document.getElementById('chatInputForm');
+                    if (chatForm) {
+                        chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                    }
                 }
             }
         });
@@ -671,63 +758,153 @@
     }
 
     // --- Voice Read-Aloud (Text-to-Speech) ---
-    const ttsButtons = document.querySelectorAll('.tts-speak-btn');
     let currentUtterance = null;
     let activeTtsBtn = null;
 
-    if (ttsButtons.length > 0 && window.speechSynthesis) {
-        ttsButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const messageId = this.getAttribute('data-message-id');
-                const contentDiv = document.getElementById(`msg-content-${messageId}`);
-                if (!contentDiv) return;
-
-                let textToSpeak = contentDiv.innerText || contentDiv.textContent;
-                
-                // If it is already speaking this specific message, stop it
-                if (window.speechSynthesis.speaking && activeTtsBtn === this) {
-                    window.speechSynthesis.cancel();
-                    resetActiveTts();
-                    return;
-                }
-
-                // If speaking something else, cancel it first
-                if (window.speechSynthesis.speaking) {
-                    window.speechSynthesis.cancel();
-                    resetActiveTts();
-                }
-
-                // Setup utterance
-                currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
-                activeTtsBtn = this;
-                
-                this.classList.add('tts-playing');
-                this.querySelector('.material-symbols-outlined').textContent = 'stop';
-
-                currentUtterance.onend = function() {
-                    resetActiveTts();
-                };
-
-                currentUtterance.onerror = function() {
-                    resetActiveTts();
-                };
-
-                window.speechSynthesis.speak(currentUtterance);
+    function attachTtsListeners() {
+        const ttsButtons = document.querySelectorAll('.tts-speak-btn');
+        if (ttsButtons.length > 0 && window.speechSynthesis) {
+            ttsButtons.forEach(btn => {
+                // Remove old listener to avoid duplicates if re-attached
+                btn.replaceWith(btn.cloneNode(true));
             });
-        });
+            
+            document.querySelectorAll('.tts-speak-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const messageId = this.getAttribute('data-message-id');
+                    const contentDiv = document.getElementById(`msg-content-${messageId}`);
+                    if (!contentDiv) return;
 
-        function resetActiveTts() {
-            if (activeTtsBtn) {
-                activeTtsBtn.classList.remove('tts-playing');
-                activeTtsBtn.querySelector('.material-symbols-outlined').textContent = 'volume_up';
-                activeTtsBtn = null;
-            }
-            currentUtterance = null;
+                    let textToSpeak = contentDiv.innerText || contentDiv.textContent;
+                    
+                    if (window.speechSynthesis.speaking && activeTtsBtn === this) {
+                        window.speechSynthesis.cancel();
+                        resetActiveTts();
+                        return;
+                    }
+
+                    if (window.speechSynthesis.speaking) {
+                        window.speechSynthesis.cancel();
+                        resetActiveTts();
+                    }
+
+                    currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
+                    activeTtsBtn = this;
+                    
+                    this.classList.add('tts-playing');
+                    this.querySelector('.material-symbols-outlined').textContent = 'stop';
+
+                    currentUtterance.onend = function() {
+                        resetActiveTts();
+                    };
+
+                    currentUtterance.onerror = function() {
+                        resetActiveTts();
+                    };
+
+                    window.speechSynthesis.speak(currentUtterance);
+                });
+            });
         }
+    }
 
-        // Stop speaking if user leaves
-        window.addEventListener('beforeunload', function() {
-            window.speechSynthesis.cancel();
+    function resetActiveTts() {
+        if (activeTtsBtn) {
+            activeTtsBtn.classList.remove('tts-playing');
+            activeTtsBtn.querySelector('.material-symbols-outlined').textContent = 'volume_up';
+            activeTtsBtn = null;
+        }
+        currentUtterance = null;
+    }
+
+    // Stop speaking if user leaves
+    window.addEventListener('beforeunload', function() {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+    });
+
+    attachTtsListeners();
+
+    // --- Dynamic AJAX Submission ---
+    const chatForm = document.getElementById('chatInputForm');
+    const sendBtn = chatForm?.querySelector('button[type="submit"]');
+
+    if (chatForm && sendBtn) {
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const messageVal = textarea.value.trim();
+            if (!messageVal) return;
+
+            // 1. Immediately inject user message
+            const safeMsg = messageVal.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const userHtml = `
+                <div class="chat-message-bubble user">
+                    <div class="chat-message-meta user">
+                        <strong>User</strong>
+                    </div>
+                    <div style="white-space: pre-wrap;">${safeMsg}</div>
+                </div>
+            `;
+            
+            // 2. Inject typing indicator
+            const typingHtml = `
+                <div class="chat-message-bubble assistant" id="temp-typing-indicator">
+                    <div class="chat-message-meta assistant">
+                        <strong>Assistant</strong>
+                    </div>
+                    <div class="typing-indicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+
+            const emptyState = document.querySelector('.empty-chat-state');
+            if (emptyState) emptyState.remove();
+
+            messagesArea.insertAdjacentHTML('beforeend', userHtml);
+            messagesArea.insertAdjacentHTML('beforeend', typingHtml);
+            
+            textarea.value = '';
+            textarea.style.height = 'auto';
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+
+            sendBtn.disabled = true;
+            sendBtn.style.opacity = '0.5';
+
+            // 3. Perform AJAX Fetch
+            const formData = new FormData(chatForm);
+            formData.append('action', 'send');
+            formData.append('message', messageVal);
+
+            fetch(chatForm.action || window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(htmlStr => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlStr, 'text/html');
+                const newMessagesArea = doc.getElementById('chat-messages-area');
+                
+                if (newMessagesArea) {
+                    messagesArea.innerHTML = newMessagesArea.innerHTML;
+                    attachTtsListeners();
+                } else {
+                    document.getElementById('temp-typing-indicator')?.remove();
+                }
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+            })
+            .catch(err => {
+                console.error("Chat error:", err);
+                document.getElementById('temp-typing-indicator')?.remove();
+            })
+            .finally(() => {
+                sendBtn.disabled = false;
+                sendBtn.style.opacity = '1';
+                textarea.focus();
+            });
         });
     }
 </script>

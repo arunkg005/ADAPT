@@ -3,6 +3,19 @@
 {% block title %}{{ title }} — {{ patient.name }} | ADAPT{% endblock %}
 
 {% block content %}
+<style>
+    .panel-danger {
+        background: var(--destructive-soft);
+        border: 1px solid color-mix(in srgb, var(--destructive) 30%, var(--border));
+    }
+    .panel-danger .section-label,
+    .panel-danger .panel-title {
+        color: var(--destructive);
+    }
+    .panel-danger .muted {
+        color: color-mix(in srgb, var(--destructive) 80%, var(--ink));
+    }
+</style>
 <section class="panel panel-danger">
     <div class="page-toolbar table-toolbar">
         <div class="table-heading-wrap">

@@ -24,7 +24,7 @@
                     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                     {{ field }}
                     {% if field.help_text %}<p class="muted form-note">{{ field.help_text }}</p>{% endif %}
-                    <div class="form-error">{{ field.errors }}</div>
+                    {% if field.errors %}{{ field.errors }}{% endif %}
                 </div>
             {% endfor %}
         </div>

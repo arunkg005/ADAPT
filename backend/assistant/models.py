@@ -1,6 +1,7 @@
 from django.db import models
+from pgvector.django import VectorField
 
-from patients.models import Patient
+from patients.models import Patient, PatientDocument
 
 
 class ChatSession(models.Model):
@@ -64,3 +65,55 @@ class ChatActionProposal(models.Model):
 
 	class Meta:
 		ordering = ["-created_at"]
+
+
+class DocumentChunk(models.Model):
+	"""A single text chunk of a PatientDocument together with its embedding vector.
+
+	Embedding dimensionality is 768, which is the exact output shape produced
+	by Google's ``text-embedding-004`` model.  Both FK columns are indexed by
+	Django automatically (ForeignKey always creates a DB index).
+
+	The ``(document, chunk_index)`` unique constraint makes re-indexing runs
+	idempotent: a second ``index_document_embeddings_async`` call for the same
+	document can safely ``bulk_create(update_conflicts=True)`` without
+	creating phantom duplicate rows.
+	"""
+
+	document = models.ForeignKey(
+		PatientDocument,
+		on_delete=models.CASCADE,
+		related_name="chunks",
+	)
+	patient = models.ForeignKey(
+		Patient,
+		on_delete=models.CASCADE,
+		related_name="document_chunks",
+	)
+	chunk_index = models.PositiveIntegerField(
+		help_text="Zero-based position of this chunk within the source document.",
+	)
+	text_content = models.TextField(
+		help_text="Raw extracted text for this chunk.",
+	)
+	embedding = VectorField(
+		dimensions=768,
+		help_text="text-embedding-004 semantic vector (768-dim).",
+	)
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		ordering = ["document", "chunk_index"]
+		constraints = [
+			models.UniqueConstraint(
+				fields=["document", "chunk_index"],
+				name="uq_documentchunk_document_index",
+			),
+		]
+		indexes = [
+			# Speeds up per-patient similarity searches without joining through document.
+			models.Index(fields=["patient"], name="idx_documentchunk_patient"),
+		]
+
+	def __str__(self):
+		return f"Chunk {self.chunk_index} of {self.document}"

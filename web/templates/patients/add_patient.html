@@ -42,24 +42,24 @@
                 <label for="id_name">Name *</label>
                 {{ form.name }}
                 <div class="helper-text form-note">Use the display name caregivers will recognize.</div>
-                <div class="form-error">{{ form.name.errors }}</div>
+                {% if form.name.errors %}{{ form.name.errors }}{% endif %}
             </div>
             <div class="field-card">
                 <label for="id_age">Age *</label>
                 {{ form.age }}
                 <div class="helper-text form-note">Age is shown in the patient list and detail cards.</div>
-                <div class="form-error">{{ form.age.errors }}</div>
+                {% if form.age.errors %}{{ form.age.errors }}{% endif %}
             </div>
             <div class="field-card">
                 <label for="id_gender">Gender *</label>
                 {{ form.gender }}
-                <div class="form-error">{{ form.gender.errors }}</div>
+                {% if form.gender.errors %}{{ form.gender.errors }}{% endif %}
             </div>
             <div class="field-card">
                 <label for="id_allergies">Allergies *</label>
                 {{ form.allergies }}
                 <div class="helper-text form-note">Keep this short and clear for quick scanning.</div>
-                <div class="form-error">{{ form.allergies.errors }}</div>
+                {% if form.allergies.errors %}{{ form.allergies.errors }}{% endif %}
             </div>
         </div>
     </section>
@@ -75,17 +75,17 @@
             <div class="field-card field-card--full">
                 <label for="id_current_scenario_description">Current scenario description *</label>
                 {{ form.current_scenario_description }}
-                <div class="form-error">{{ form.current_scenario_description.errors }}</div>
+                {% if form.current_scenario_description.errors %}{{ form.current_scenario_description.errors }}{% endif %}
             </div>
             <div class="field-card field-card--full">
                 <label for="id_doctor_guidelines">Doctor guidelines (optional)</label>
                 {{ form.doctor_guidelines }}
-                <div class="form-error">{{ form.doctor_guidelines.errors }}</div>
+                {% if form.doctor_guidelines.errors %}{{ form.doctor_guidelines.errors }}{% endif %}
             </div>
             <div class="field-card field-card--full">
                 <label for="id_intolerances">Intolerances (optional)</label>
                 {{ form.intolerances }}
-                <div class="form-error">{{ form.intolerances.errors }}</div>
+                {% if form.intolerances.errors %}{{ form.intolerances.errors }}{% endif %}
             </div>
         </div>
     </section>
@@ -102,13 +102,13 @@
                 <label>Common disease history</label>
                 <div class="helper-text form-note wide">Pick any conditions that already apply.</div>
                 {{ form.common_diseases }}
-                <div class="form-error">{{ form.common_diseases.errors }}</div>
+                {% if form.common_diseases.errors %}{{ form.common_diseases.errors }}{% endif %}
             </div>
             <div class="field-card field-card--full">
                 <label for="id_custom_diseases">Other disease history</label>
                 {{ form.custom_diseases }}
                 <div class="helper-text form-note">Add any additional diseases separated by commas.</div>
-                <div class="form-error">{{ form.custom_diseases.errors }}</div>
+                {% if form.custom_diseases.errors %}{{ form.custom_diseases.errors }}{% endif %}
             </div>
         </div>
     </section>
@@ -125,19 +125,19 @@
                 <label for="id_report_docs">Reports *</label>
                 {{ form.report_docs }}
                 <div class="helper-text form-note">Images or PDFs are both acceptable.</div>
-                <div class="form-error">{{ form.report_docs.errors }}</div>
+                {% if form.report_docs.errors %}{{ form.report_docs.errors }}{% endif %}
             </div>
             <div class="field-card">
                 <label for="id_prescription_docs">Prescriptions *</label>
                 {{ form.prescription_docs }}
                 <div class="helper-text form-note">Include prescription documents used for review.</div>
-                <div class="form-error">{{ form.prescription_docs.errors }}</div>
+                {% if form.prescription_docs.errors %}{{ form.prescription_docs.errors }}{% endif %}
             </div>
             <div class="field-card field-card--full">
                 <label for="id_medication_docs">Ongoing medication docs *</label>
                 {{ form.medication_docs }}
                 <div class="helper-text form-note">Add medication records, labels, or supporting paperwork.</div>
-                <div class="form-error">{{ form.medication_docs.errors }}</div>
+                {% if form.medication_docs.errors %}{{ form.medication_docs.errors }}{% endif %}
             </div>
         </div>
     </section>

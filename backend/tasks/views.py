@@ -51,7 +51,7 @@ def index(request):
 @login_required
 def item_list(request, patient_id, item_type):
 	meta = _get_type_meta(item_type)
-	patient = get_object_or_404(Patient, id=patient_id)
+	patient = get_object_or_404(Patient, id=patient_id, user=request.user)
 
 	if request.method == "POST" and item_type == CareItem.ItemType.ROUTINE:
 		patient.routine_reminder_enabled = request.POST.get("routine_reminder_enabled") == "on"
@@ -83,7 +83,7 @@ def item_list(request, patient_id, item_type):
 @login_required
 def item_create(request, patient_id, item_type):
 	meta = _get_type_meta(item_type)
-	patient = get_object_or_404(Patient, id=patient_id)
+	patient = get_object_or_404(Patient, id=patient_id, user=request.user)
 	if request.method == "POST":
 		form = CareItemForm(request.POST, item_type=item_type, patient=patient)
 		if form.is_valid():
@@ -108,7 +108,7 @@ def item_create(request, patient_id, item_type):
 @login_required
 def item_edit(request, patient_id, item_type, item_id):
 	meta = _get_type_meta(item_type)
-	patient = get_object_or_404(Patient, id=patient_id)
+	patient = get_object_or_404(Patient, id=patient_id, user=request.user)
 	item = get_object_or_404(CareItem, id=item_id, patient=patient, item_type=item_type)
 
 	if request.method == "POST":
@@ -140,7 +140,7 @@ def item_edit(request, patient_id, item_type, item_id):
 @login_required
 def item_delete(request, patient_id, item_type, item_id):
 	meta = _get_type_meta(item_type)
-	patient = get_object_or_404(Patient, id=patient_id)
+	patient = get_object_or_404(Patient, id=patient_id, user=request.user)
 	item = get_object_or_404(CareItem, id=item_id, patient=patient, item_type=item_type)
 
 	if request.method == "POST":

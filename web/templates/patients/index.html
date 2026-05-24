@@ -3,6 +3,42 @@
 {% block title %}Patients | ADAPT{% endblock %}
 
 {% block content %}
+<style>
+    .patient-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 180px;
+        transition: transform var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+    }
+    .patient-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+    }
+    .patient-card__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.1rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 12px;
+    }
+    .patient-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+    @media (max-width: 768px) {
+        .patient-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 <section class="panel">
     <div class="caretaker-meta">
         <div>
@@ -15,17 +51,17 @@
 </section>
 
 {% if patients %}
-    <section class="grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+    <section class="patient-grid">
         {% for patient in patients %}
-            <article class="metric" style="display:flex; flex-direction:column; gap:12px; min-height: 180px;">
+            <article class="patient-card">
                 <div class="patient-card__header">
                     <strong>{{ patient.name }}</strong>
-                    <span>{{ patient.age }} yrs</span>
+                    <span class="muted" style="font-size: 0.9rem;">{{ patient.age }} yrs</span>
                 </div>
                 <div class="muted">{{ patient.get_gender_display }}</div>
-                <div class="row-actions" style="margin-top:auto;">
-                    <a class="btn primary" href="{% url 'dashboard:patient_dashboard' patient.id %}">Open dashboard</a>
-                    <a class="btn" href="{% url 'dashboard:patient_settings' patient.id %}">Settings</a>
+                <div class="row-actions" style="margin-top:auto; flex-wrap: wrap;">
+                    <a class="btn primary" style="flex:1; justify-content:center;" href="{% url 'dashboard:patient_dashboard' patient.id %}">Dashboard</a>
+                    <a class="btn" style="flex:1; justify-content:center;" href="{% url 'dashboard:patient_settings' patient.id %}">Settings</a>
                 </div>
             </article>
         {% endfor %}
