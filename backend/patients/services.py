@@ -3,8 +3,12 @@ import json
 import re
 from typing import Iterable
 
-import google.generativeai as genai
 from PIL import Image
+
+try:
+    import google.generativeai as genai
+except ImportError:  # pragma: no cover - exercised on clean deploy targets
+    genai = None
 
 
 PLACEHOLDER_KEY = "replace-with-your-gemini-api-key"
@@ -45,7 +49,7 @@ def _fallback_summary(patient, documents):
     ]
     for doc in documents:
         lines.append(f"- {doc.get_category_display()}: {doc.file.name}")
-    lines.append("AI summary was not generated because Gemini API key is missing or invalid.")
+    lines.append("AI summary was not generated because Gemini is unavailable or the API key is missing/invalid.")
     return "\n".join(lines)
 
 
@@ -54,7 +58,7 @@ def generate_patient_summary(patient, documents: Iterable):
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
     prompt = _build_prompt(patient, documents)
 
-    if not api_key or api_key == PLACEHOLDER_KEY:
+    if genai is None or not api_key or api_key == PLACEHOLDER_KEY:
         return _fallback_summary(patient, documents)
 
     try:
@@ -102,7 +106,7 @@ def _fallback_structured_data(patient):
 def extract_structured_clinical_data(patient, documents: Iterable):
     documents = list(documents)
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
-    if not api_key or api_key == PLACEHOLDER_KEY:
+    if genai is None or not api_key or api_key == PLACEHOLDER_KEY:
         return _fallback_structured_data(patient)
 
     prompt = (
